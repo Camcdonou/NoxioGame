@@ -5,11 +5,13 @@ import com.google.gson.*;
 import org.springframework.web.socket.*;
 
 import org.infpls.noxio.game.module.game.dao.DaoContainer;
-import org.infpls.noxio.game.module.game.session.login.Login;
+import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.session.error.*;
+import org.infpls.noxio.game.module.game.session.login.Login;
 import org.infpls.noxio.game.module.game.session.lobby.Lobby;
+import org.infpls.noxio.game.module.game.session.ingame.InGame;
 
-public class NoxioSession {
+public final class NoxioSession {
   private final WebSocketSession webSocket;
   private final DaoContainer dao;
   
@@ -20,7 +22,7 @@ public class NoxioSession {
     this.webSocket = webSocket;
     this.dao = dao;
         
-    sessionState = new Login(this, dao.getUserDao(), dao.getServerInfoDao());
+    changeState(new Login(this, dao.getUserDao(), dao.getServerInfoDao()));
   }
   
   public void handlePacket(final String data) throws IOException {
@@ -32,23 +34,23 @@ public class NoxioSession {
     webSocket.sendMessage(new TextMessage(gson.toJson(p)));
   }
   
-  /* State info
-    00 - Login State
-    01 - Lobby State
-  */
-  public void changeState(final int s) throws IOException { /* Not a huge fan of how this works */
-    sessionState.destroy();
-    switch(s) {
-      case 1 : { sessionState = new Lobby(this); break; }
-      default : { close(); break; } //NO.
-    }
+
+  public void changeState(final SessionState ss) throws IOException {
+    if(sessionState != null) { sessionState.destroy(); } 
+    if(ss == null) { throw new IOException("Null State Exception. What the fuck are you doing?"); } //I can't believe you've done this.
+    sessionState = ss;
+  }
+  
+  public void joinGame(final GameLobby gl) throws IOException {
+    if(!loggedIn()) { throw new IOException("This session is not logged in!"); }
+    changeState(new InGame(this, gl));
   }
   
   public void login(final String user, final String sid) throws IOException {
     if(loggedIn()) { throw new IOException("This session is already logged in!"); }
     this.user = user;
     this.sid = sid;
-    changeState(1);
+    changeState(new Lobby(this, dao.getLobbyDao()));
   }
   
   public boolean loggedIn() {

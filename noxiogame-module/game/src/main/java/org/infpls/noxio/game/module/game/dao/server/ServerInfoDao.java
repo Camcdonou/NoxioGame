@@ -3,6 +3,10 @@ package org.infpls.noxio.game.module.game.dao.server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/* @FIXME
+   Refactor this class. Name is doof as fuck.
+*/
+
 @Component
 public class ServerInfoDao {
   
