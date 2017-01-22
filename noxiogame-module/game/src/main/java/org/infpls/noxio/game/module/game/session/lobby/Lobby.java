@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.util.*;
 
 
 public class Lobby extends SessionState {
@@ -52,7 +53,21 @@ public class Lobby extends SessionState {
     sendPacket(new PacketB01(info));
   }
   
-  private void createLobby(PacketB03 p) throws IOException { //@FIXME Everything is wrong.
+  private void createLobby(PacketB03 p) throws IOException {
+    /* Make sure data is valid */
+    if(!Validation.isAlphaNumericWithSpaces(p.getName())) {
+      sendPacket(new PacketB05("Lobby name must be alpha-numeric characters only."));
+      return;
+    }
+    if(p.getName().length() < 4) {
+      sendPacket(new PacketB05("Lobby name must be at least 4 characters."));
+      return;
+    }
+    if(p.getName().length() > 32) {
+      sendPacket(new PacketB05("Lobby name cannot be longer than 32 characters."));
+      return;
+    }
+    
     GameLobby gl = lobbyDao.createLobby(p.getName());
     if(gl != null) {
       session.joinGame(gl);

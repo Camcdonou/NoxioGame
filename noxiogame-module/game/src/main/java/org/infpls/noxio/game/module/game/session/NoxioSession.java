@@ -35,10 +35,14 @@ public final class NoxioSession {
   }
   
 
-  public void changeState(final SessionState ss) throws IOException {
+  private void changeState(final SessionState ss) throws IOException {
     if(sessionState != null) { sessionState.destroy(); } 
     if(ss == null) { throw new IOException("Null State Exception. What the fuck are you doing?"); } //I can't believe you've done this.
     sessionState = ss;
+  }
+  
+  public void leaveGame() throws IOException {
+    changeState(new Lobby(this, dao.getLobbyDao()));
   }
   
   public void joinGame(final GameLobby gl) throws IOException {

@@ -22,6 +22,7 @@ public class LobbyDao {
   }
   
   public List<GameLobbyInfo> getLobbyInfo() {
+    cleanUp();
     List<GameLobbyInfo> info = new ArrayList();
     for(int i=0;i<lobbies.size();i++) {
       info.add(lobbies.get(i).getInfo());
@@ -30,11 +31,21 @@ public class LobbyDao {
   }
   
   public GameLobby getLobby(final String lid) {
+    cleanUp();
     for(int i=0;i<lobbies.size();i++) {
       if(lobbies.get(i).getLid().equals(lid)) {
         return lobbies.get(i);
       }
     }
     return null;
+  }
+  
+  /* This method deletes any user created lobbies that have 0 players currently in them */
+  public void cleanUp() { 
+    for(int i=0;i<lobbies.size();i++) {
+      if(lobbies.get(i).isClosed()) {
+        lobbies.remove(i);
+      }
+    }
   }
 }
