@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.game;
 
+import java.io.IOException;
 import java.util.*;
 
 import org.infpls.noxio.game.module.game.session.Packet;
@@ -9,7 +10,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class NoxioGame {
   private final List<Controller> controllers; /* Player controller objects */
-  private final List<GameObject> objects; /* All game objects */
+  public final List<GameObject> objects; /* All game objects */
   
   private int idGen; /* Used to generate OIDs for objects. */
   public NoxioGame() {
@@ -21,11 +22,12 @@ public class NoxioGame {
     List<Packet> updates = new ArrayList();
     for(int i=0;i<packets.size();i++) {
       Packet p = packets.get(i);
+      Controller c = getController(p.getSrcSid());
       switch(p.getType()) {
-        case "i00" : { getController(p.getSrcSid()).handlePacket(p); break; } /* @FIXME could throw null pointer */
-        case "i01" : { getController(p.getSrcSid()).handlePacket(p); break; }
+        case "i00" : { if(c != null) { c.handlePacket(p); } break; }
+        case "i01" : { if(c != null) { c.handlePacket(p); } break; }
         case "i02" : { spawnPlayer((PacketI02)p, updates);  break; }
-        case "i10" : { getController(p.getSrcSid()).handlePacket(p); break; }
+        case "i10" : { if(c != null) { c.handlePacket(p); } break; }
         default : { /* @FIXME ERROR REPORT */ break; }
       }
     }
@@ -41,7 +43,7 @@ public class NoxioGame {
     if(c.getControlled() != null) { return; } /* Already controlling an object */
     
     long oid = createOid();
-    Player player = new Player(this, oid, new Vec2((float)(Math.random()*250.0), (float)(Math.random()*250.0)));
+    Player player = new Player(this, oid, new Vec2((float)(Math.random()*500.0), (float)(Math.random()*350.0)));
     addObject(player);
     updates.add(new PacketG10(oid, player.getType(), player.getPosition(), player.getVelocity()));
     updates.add(c.setControl(player));
@@ -59,6 +61,7 @@ public class NoxioGame {
         obj.destroy();
         Controller c = getControllerByObject(obj);
         if(c != null) { updates.add(c.objectDestroyed()); }
+        updates.add(new PacketG11(obj.getOid()));
       }
       else { obj.step(updates); }
     }
@@ -85,8 +88,12 @@ public class NoxioGame {
     return null;
   }
   
-  public void join(final NoxioSession player) {
+  public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(player.getSessionId()));
+    for(int i=0;i<objects.size();i++) { /* @FIXME potential for desynch or bad multi threading here */
+      GameObject obj = objects.get(i);
+      player.sendPacket(new PacketG10(obj.getOid(), obj.getType(), obj.getPosition(), obj.getVelocity()));
+    }
   }
   
   public void leave(final NoxioSession player) {

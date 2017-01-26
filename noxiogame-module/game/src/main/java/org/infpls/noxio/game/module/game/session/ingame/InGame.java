@@ -36,6 +36,7 @@ public class InGame extends SessionState {
     > i01 mouse neutral
     > i02 player request spawn
     < i03 player object control
+    > i10 player use action
   */
   
   @Override
@@ -55,6 +56,7 @@ public class InGame extends SessionState {
         case "i00" : { lobby.pushPacket(gson.fromJson(data, PacketI00.class).setSrcSid(session.getSessionId())); break; }
         case "i01" : { lobby.pushPacket(gson.fromJson(data, PacketI01.class).setSrcSid(session.getSessionId())); break; }
         case "i02" : { lobby.pushPacket(gson.fromJson(data, PacketI02.class).setSrcSid(session.getSessionId())); break; }
+        case "i10" : { lobby.pushPacket(gson.fromJson(data, PacketI10.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(IOException | NullPointerException | JsonParseException ex) {

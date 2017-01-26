@@ -51,7 +51,9 @@ public class Controller {
   }
   
   public void destroy() {
-    /* @FIXME DO A THING */
+    if(this.object != null) {
+      this.object.kill();
+    }
   }
   
   public String getSid() { return sid; }

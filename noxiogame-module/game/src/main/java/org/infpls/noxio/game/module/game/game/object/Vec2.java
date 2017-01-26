@@ -15,9 +15,12 @@ public final class Vec2 {
   public boolean isZero() { return x == 0.0f && y == 0.0f; }
   public Vec2 add(final Vec2 b) { return new Vec2(x + b.getX(), y + b.getY()); }
   public Vec2 subtract(final Vec2 b) { return new Vec2(x - b.getX(), y - b.getY()); }
-  public Vec2 scale(float s) { return new Vec2(x*s, y*s); }
-  public Vec2 inverse(float s) { return new Vec2(x*-1, y*-1); }
+  public Vec2 scale(final float s) { return new Vec2(x*s, y*s); }
+  public Vec2 inverse() { return new Vec2(x*-1, y*-1); }
   public float magnitude() { return (float)(Math.sqrt((x*x)+(y*y))); }
   public Vec2 normalize() { float m = magnitude(); return new Vec2(x/m,y/m); }
+  public Vec2 lerp(final Vec2 b, final float s) { return new Vec2((x*s)+(b.getX()*(1-s)),(y*s)+(b.getY()*(1-s))); }
+  public float distance(final Vec2 b) { return subtract(b).magnitude(); }
+  public Vec2 tangent() { return new Vec2(y*-1, x); }
   public Vec2 copy() { return new Vec2(x, y); }
 }
