@@ -69,6 +69,10 @@ public final class NoxioSession {
     return webSocket.getId();
   }
   
+  public String getWebSocketId() {
+    return webSocket.getId();
+  }
+  
   public void destroy() throws IOException {
     sessionState.destroy();
   }

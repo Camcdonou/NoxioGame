@@ -7,6 +7,10 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.infpls.noxio.game.module.game.dao.DaoContainer;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
+/* @FIXME Apparently GSON will explode if you send bad data to a float/int/long. 
+   NaN in particular caused me to notice this. 
+   Please put in handlers. */
+
 public class GameWebSocket extends TextWebSocketHandler {
 
     @Autowired

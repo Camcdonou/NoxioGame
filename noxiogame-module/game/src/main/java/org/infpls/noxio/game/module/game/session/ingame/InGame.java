@@ -25,8 +25,17 @@ public class InGame extends SessionState {
     > g02 close
     > g03 leave game
     < g04 players list
-    < g05 DEBUG @FIXME
+    < g05 game step finish / tells client to parse and render @FIXME still not 100% onboard with this style
     < g06 failed to join game
+  
+    < g10 create object
+    < g11 delete object
+    < g12 update object pos/vel
+  
+    > i00 mouse active
+    > i01 mouse neutral
+    > i02 player request spawn
+    < i03 player object control
   */
   
   @Override
@@ -36,9 +45,16 @@ public class InGame extends SessionState {
       Packet p = gson.fromJson(data, Packet.class);
       if(p.getType() == null) { close("Invalid data: NULL TYPE"); return; } //Switch statements throw NullPointer if this happens.
       switch(p.getType()) {
+        /* Session Type Packets g0x */
         case "g00" : { clientReady(gson.fromJson(data, PacketG00.class)); break; }
         case "g02" : { close(); break; }
         case "g03" : { leaveGame(gson.fromJson(data, PacketG03.class)); break; }
+        /* Ingame Type Packets gxx */
+        
+        /* Input Type Packets ixx */
+        case "i00" : { lobby.pushPacket(gson.fromJson(data, PacketI00.class).setSrcSid(session.getSessionId())); break; }
+        case "i01" : { lobby.pushPacket(gson.fromJson(data, PacketI01.class).setSrcSid(session.getSessionId())); break; }
+        case "i02" : { lobby.pushPacket(gson.fromJson(data, PacketI02.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(IOException | NullPointerException | JsonParseException ex) {

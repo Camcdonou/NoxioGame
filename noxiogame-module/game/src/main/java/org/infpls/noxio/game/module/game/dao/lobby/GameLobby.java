@@ -3,8 +3,9 @@ package org.infpls.noxio.game.module.game.dao.lobby;
 import java.io.IOException;
 import java.util.*;
 
-import org.infpls.noxio.game.module.game.session.NoxioSession;
+import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.session.ingame.*;
+import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
 public class GameLobby {
@@ -16,7 +17,9 @@ public class GameLobby {
   private final int maxPlayers;
   private final List<NoxioSession> players; //@FIXME Access to this must be synchronized or it might RIP
   
-  private final GameLoop loop;
+  private final GameLoop loop; /* Seperate timer thread to trigger game steps */
+  private final NoxioGame game; /* The actual game object */
+  private List<Packet> gamePackets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
   
   private boolean closed; //Clean this shit up!
   public GameLobby(final String name, final boolean autoClose) {
@@ -25,14 +28,31 @@ public class GameLobby {
     this.autoClose = autoClose;
     maxPlayers = 16; //Lol
     players = new ArrayList();
-    loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
     closed = false;
+    
+    gamePackets = new ArrayList();
+    game = new NoxioGame();
+    loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
   }
   
-  public void step() {
+  public void step(final long tick) {
     try {
+      final List<Packet> preStep = game.handlePackets(popPackets());
       for(int i=0;i<players.size();i++) {
-        players.get(i).sendPacket(new PacketG05(0));
+        for(int j=0;j<preStep.size();j++) {
+          if(preStep.get(j).matchSrcSid(players.get(i).getSessionId())) {
+            players.get(i).sendPacket(preStep.get(j));
+          }
+        }
+      }
+      final List<Packet> updates = game.step();
+      for(int i=0;i<players.size();i++) {
+        for(int j=0;j<updates.size();j++) {
+          if(updates.get(j).matchSrcSid(players.get(i).getSessionId())) {
+            players.get(i).sendPacket(updates.get(j));
+          }
+        }
+        players.get(i).sendPacket(new PacketG05(tick, System.currentTimeMillis()));
       }
     }
     catch(IOException e) {
@@ -44,6 +64,7 @@ public class GameLobby {
     if(closed) { return false; }
     if(players.size() >= maxPlayers) { return false; }
     if(players.contains(player)) { return false; } // @FIXME If this actually happens then something has gone HORRENDOUSLY wrong. Maybe even throw an exception.
+    game.join(player);
     players.add(player);
     updatePlayerList();
     return true;
@@ -51,6 +72,7 @@ public class GameLobby {
   
   public void leave(NoxioSession player) throws IOException {
     players.remove(player);
+    game.leave(player);
     if(players.size() < 1 && autoClose) { close(); }
     if(players.size() >= 1) { updatePlayerList(); }
   }
@@ -60,6 +82,7 @@ public class GameLobby {
     for(int i=0;i<players.size();i++) {
       players.get(i).leaveGame(); /* @FIXME maybe give leaveGame a message parameter to tell people why they were removed if there is a reason */
     }
+    game.close();
   }
   
   private void updatePlayerList() throws IOException {
@@ -72,10 +95,36 @@ public class GameLobby {
     }
   }
   
+  /* Game Packet handling methods 
+     @FIXME this is a bit jank
+     - syncAccess.s == true / pop
+     - syncAccess.s == false / push
+  */
+  public void pushPacket(final Packet p) {
+    syncAccess(false, p);
+  }
+  
+  public List<Packet> popPackets() {
+    return syncAccess(true, null);
+  }
+  
+  private synchronized List<Packet> syncAccess(final boolean s, final Packet p) {
+    if(s) {
+      List<Packet> packets = gamePackets;
+      gamePackets = new ArrayList();
+      return packets;
+    }
+    else {
+      if(p == null) { /* @FIXME THROW EXCEPTION */ }
+      gamePackets.add(p);
+      return null;
+    }
+  }
+  
   //@FIXME Not a great way to do this. Need to seperate Offical Server into it's own type. Seperate from a user server. Also the host being the person in slot 0 is kinda dumb maybe.
-  public String getHost() { return autoClose ? (players.size() > 0 ? players.get(0).getUser() : "N/A") : "Official Server"; }
+  public String getHostName() { return autoClose ? (players.size() > 0 ? players.get(0).getUser() : "N/A") : "Official Server"; }
   public String getLid() { return lid; }
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", getHost(), players.size(), maxPlayers); }
+  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", getHostName(), players.size(), maxPlayers); }
   public boolean isClosed() { return closed; }
   
   /* @FIXME This might be the worst way to do this in the universe. It might be fine. No way to know really. 
@@ -97,7 +146,7 @@ public class GameLobby {
         long now = System.currentTimeMillis();
         if(last + GameLoop.TICK_RATE <= now) {
           last = now;
-          lobby.step();
+          lobby.step(now);
         }
         try {
           long t = (last + GameLoop.TICK_RATE) - now;
