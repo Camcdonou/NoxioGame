@@ -6,13 +6,14 @@ import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 
 public class Player extends GameObject {
-  private static final float SPEED = 2.1f, FRICTION = 0.77f;
-  private static final float ACTION_ONE_SPEED = 7.8f, ACTION_TWO_SPEED = 5.6f, ACTION_THREE_SPEED = 7.2f, ACTION_FOUR_SPEED = 4.6f;
+  private static final float SPEED = 1.1f, FRICTION = 0.88f;
+  private static final float ACTION_ONE_SPEED = 8.8f, ACTION_TWO_SPEED = 6.6f, ACTION_THREE_SPEED = 8.2f, SHINE_RADIUS = 55.0f;
   
-  private int cooldown;
+  private int cooldown, burstCooldown, spawnProtection;
   private Action action;
   public Player(final NoxioGame game, final long oid, final Vec2 position) {
     super(game, oid, "obj.player", position);
+    cooldown = 0; burstCooldown = 0; spawnProtection = 66;
   }
   
   public void move(final Vec2 direction) {
@@ -40,31 +41,40 @@ public class Player extends GameObject {
       action = null;
     }
     if(cooldown > 0) { cooldown--; }
+    if(burstCooldown > 0) { burstCooldown--; }
+    if(spawnProtection > 0) { spawnProtection--; }
   }
   
   private void useActionOne(final List<Packet> updates) {
-    final Vec2 dir = action.getTarget().subtract(position).normalize();
-    final Bullet b = new Bullet(game, game.createOid(), position.copy(), velocity.add(dir.scale(ACTION_ONE_SPEED)), this);
-    game.addObject(b);
-    updates.add(new PacketG10(b.getOid(), b.getType(), b.getPosition(), b.getVelocity()));
-    cooldown = 0;
+    if(burstCooldown < 8) {
+      final Vec2 dir = action.getTarget().subtract(position).normalize();
+      final Bullet b = new Bullet(game, game.createOid(), position.copy(), dir.scale(ACTION_ONE_SPEED), this);
+      game.addObject(b);
+      updates.add(new PacketG10(b.getOid(), b.getType(), b.getPosition(), b.getVelocity()));
+      burstCooldown+=2;
+      if(burstCooldown >= 8) {
+        cooldown=15;
+      }
+    }
   }
   
   private void useActionTwo(final List<Packet> updates) {
     final Vec2 dir = action.getTarget().subtract(position).normalize();
     final Vec2[] shots = new Vec2[]{
       dir.lerp(dir.tangent(), 0.0f),
-      dir.lerp(dir.tangent(), 0.5f),
+      dir.lerp(dir.tangent(), 0.33f),
+      dir.lerp(dir.tangent(), 0.66f),
       dir.lerp(dir.tangent(), 1.0f),
-      dir.lerp(dir.tangent().inverse(), 0.5f),
+      dir.lerp(dir.tangent().inverse(), 0.66f),
+      dir.lerp(dir.tangent().inverse(), 0.33f),
       dir.lerp(dir.tangent().inverse(), 0.0f)
     };
     for(int i=0;i<shots.length;i++) {
-      final Bullet b = new Bullet(game, game.createOid(), position.copy(), velocity.add(shots[i].scale(ACTION_TWO_SPEED)), this);
+      final Bullet b = new Bullet(game, game.createOid(), position.copy(), shots[i].scale(ACTION_TWO_SPEED), this);
       game.addObject(b);
       updates.add(new PacketG10(b.getOid(), b.getType(), b.getPosition(), b.getVelocity()));
     }
-    cooldown = 10;
+    cooldown = 30;
   }
     
   private void useActionThree(final List<Packet> updates) {
@@ -77,41 +87,42 @@ public class Player extends GameObject {
       dir.lerp(dir.tangent().inverse(), 0.8f)
     };
     for(int i=0;i<shots.length;i++) {
-      final Bullet b = new Bullet(game, game.createOid(), position.copy(), velocity.add(shots[i].scale(ACTION_THREE_SPEED)), this);
+      final Bullet b = new Bullet(game, game.createOid(), position.copy(), shots[i].scale(ACTION_THREE_SPEED), this);
       game.addObject(b);
       updates.add(new PacketG10(b.getOid(), b.getType(), b.getPosition(), b.getVelocity()));
     }
-    cooldown = 10;
+    cooldown = 15;
   }
       
   private void useActionFour(final List<Packet> updates) {
-    final Vec2 dir = action.getTarget().subtract(position).normalize();
-    final Vec2[] shots = new Vec2[]{
-      dir.lerp(dir.tangent(), 0.0f),
-      dir.lerp(dir.tangent(), 0.25f),
-      dir.lerp(dir.tangent(), 0.5f),
-      dir.lerp(dir.tangent(), 0.75f),
-      dir.lerp(dir.tangent(), 1.0f),
-      dir.lerp(dir.tangent().inverse(), 0.0f),
-      dir.lerp(dir.tangent().inverse(), 0.25f),
-      dir.lerp(dir.tangent().inverse(), 0.5f),
-      dir.lerp(dir.tangent().inverse(), 0.75f),
-      dir.inverse().lerp(dir.tangent(), 0.25f),
-      dir.inverse().lerp(dir.tangent(), 0.5f),
-      dir.inverse().lerp(dir.tangent(), 0.75f),
-      dir.inverse().lerp(dir.tangent().inverse(), 0.25f),
-      dir.inverse().lerp(dir.tangent().inverse(), 0.5f),
-      dir.inverse().lerp(dir.tangent().inverse(), 0.75f)
-    };
-    for(int i=0;i<shots.length;i++) {
-      final Bullet b = new Bullet(game, game.createOid(), position.copy(), velocity.add(shots[i].scale(ACTION_FOUR_SPEED)), this);
-      game.addObject(b);
-      updates.add(new PacketG10(b.getOid(), b.getType(), b.getPosition(), b.getVelocity()));
+    for(int i=0;i<game.objects.size();i++) {
+      GameObject obj = game.objects.get(i);
+      if(obj.getPosition().distance(position) < SHINE_RADIUS) {
+        if(obj.getType().equals("obj.player")) {
+          if(obj == this) {
+            /* Safe! */
+          }
+          else {
+            obj.kill();
+          }
+        }
+        else if(obj.getType().equals("obj.bullet")) {
+          obj.setVelocity(obj.getPosition().subtract(position).normalize().scale((obj.getVelocity().magnitude()*1.5f)+3.0f));
+        }
+      }
     }
-    cooldown = 10;
+    updates.add(new PacketG13(oid));
+    cooldown = 30;
   }
   
   public void setAction(final Action action) {
-    this.action = action;
+    if(cooldown < 5) {
+      this.action = action;
+    }
+  }
+  
+  @Override
+  public void kill() {
+    if(spawnProtection < 1) { dead = true; }
   }
 }

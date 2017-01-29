@@ -132,11 +132,14 @@ public class GameLobby {
      players to the game loop before their clients are ready to handle the stream of data.
   */
   private class GameLoop extends Thread {
-    private static final int TICK_RATE = 100;
+    private static final int TICK_RATE = 33;
     private final GameLobby lobby;
+    
+    private long lastStepTime; /* @FIXME DEBUG */
     public GameLoop(final GameLobby lobby) {
       super();
       this.lobby = lobby;
+      lastStepTime = 0;
     }
     
     @Override
@@ -146,13 +149,16 @@ public class GameLobby {
         long now = System.currentTimeMillis();
         if(last + GameLoop.TICK_RATE <= now) {
           last = now;
-          lobby.step(now);
+          lobby.step(lastStepTime);
+          lastStepTime = System.currentTimeMillis() - now;
         }
         try {
-          long t = (last + GameLoop.TICK_RATE) - now;
+          long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
           sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
         }
         catch(InterruptedException ex) {
+          System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
+          ex.printStackTrace();
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
         }
       }
