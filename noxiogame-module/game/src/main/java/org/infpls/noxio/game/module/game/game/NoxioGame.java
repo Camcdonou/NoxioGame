@@ -53,6 +53,7 @@ public class NoxioGame {
     final List<Packet> updates = new ArrayList();
     for(int i=0;i<controllers.size();i++) {
       controllers.get(i).step();
+      updates.add(new PacketG14(controllers.get(i).getScore())); /* @FIXME this is such fucking cancer omfg */
     }
     for(int i=0;i<objects.size();i++) {
       GameObject obj = objects.get(i);
@@ -88,11 +89,24 @@ public class NoxioGame {
     return null;
   }
   
+  public PacketG15 reportKill(GameObject killer, GameObject killed) {
+    Controller killerCont = getControllerByObject(killer);
+    Controller killedCont = getControllerByObject(killed);
+    if(killerCont != null && killedCont != null) {
+      if(killerCont == killedCont) { killedCont.getScore().death(); return new PacketG15(killerCont.getUser() + " committed suicide."); }
+      else { killedCont.getScore().death(); killerCont.getScore().kill(); return new PacketG15(killerCont.getUser() + " killed " + killedCont.getUser() + "."); }
+    }
+    return null;
+  }
+  
   public void join(final NoxioSession player) throws IOException {
-    controllers.add(new Controller(player.getSessionId()));
+    controllers.add(new Controller(player.getUser(), player.getSessionId()));
     for(int i=0;i<objects.size();i++) { /* @FIXME potential for desynch or bad multi threading here */
       GameObject obj = objects.get(i);
       player.sendPacket(new PacketG10(obj.getOid(), obj.getType(), obj.getPosition(), obj.getVelocity()));
+    }
+    for(int i=0;i<controllers.size();i++) { /* @FIXME potential for desynch or bad multi threading here */
+      player.sendPacket(new PacketG14(controllers.get(i).getScore()));
     }
   }
   

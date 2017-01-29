@@ -46,6 +46,7 @@ public abstract class GameObject {
   public final Vec2 getVelocity() { return velocity; }
   
   public boolean isDead() { return dead; } /* If this method returns true the object is destroyed on the next game tick. */
+  public Packet kill(GameObject killer) { dead = true; return null; }
   public void kill() { dead = true; } /* Marks as dead and does whatever dead things do */
   public void destroy() { } /* Called right before removing the object from the game */
 }

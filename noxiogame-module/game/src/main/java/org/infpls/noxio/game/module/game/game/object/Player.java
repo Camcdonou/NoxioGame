@@ -103,7 +103,8 @@ public class Player extends GameObject {
             /* Safe! */
           }
           else {
-            obj.kill();
+            Packet p = obj.kill(this);
+            if(p != null) { updates.add(p); }
           }
         }
         else if(obj.getType().equals("obj.bullet")) {
@@ -119,6 +120,12 @@ public class Player extends GameObject {
     if(cooldown < 5) {
       this.action = action;
     }
+  }
+  
+  @Override
+  public PacketG15 kill(GameObject killer) {
+    if(spawnProtection < 1) { dead = true; return game.reportKill(this, killer); }
+    return null;
   }
   
   @Override

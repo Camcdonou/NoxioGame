@@ -5,13 +5,16 @@ import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 
 public class Controller {
-  private final String sid;
+  private final String user, sid;
   private GameObject object;
   private Vec2 mouse;
   private Action action;
-  public Controller(final String sid) {
+  private final Score score;
+  public Controller(final String user, final String sid) {
+    this.user = user;
     this.sid = sid;
     this.mouse = new Vec2();
+    this.score = new Score(user);
   }
   
   public void handlePacket(Packet p) {
@@ -56,6 +59,8 @@ public class Controller {
     }
   }
   
+  public String getUser() { return user; }
   public String getSid() { return sid; }
   public GameObject getControlled() { return object; }
+  public Score getScore() { return score; }
 }

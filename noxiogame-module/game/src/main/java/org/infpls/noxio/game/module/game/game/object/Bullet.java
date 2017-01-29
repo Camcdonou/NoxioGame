@@ -38,7 +38,8 @@ public class Bullet extends GameObject {
             /* Safe! */
           }
           else {
-            obj.kill();
+            Packet p = obj.kill(owner);
+            if(p != null) { updates.add(p); }
           }
         }
         else if(obj.getType().equals("obj.bullet")) {

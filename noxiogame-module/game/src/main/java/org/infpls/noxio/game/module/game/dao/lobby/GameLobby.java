@@ -66,7 +66,7 @@ public class GameLobby {
     if(players.contains(player)) { return false; } // @FIXME If this actually happens then something has gone HORRENDOUSLY wrong. Maybe even throw an exception.
     game.join(player);
     players.add(player);
-    updatePlayerList();
+    updatePlayerList(player.getUser() + " joined the game.");
     return true;
   }
   
@@ -74,7 +74,7 @@ public class GameLobby {
     players.remove(player);
     game.leave(player);
     if(players.size() < 1 && autoClose) { close(); }
-    if(players.size() >= 1) { updatePlayerList(); }
+    if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }
   }
   
   private void close() throws IOException {
@@ -85,13 +85,14 @@ public class GameLobby {
     game.close();
   }
   
-  private void updatePlayerList() throws IOException {
+  private void updatePlayerList(final String message) throws IOException {
     List<String> playerList = new ArrayList();
     for(int i=0;i<players.size();i++) {
       playerList.add(players.get(i).getUser());
     }
     for(int i=0;i<players.size();i++) {
       players.get(i).sendPacket(new PacketG04(playerList));
+      players.get(i).sendPacket(new PacketG15(message));
     }
   }
   

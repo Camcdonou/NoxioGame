@@ -31,6 +31,10 @@ public class InGame extends SessionState {
     < g10 create object
     < g11 delete object
     < g12 update object pos/vel
+    < g13 shine ability used (visual effect)
+    < g14 scoreboard update
+    < g15 sys message
+    < g16 new game
   
     > i00 mouse active
     > i01 mouse neutral
