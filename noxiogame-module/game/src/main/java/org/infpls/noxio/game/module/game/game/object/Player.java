@@ -124,7 +124,7 @@ public class Player extends GameObject {
   
   @Override
   public PacketG15 kill(GameObject killer) {
-    if(spawnProtection < 1) { dead = true; return game.reportKill(this, killer); }
+    if(spawnProtection < 1) { dead = true; return game.reportKill(killer, this); }
     return null;
   }
   

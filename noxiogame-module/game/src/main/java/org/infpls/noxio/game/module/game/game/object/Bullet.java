@@ -32,7 +32,7 @@ public class Bullet extends GameObject {
   public void hitDetect(final List<Packet> updates) {
     for(int i=0;i<game.objects.size();i++) {
       GameObject obj = game.objects.get(i);
-      if(obj.getPosition().distance(position) < RADIUS) {
+      if(obj.getPosition().distance(position) < RADIUS && !obj.isDead()) {
         if(obj.getType().equals("obj.player")) {
           if(obj == owner && life > 230) {
             /* Safe! */

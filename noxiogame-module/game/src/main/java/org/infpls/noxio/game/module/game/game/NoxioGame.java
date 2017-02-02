@@ -9,6 +9,11 @@ import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class NoxioGame {
+  
+  private final int scoreToWin;
+  private boolean gameOver;
+  private int resetTimer;
+  
   private final List<Controller> controllers; /* Player controller objects */
   public final List<GameObject> objects; /* All game objects */
   
@@ -16,6 +21,9 @@ public class NoxioGame {
   public NoxioGame() {
     controllers = new ArrayList();
     objects = new ArrayList();
+    
+    gameOver = false;
+    scoreToWin = 15; /* @FIXME Ayy Lmao */
   }
   
   public List<Packet> handlePackets(final List<Packet> packets) {
@@ -23,12 +31,17 @@ public class NoxioGame {
     for(int i=0;i<packets.size();i++) {
       Packet p = packets.get(i);
       Controller c = getController(p.getSrcSid());
-      switch(p.getType()) {
-        case "i00" : { if(c != null) { c.handlePacket(p); } break; }
-        case "i01" : { if(c != null) { c.handlePacket(p); } break; }
-        case "i02" : { spawnPlayer((PacketI02)p, updates);  break; }
-        case "i10" : { if(c != null) { c.handlePacket(p); } break; }
-        default : { /* @FIXME ERROR REPORT */ break; }
+      if(c != null) {
+        switch(p.getType()) {
+          case "i00" : { if(c != null) { c.handlePacket(p); } break; }
+          case "i01" : { if(c != null) { c.handlePacket(p); } break; }
+          case "i02" : { spawnPlayer((PacketI02)p, updates);  break; }
+          case "i10" : { if(c != null) { c.handlePacket(p); } break; }
+          default : { /* @FIXME ERROR REPORT */ break; }
+        }
+      }
+      else {
+        /* @FIXME kick this player for broken state/hacking */
       }
     }
     return updates;
@@ -51,9 +64,19 @@ public class NoxioGame {
   
   public List<Packet> step() {
     final List<Packet> updates = new ArrayList();
-    for(int i=0;i<controllers.size();i++) {
-      controllers.get(i).step();
-      updates.add(new PacketG14(controllers.get(i).getScore())); /* @FIXME this is such fucking cancer omfg */
+    if(!gameOver) {
+      for(int i=0;i<controllers.size();i++) {
+        final Controller cont = controllers.get(i);
+        cont.step();
+        updates.add(new PacketG14(cont.getScore())); /* @FIXME this is such fucking cancer omfg */
+        if(cont.getScore().getKills() >= scoreToWin) {
+          updates.add(new PacketG16(cont.getUser()));
+          gameOver = true; resetTimer = 150;
+        }
+      }
+    }
+    else {
+     if(resetTimer > 0) { resetTimer--; }
     }
     for(int i=0;i<objects.size();i++) {
       GameObject obj = objects.get(i);
@@ -65,7 +88,7 @@ public class NoxioGame {
         updates.add(new PacketG11(obj.getOid()));
       }
       else { obj.step(updates); }
-    }
+    }    
     return updates;
   }
   
@@ -101,6 +124,7 @@ public class NoxioGame {
   
   public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(player.getUser(), player.getSessionId()));
+    player.sendPacket(new PacketG18(scoreToWin)); /* @FIXME potential for desynch or bad multi threading here */
     for(int i=0;i<objects.size();i++) { /* @FIXME potential for desynch or bad multi threading here */
       GameObject obj = objects.get(i);
       player.sendPacket(new PacketG10(obj.getOid(), obj.getType(), obj.getPosition(), obj.getVelocity()));
@@ -124,5 +148,6 @@ public class NoxioGame {
     /* Do things! */
   }
   
+  public boolean isGameOver() { return resetTimer < 1 && gameOver; }
   public long createOid() { return idGen++; } /* @FIXME maybe use GUID instead... this could save bandwidth though... */
 }

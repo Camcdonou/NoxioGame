@@ -27,7 +27,7 @@ public class UserDao {
   
   public void destroySession(final WebSocketSession webSocket) throws IOException {
     for(int i=0;i<sessions.size();i++) {
-      if(sessions.get(i).getSessionId().equals(webSocket.getId())) {
+      if(sessions.get(i).getWebSocketId().equals(webSocket.getId())) {
         sessions.get(i).destroy();
         sessions.remove(i);
         return;

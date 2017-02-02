@@ -15,10 +15,10 @@ public class GameLobby {
   private final boolean autoClose; //Automatically close this lobby if it's empty.
   
   private final int maxPlayers;
-  private final List<NoxioSession> players; //@FIXME Access to this must be synchronized or it might RIP
+  private final List<NoxioSession> players, loading; //@FIXME Access to this should be synchronized or it might RIP
   
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
-  private final NoxioGame game; /* The actual game object */
+  private NoxioGame game; /* The actual game object */
   private List<Packet> gamePackets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
   
   private boolean closed; //Clean this shit up!
@@ -28,6 +28,7 @@ public class GameLobby {
     this.autoClose = autoClose;
     maxPlayers = 16; //Lol
     players = new ArrayList();
+    loading = new ArrayList();
     closed = false;
     
     gamePackets = new ArrayList();
@@ -37,22 +38,36 @@ public class GameLobby {
   
   public void step(final long tick) {
     try {
+      if(game.isGameOver()) {
+        newGame();
+        popPackets();
+        for(int i=0;i<players.size();i++) {
+          players.get(i).sendPacket(new PacketG17());
+          loading.add(players.get(i)); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
+          /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
+        }
+        return; /* Screw you guys I'm going home. */
+      }
       final List<Packet> preStep = game.handlePackets(popPackets());
       for(int i=0;i<players.size();i++) {
-        for(int j=0;j<preStep.size();j++) {
-          if(preStep.get(j).matchSrcSid(players.get(i).getSessionId())) {
-            players.get(i).sendPacket(preStep.get(j));
+        if(!loading.contains(players.get(i))) {
+          for(int j=0;j<preStep.size();j++) {
+            if(preStep.get(j).matchSrcSid(players.get(i).getSessionId())) {
+              players.get(i).sendPacket(preStep.get(j));
+            }
           }
         }
       }
       final List<Packet> updates = game.step();
       for(int i=0;i<players.size();i++) {
-        for(int j=0;j<updates.size();j++) {
-          if(updates.get(j).matchSrcSid(players.get(i).getSessionId())) {
-            players.get(i).sendPacket(updates.get(j));
+        if(!loading.contains(players.get(i))) {
+          for(int j=0;j<updates.size();j++) {
+            if(updates.get(j).matchSrcSid(players.get(i).getSessionId())) {
+              players.get(i).sendPacket(updates.get(j));
+            }
           }
+          players.get(i).sendPacket(new PacketG05(tick, System.currentTimeMillis()));
         }
-        players.get(i).sendPacket(new PacketG05(tick, System.currentTimeMillis()));
       }
     }
     catch(IOException e) {
@@ -60,18 +75,33 @@ public class GameLobby {
     }
   }
   
-  public boolean join(NoxioSession player) throws IOException {
+  public void newGame() {
+    game = new NoxioGame();
+  }
+  
+  public boolean connect(NoxioSession player) throws IOException {
     if(closed) { return false; }
     if(players.size() >= maxPlayers) { return false; }
     if(players.contains(player)) { return false; } // @FIXME If this actually happens then something has gone HORRENDOUSLY wrong. Maybe even throw an exception.
-    game.join(player);
     players.add(player);
+    loading.add(player);
+    updatePlayerList(player.getUser() + " connected.");
+    return true;
+  }
+  
+  public boolean join(NoxioSession player) throws IOException {
+    if(closed) { return false; }
+    if(players.size() >= maxPlayers) { return false; }
+    if(!players.contains(player) || !loading.contains(player)) { return false; } //@FIXME the fuck you doing nigga?
+    game.join(player);
+    loading.remove(player);
     updatePlayerList(player.getUser() + " joined the game.");
     return true;
   }
   
   public void leave(NoxioSession player) throws IOException {
     players.remove(player);
+    while(loading.remove(player));
     game.leave(player);
     if(players.size() < 1 && autoClose) { close(); }
     if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }

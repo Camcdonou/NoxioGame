@@ -27,6 +27,7 @@ public class InGame extends SessionState {
     < g04 players list
     < g05 game step finish / tells client to parse and render @FIXME still not 100% onboard with this style
     < g06 failed to join game
+    > g07 load done
   
     < g10 create object
     < g11 delete object
@@ -34,7 +35,9 @@ public class InGame extends SessionState {
     < g13 shine ability used (visual effect)
     < g14 scoreboard update
     < g15 sys message
-    < g16 new game
+    < g16 game over
+    < g17 new game
+    < g18 game rules (custom gametype settings such as kills to win or number of teams)
   
     > i00 mouse active
     > i01 mouse neutral
@@ -54,6 +57,7 @@ public class InGame extends SessionState {
         case "g00" : { clientReady(gson.fromJson(data, PacketG00.class)); break; }
         case "g02" : { close(); break; }
         case "g03" : { leaveGame(gson.fromJson(data, PacketG03.class)); break; }
+        case "g07" : { loadDone(gson.fromJson(data, PacketG07.class)); break; }
         /* Ingame Type Packets gxx */
         
         /* Input Type Packets ixx */
@@ -68,10 +72,18 @@ public class InGame extends SessionState {
     }
   }
   
-  private void clientReady(PacketG00 p) throws IOException {
-    GameLobbyInfo info = lobby.getInfo();
-    sendPacket(new PacketG01(info.getName(), info.getMaxPlayers()));
-    
+  private void clientReady(PacketG00 p) throws IOException {  
+    if(!lobby.connect(this.session)) {
+      sendPacket(new PacketG06("Failed to connect to game."));
+      session.leaveGame();
+    }
+    else { 
+      GameLobbyInfo info = lobby.getInfo();
+      sendPacket(new PacketG01(info.getName(), info.getMaxPlayers()));
+    }
+  }
+  
+  private void loadDone(PacketG07 p) throws IOException {
     if(!lobby.join(this.session)) {
       sendPacket(new PacketG06("Failed to join game."));
       session.leaveGame();
