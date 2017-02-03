@@ -30,8 +30,11 @@ public final class NoxioSession {
   }
   
   public void sendPacket(final Packet p) throws IOException {
-    final Gson gson = new GsonBuilder().create();
-    webSocket.sendMessage(new TextMessage(gson.toJson(p)));
+    if(isOpen()) {
+      final Gson gson = new GsonBuilder().create();
+      webSocket.sendMessage(new TextMessage(gson.toJson(p)));
+    }
+    else { destroy(); }
   }
   
 

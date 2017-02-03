@@ -79,6 +79,7 @@ public class InGame extends SessionState {
     - e00 client ready
     - e01 load done
     - e02 leave game
+    - e03 remove from game
   */
   
   private void clientReady(PacketG00 p) throws IOException { lobby.pushEvent(new SessionE00(session)); }
@@ -86,8 +87,5 @@ public class InGame extends SessionState {
   private void leaveGame(PacketG03 p) throws IOException { lobby.pushEvent(new SessionE02(session)); }
   
   @Override
-  public void destroy() throws IOException {
-    lobby.remove(this.session);
-  }
-  
+  public void destroy() throws IOException { lobby.pushEvent(new SessionE03(session)); }
 }

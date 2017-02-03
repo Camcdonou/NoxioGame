@@ -46,9 +46,9 @@ public class GameLobby {
       final List<SessionEvent> evts = events.pop();
       for(int i=0;i<evts.size();i++) {
         SessionEvent evt = evts.get(i);
-        if(!evt.getSession().isOpen()) { continue; } /* A simple check to make sure nothing has happened to our connection while we were waiting. */
         switch(evt.getType()) {
           case "e00" : {
+            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
             if(!connect(evt.getSession())) {
               evt.getSession().sendPacket(new PacketG06("Failed to connect to game."));
               evt.getSession().leaveGame();
@@ -60,6 +60,7 @@ public class GameLobby {
             break;
           }
           case "e01" : {
+            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
             if(!join(evt.getSession())) {
               evt.getSession().sendPacket(new PacketG06("Failed to join game."));
               evt.getSession().leaveGame();
@@ -67,8 +68,13 @@ public class GameLobby {
             break;
           }
           case "e02" : {
+            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
             leave(evt.getSession());
             evt.getSession().sendPacket(new PacketG08());
+            break;
+          }
+          case "e03" : {
+            remove(evt.getSession());
             break;
           }
           default : { throw new IOException("Invalid SessionEvent type: " + evt.getType() + ". This really should never happen."); }
