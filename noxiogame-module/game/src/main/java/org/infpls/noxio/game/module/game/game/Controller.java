@@ -27,7 +27,6 @@ public class Controller {
   }
   
   public void step() {
-    /* @FIXME this is not a good way to setup how controls work */
     if(object != null && mouse != null) {
       if(object.getType().equals("obj.player")) {
         Player p = (Player)object;

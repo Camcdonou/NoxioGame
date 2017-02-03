@@ -130,6 +130,6 @@ public class Player extends GameObject {
   
   @Override
   public void kill() {
-    if(spawnProtection < 1) { dead = true; }
+    dead = true;
   }
 }

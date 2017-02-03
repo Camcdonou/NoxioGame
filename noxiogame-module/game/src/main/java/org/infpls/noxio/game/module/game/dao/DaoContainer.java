@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.infpls.noxio.game.module.game.dao.user.UserDao;
-import org.infpls.noxio.game.module.game.dao.server.ServerInfoDao;
+import org.infpls.noxio.game.module.game.dao.server.InfoDao;
 import org.infpls.noxio.game.module.game.dao.lobby.LobbyDao;
 
 @Component
@@ -14,7 +14,7 @@ public class DaoContainer {
   private final LobbyDao lobbyDao;
   
   @Autowired
-  private ServerInfoDao serverInfoDao;
+  private InfoDao infoDao;
   
   public DaoContainer() {
     userDao = new UserDao();
@@ -22,6 +22,6 @@ public class DaoContainer {
   }
 
   public UserDao getUserDao() { return userDao;  }
-  public ServerInfoDao getServerInfoDao() { return serverInfoDao;  }
+  public InfoDao getInfoDao() { return infoDao;  }
   public LobbyDao getLobbyDao() { return lobbyDao;  }
 }

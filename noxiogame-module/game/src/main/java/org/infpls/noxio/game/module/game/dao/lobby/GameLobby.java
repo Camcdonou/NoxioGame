@@ -19,7 +19,9 @@ public class GameLobby {
   
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
   private NoxioGame game; /* The actual game object */
-  private List<Packet> gamePackets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
+  
+  private final PacketSync packets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
+  private final EventSync events; /* Second verse same as the first. */
   
   private boolean closed; //Clean this shit up!
   public GameLobby(final String name, final boolean autoClose) {
@@ -31,16 +33,50 @@ public class GameLobby {
     loading = new ArrayList();
     closed = false;
     
-    gamePackets = new ArrayList();
+    packets = new PacketSync();
+    events = new EventSync();
+    
     game = new NoxioGame();
     loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
   }
   
+  /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */
   public void step(final long tick) {
     try {
+      final List<SessionEvent> evts = events.pop();
+      for(int i=0;i<evts.size();i++) {
+        SessionEvent evt = evts.get(i);
+        if(!evt.getSession().isOpen()) { continue; } /* A simple check to make sure nothing has happened to our connection while we were waiting. */
+        switch(evt.getType()) {
+          case "e00" : {
+            if(!connect(evt.getSession())) {
+              evt.getSession().sendPacket(new PacketG06("Failed to connect to game."));
+              evt.getSession().leaveGame();
+            }
+            else { 
+              GameLobbyInfo info = getInfo();
+              evt.getSession().sendPacket(new PacketG01(info.getName(), info.getMaxPlayers()));
+            }
+            break;
+          }
+          case "e01" : {
+            if(!join(evt.getSession())) {
+              evt.getSession().sendPacket(new PacketG06("Failed to join game."));
+              evt.getSession().leaveGame();
+            }
+            break;
+          }
+          case "e02" : {
+            leave(evt.getSession());
+            evt.getSession().sendPacket(new PacketG08());
+            break;
+          }
+          default : { throw new IOException("Invalid SessionEvent type: " + evt.getType() + ". This really should never happen."); }
+        }
+      }
       if(game.isGameOver()) {
         newGame();
-        popPackets();
+        packets.pop();
         for(int i=0;i<players.size();i++) {
           players.get(i).sendPacket(new PacketG17());
           loading.add(players.get(i)); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
@@ -48,7 +84,7 @@ public class GameLobby {
         }
         return; /* Screw you guys I'm going home. */
       }
-      final List<Packet> preStep = game.handlePackets(popPackets());
+      final List<Packet> preStep = game.handlePackets(packets.pop());
       for(int i=0;i<players.size();i++) {
         if(!loading.contains(players.get(i))) {
           for(int j=0;j<preStep.size();j++) {
@@ -70,41 +106,55 @@ public class GameLobby {
         }
       }
     }
-    catch(IOException e) {
+    catch(Exception ex) {
+      for(int i=0;i<players.size();i++) {
+        try { players.get(i).close(ex); }
+        catch(IOException ioex) { System.err.println("Bad stuff be happening here!"); ioex.printStackTrace(); }
+      }
+      System.err.println("## CRITICAL ## Game step exception!");
+      ex.printStackTrace();
       /* @FIXME do something? Probably handle server side GAME errors by closing the lobby and kicking players to menu. */
     }
   }
   
-  public void newGame() {
+  private void newGame() {
     game = new NoxioGame();
   }
   
-  public boolean connect(NoxioSession player) throws IOException {
+  private boolean connect(NoxioSession player) throws IOException {
     if(closed) { return false; }
     if(players.size() >= maxPlayers) { return false; }
-    if(players.contains(player)) { return false; } // @FIXME If this actually happens then something has gone HORRENDOUSLY wrong. Maybe even throw an exception.
+    if(players.contains(player)) { player.close("Lobby Doppleganger Error."); return false; }
     players.add(player);
     loading.add(player);
     updatePlayerList(player.getUser() + " connected.");
     return true;
   }
   
-  public boolean join(NoxioSession player) throws IOException {
+  private boolean join(NoxioSession player) throws IOException {
     if(closed) { return false; }
     if(players.size() >= maxPlayers) { return false; }
-    if(!players.contains(player) || !loading.contains(player)) { return false; } //@FIXME the fuck you doing nigga?
+    if(!players.contains(player) || !loading.contains(player)) { player.close("Lobby Ghost Error."); return false; }
     game.join(player);
     loading.remove(player);
     updatePlayerList(player.getUser() + " joined the game.");
     return true;
   }
   
-  public void leave(NoxioSession player) throws IOException {
-    players.remove(player);
+  private void leave(NoxioSession player) throws IOException {
+    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
     while(loading.remove(player));
     game.leave(player);
     if(players.size() < 1 && autoClose) { close(); }
     if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }
+  }
+  
+  public void remove(NoxioSession player) throws IOException { /* Similar to leave but called from the destroy() of a session. */
+    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
+    while(loading.remove(player));
+    game.leave(player);
+    if(players.size() < 1 && autoClose) { close(); }
+    if(players.size() >= 1) { updatePlayerList(player.getUser() + " disconnected."); }
   }
   
   private void close() throws IOException {
@@ -126,31 +176,8 @@ public class GameLobby {
     }
   }
   
-  /* Game Packet handling methods 
-     @FIXME this is a bit jank
-     - syncAccess.s == true / pop
-     - syncAccess.s == false / push
-  */
-  public void pushPacket(final Packet p) {
-    syncAccess(false, p);
-  }
-  
-  public List<Packet> popPackets() {
-    return syncAccess(true, null);
-  }
-  
-  private synchronized List<Packet> syncAccess(final boolean s, final Packet p) {
-    if(s) {
-      List<Packet> packets = gamePackets;
-      gamePackets = new ArrayList();
-      return packets;
-    }
-    else {
-      if(p == null) { /* @FIXME THROW EXCEPTION */ }
-      gamePackets.add(p);
-      return null;
-    }
-  }
+  public void pushPacket(final Packet p) { packets.push(p); }
+  public void pushEvent(final SessionEvent evt) { events.push(evt); }
   
   //@FIXME Not a great way to do this. Need to seperate Offical Server into it's own type. Seperate from a user server. Also the host being the person in slot 0 is kinda dumb maybe.
   public String getHostName() { return autoClose ? (players.size() > 0 ? players.get(0).getUser() : "N/A") : "Official Server"; }
@@ -192,6 +219,56 @@ public class GameLobby {
           ex.printStackTrace();
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
         }
+      }
+    }
+  }
+  
+  private class PacketSync {
+    private List<Packet> packets;
+    public PacketSync() { packets = new ArrayList(); }
+
+    public void push(final Packet p) { syncPacketAccess(false, p); }
+    public List<Packet> pop() { return syncPacketAccess(true, null); }
+
+    /* Game Packet handling methods 
+       - syncAccess.s == true / pop
+       - syncAccess.s == false / push
+    */
+    private synchronized List<Packet> syncPacketAccess(final boolean s, final Packet p) {
+      if(s) {
+        List<Packet> pkts = packets;
+        packets = new ArrayList();
+        return pkts;
+      }
+      else {
+        if(p == null) { return null; }
+        packets.add(p);
+        return null;
+      }
+    }
+  }
+  
+  private class EventSync {
+    private List<SessionEvent> sessionEvents;
+    public EventSync() { sessionEvents = new ArrayList(); }
+
+    public void push(final SessionEvent evt) { syncEventAccess(false, evt); }
+    public List<SessionEvent> pop() { return syncEventAccess(true, null); }
+
+    /* SessionEvent handling methods 
+     - syncAccess.s == true / pop
+     - syncAccess.s == false / push
+    */
+    private synchronized List<SessionEvent> syncEventAccess(final boolean s, final SessionEvent evt) {
+      if(s) {
+        List<SessionEvent> evts = sessionEvents;
+        sessionEvents = new ArrayList();
+        return evts;
+      }
+      else {
+        if(evt == null) { return null; }
+        sessionEvents.add(evt);
+        return null;
       }
     }
   }

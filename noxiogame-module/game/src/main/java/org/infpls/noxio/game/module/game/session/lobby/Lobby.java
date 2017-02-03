@@ -77,7 +77,7 @@ public class Lobby extends SessionState {
     }
   }
   
-  private void joinLobby(PacketB04 p) throws IOException { //@FIXME Everything is wrong.
+  private void joinLobby(PacketB04 p) throws IOException {
     GameLobby gl = lobbyDao.getLobby(p.getLid());
     if(gl != null) {
       session.joinGame(gl);

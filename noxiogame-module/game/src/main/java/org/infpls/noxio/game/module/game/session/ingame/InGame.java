@@ -28,6 +28,8 @@ public class InGame extends SessionState {
     < g05 game step finish / tells client to parse and render @FIXME still not 100% onboard with this style
     < g06 failed to join game
     > g07 load done
+    < g08 left game lobby
+    > g09 client game closed (ready to change state)
   
     < g10 create object
     < g11 delete object
@@ -58,6 +60,7 @@ public class InGame extends SessionState {
         case "g02" : { close(); break; }
         case "g03" : { leaveGame(gson.fromJson(data, PacketG03.class)); break; }
         case "g07" : { loadDone(gson.fromJson(data, PacketG07.class)); break; }
+        case "g09" : { session.leaveGame(); break; }
         /* Ingame Type Packets gxx */
         
         /* Input Type Packets ixx */
@@ -67,36 +70,24 @@ public class InGame extends SessionState {
         case "i10" : { lobby.pushPacket(gson.fromJson(data, PacketI10.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
-    } catch(IOException | NullPointerException | JsonParseException ex) {
+    } catch(Exception ex) { /* @FIXME IOException | NullPointerException | JsonParseException */
       close(ex);
     }
   }
   
-  private void clientReady(PacketG00 p) throws IOException {  
-    if(!lobby.connect(this.session)) {
-      sendPacket(new PacketG06("Failed to connect to game."));
-      session.leaveGame();
-    }
-    else { 
-      GameLobbyInfo info = lobby.getInfo();
-      sendPacket(new PacketG01(info.getName(), info.getMaxPlayers()));
-    }
-  }
+  /* SessionEvent Info
+    - e00 client ready
+    - e01 load done
+    - e02 leave game
+  */
   
-  private void loadDone(PacketG07 p) throws IOException {
-    if(!lobby.join(this.session)) {
-      sendPacket(new PacketG06("Failed to join game."));
-      session.leaveGame();
-    }
-  }
-  
-  private void leaveGame(PacketG03 p) throws IOException {
-    session.leaveGame();
-  }
+  private void clientReady(PacketG00 p) throws IOException { lobby.pushEvent(new SessionE00(session)); }
+  private void loadDone(PacketG07 p) throws IOException { lobby.pushEvent(new SessionE01(session)); }
+  private void leaveGame(PacketG03 p) throws IOException { lobby.pushEvent(new SessionE02(session)); }
   
   @Override
   public void destroy() throws IOException {
-    lobby.leave(this.session);
+    lobby.remove(this.session);
   }
   
 }

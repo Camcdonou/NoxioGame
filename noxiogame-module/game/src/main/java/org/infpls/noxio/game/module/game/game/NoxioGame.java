@@ -124,12 +124,12 @@ public class NoxioGame {
   
   public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(player.getUser(), player.getSessionId()));
-    player.sendPacket(new PacketG18(scoreToWin)); /* @FIXME potential for desynch or bad multi threading here */
-    for(int i=0;i<objects.size();i++) { /* @FIXME potential for desynch or bad multi threading here */
+    player.sendPacket(new PacketG18(scoreToWin));
+    for(int i=0;i<objects.size();i++) {
       GameObject obj = objects.get(i);
       player.sendPacket(new PacketG10(obj.getOid(), obj.getType(), obj.getPosition(), obj.getVelocity()));
     }
-    for(int i=0;i<controllers.size();i++) { /* @FIXME potential for desynch or bad multi threading here */
+    for(int i=0;i<controllers.size();i++) {
       player.sendPacket(new PacketG14(controllers.get(i).getScore()));
     }
   }

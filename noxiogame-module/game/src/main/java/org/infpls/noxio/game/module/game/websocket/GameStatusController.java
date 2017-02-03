@@ -7,18 +7,18 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import org.infpls.noxio.game.module.game.dao.server.ServerInfoDao;
+import org.infpls.noxio.game.module.game.dao.server.InfoDao;
 
 @Controller
 public class GameStatusController {
   
     @Autowired
-    private ServerInfoDao serverInfoDao;
+    private InfoDao infoDao;
   
     @RequestMapping(value = "/info", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody ResponseEntity getInfo() {
         Gson gson = new GsonBuilder().create();
-        return new ResponseEntity(gson.toJson(serverInfoDao.getServerInfo()), HttpStatus.OK);
+        return new ResponseEntity(gson.toJson(infoDao.getServerInfo()), HttpStatus.OK);
     }
   
     @RequestMapping(value = "/status", method = RequestMethod.GET, produces = "application/json")

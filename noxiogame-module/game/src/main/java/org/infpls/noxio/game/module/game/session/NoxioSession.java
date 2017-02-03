@@ -22,7 +22,7 @@ public final class NoxioSession {
     this.webSocket = webSocket;
     this.dao = dao;
         
-    changeState(new Login(this, dao.getUserDao(), dao.getServerInfoDao()));
+    changeState(new Login(this, dao.getUserDao(), dao.getInfoDao()));
   }
   
   public void handlePacket(final String data) throws IOException {
@@ -71,6 +71,10 @@ public final class NoxioSession {
   
   public String getWebSocketId() {
     return webSocket.getId();
+  }
+  
+  public boolean isOpen() { 
+    return webSocket.isOpen();
   }
   
   public void destroy() throws IOException {

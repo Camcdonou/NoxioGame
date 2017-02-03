@@ -2,10 +2,6 @@ package org.infpls.noxio.game.module.game.dao.lobby;
 
 import java.util.*;
 
-/* @FIXME
-   LobbyDao do thing and do
-*/
-
 public class LobbyDao {
   private final List<GameLobby> lobbies; /* This is a list of all active user NoxioSessions. */
   
@@ -39,8 +35,8 @@ public class LobbyDao {
     }
     return null;
   }
-  
-  /* This method deletes any user created lobbies that have 0 players currently in them */
+ 
+  /* This method deletes any user created lobbies that are flagged as closed. */
   public void cleanUp() { 
     for(int i=0;i<lobbies.size();i++) {
       if(lobbies.get(i).isClosed()) {

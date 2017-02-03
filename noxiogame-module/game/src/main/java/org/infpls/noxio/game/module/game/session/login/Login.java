@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.*;
 import org.infpls.noxio.game.module.game.dao.server.ServerInfo;
 
-import org.infpls.noxio.game.module.game.dao.server.ServerInfoDao;
+import org.infpls.noxio.game.module.game.dao.server.InfoDao;
 import org.infpls.noxio.game.module.game.dao.user.UserDao;
 import org.infpls.noxio.game.module.game.session.*;
 
@@ -14,13 +14,13 @@ import org.infpls.noxio.game.module.game.session.*;
 public class Login extends SessionState {
   
   private final UserDao userDao;
-  private final ServerInfoDao serverInfoDao;
+  private final InfoDao infoDao;
   
-  public Login(final NoxioSession session, final UserDao userDao, final ServerInfoDao serverInfoDao) throws IOException {
+  public Login(final NoxioSession session, final UserDao userDao, final InfoDao infoDao) throws IOException {
     super(session);
     
     this.userDao = userDao;
-    this.serverInfoDao = serverInfoDao;
+    this.infoDao = infoDao;
     
     sendPacket(new PacketS00('l'));
   }
@@ -55,7 +55,7 @@ public class Login extends SessionState {
     /* I know where you live. */
 
     /* @FIXME also the app name is hardcoded here, make that a prop later. */
-    final String address = "http://" + serverInfoDao.getAuthServerAddress() + "/noxioauth/validate/" + p.getUser() + "/" + p.getSid();
+    final String address = "http://" + infoDao.getAuthServerAddress() + "/noxioauth/validate/" + p.getUser() + "/" + p.getSid();
     StringBuilder result = new StringBuilder();
     URL url = new URL(address);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -71,7 +71,7 @@ public class Login extends SessionState {
     PacketL03 r = gson.fromJson(result.toString(), PacketL03.class);
     
     if(r.getResult()) {
-      ServerInfo info = serverInfoDao.getServerInfo();
+      ServerInfo info = infoDao.getServerInfo();
       sendPacket(new PacketL01(info.getName(), info.getLocation(), info.getDescription()));
       session.login(p.getUser(), p.getSid());
     }

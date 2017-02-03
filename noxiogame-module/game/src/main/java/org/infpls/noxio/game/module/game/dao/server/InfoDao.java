@@ -3,12 +3,12 @@ package org.infpls.noxio.game.module.game.dao.server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-/* @FIXME
-   Refactor this class. Name is doof as fuck.
+/* This class is basically just access to the noxio.properties file. 
+   Contains various settings and information.
 */
 
 @Component
-public class ServerInfoDao {
+public class InfoDao {
   
     @Value("${noxio.game.server.name}")
     private String name;
