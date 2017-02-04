@@ -36,6 +36,9 @@ public class GameLobby {
     packets = new PacketSync();
     events = new EventSync();
     
+    outAll = new ArrayList();
+    outDirect = new HashMap();
+    
     game = new NoxioGame(this);
     loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
   }
@@ -70,7 +73,7 @@ public class GameLobby {
           case "e02" : {
             if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
             leave(evt.getSession());
-            sendPacket(new PacketG08(), evt.getSession());
+            evt.getSession().sendPacket(new PacketG08()); /* This the only packet we dont send in a blob because it's the leaving packet. */
             break;
           }
           case "e03" : {
@@ -92,7 +95,22 @@ public class GameLobby {
       }
       game.handlePackets(packets.pop());
       game.step();
-      sendPacket(new PacketG05(tick, System.currentTimeMillis()));
+      
+      for(int i=0;i<players.size();i++) {
+        final NoxioSession player = players.get(i);
+        if(!loading.contains(player)) {
+          player.sendPacket(new PacketS01(outAll));
+        }
+      }
+      outAll.clear();
+      for(int i=0;i<players.size();i++) {
+        final NoxioSession player = players.get(i);
+        if(!loading.contains(player)) {
+          player.sendPacket(new PacketS01(outDirect.get(player)));
+          player.sendPacket(new PacketG05(tick, System.currentTimeMillis()));
+        }
+        outDirect.get(player).clear();
+      }
     }
     catch(Exception ex) {
       for(int i=0;i<players.size();i++) {
@@ -115,6 +133,7 @@ public class GameLobby {
     if(players.contains(player)) { player.close("Lobby Doppleganger Error."); return false; }
     players.add(player);
     loading.add(player);
+    outDirect.put(player, new ArrayList());
     updatePlayerList(player.getUser() + " connected.");
     return true;
   }
@@ -133,6 +152,7 @@ public class GameLobby {
     if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
     while(loading.remove(player));
     game.leave(player);
+    outDirect.remove(player);
     if(players.size() < 1 && autoClose) { close(); }
     if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }
   }
@@ -141,6 +161,7 @@ public class GameLobby {
     if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
     while(loading.remove(player));
     game.leave(player);
+    outDirect.remove(player);
     if(players.size() < 1 && autoClose) { close(); }
     if(players.size() >= 1) { updatePlayerList(player.getUser() + " disconnected."); }
   }
@@ -164,46 +185,26 @@ public class GameLobby {
     }
   }
   
+  private List<Packet> outAll;
+  private Map<NoxioSession, List<Packet>> outDirect;
   /* Send a packet to everyone in the lobby */
   public void sendPacket(final Packet p) { /* @FIXME catching exceptions here in these 3 methods is bad nono */
-    try {
-      for(int i=0;i<players.size();i++) {
-        final NoxioSession player = players.get(i);
-        if(!loading.contains(player)) {
-          player.sendPacket(p);
-        }
-      }
-    }
-    catch(IOException ex) {
-      ex.printStackTrace();
-    }
+    outAll.add(p);
   }
   
   /* Send a packet to a specific player with the given SID */
   public void sendPacket(final Packet p, final String sid) {
-    try {
-      for(int i=0;i<players.size();i++) {
-        final NoxioSession player = players.get(i);
-        if(!loading.contains(player) && player.getSessionId().equals(sid)) {
-          player.sendPacket(p);
-        }
+    for(int i=0;i<players.size();i++) {
+      final NoxioSession player = players.get(i);
+      if(!loading.contains(player) && player.getSessionId().equals(sid)) {
+        outDirect.get(player).add(p);
       }
-    }
-    catch(IOException ex) {
-      ex.printStackTrace();
     }
   }
   
   /* Send a packet to a specific player */
   public void sendPacket(final Packet p, final NoxioSession player) {
-    try {
-      if(!loading.contains(player)) {
-        player.sendPacket(p);
-      }
-    }
-    catch(IOException ex) {
-      ex.printStackTrace();
-    }
+    outDirect.get(player).add(p);
   }
   
   public void pushPacket(final Packet p) { packets.push(p); }
