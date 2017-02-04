@@ -30,11 +30,12 @@ public final class NoxioSession {
   }
   
   public void sendPacket(final Packet p) throws IOException {
+    /* Due to the multi threaded nature of this application, it's possible a packet can attempt to be sent right as teh connection closes.
+       This isOpen() is just a small prevention measure to stop lots of pointless exceptions. */
     if(isOpen()) {
       final Gson gson = new GsonBuilder().create();
       webSocket.sendMessage(new TextMessage(gson.toJson(p)));
     }
-    else { destroy(); }
   }
   
 
