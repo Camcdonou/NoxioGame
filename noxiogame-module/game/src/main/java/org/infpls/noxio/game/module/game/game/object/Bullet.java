@@ -2,13 +2,11 @@ package org.infpls.noxio.game.module.game.game.object;
 
 
 import org.infpls.noxio.game.module.game.game.NoxioGame;
-import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
-import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
 
 public class Bullet extends GameObject {
   private static final float FRICTION = 0.99f, RADIUS = 12.5f;
-  private final GameObject owner;
+  private GameObject owner;
   private int life;
   public Bullet(final NoxioGame game, final long oid, final Vec2 position, final Vec2 velocity, final GameObject owner) {
     super(game, oid, "obj.bullet", position, velocity);
@@ -55,5 +53,7 @@ public class Bullet extends GameObject {
     }
   }
   
+  public void resetLife() { life=128; }
+  public void setOwner(final GameObject owner) { this.owner = owner; }
   public GameObject getOwner() { return owner; }
 }

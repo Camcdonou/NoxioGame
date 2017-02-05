@@ -7,7 +7,7 @@ import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
 
 public class Player extends GameObject {
   private static final float SPEED = 1.1f, FRICTION = 0.88f;
-  private static final float ACTION_ONE_SPEED = 8.8f, ACTION_TWO_SPEED = 6.6f, ACTION_THREE_SPEED = 8.2f, SHINE_RADIUS = 55.0f;
+  private static final float ACTION_ONE_SPEED = 10.8f, ACTION_TWO_SPEED = 7.6f, ACTION_THREE_SPEED = 9.2f, SHINE_RADIUS = 55.0f;
   
   private int cooldown, burstCooldown, spawnProtection;
   private Action action;
@@ -84,11 +84,11 @@ public class Player extends GameObject {
   private void useActionThree() {
     final Vec2 dir = action.getTarget().subtract(position).normalize();
     final Vec2[] shots = new Vec2[]{
-      dir.lerp(dir.tangent(), 0.8f),
-      dir.lerp(dir.tangent(), 0.9f),
-      dir.lerp(dir.tangent(), 1.0f),
-      dir.lerp(dir.tangent().inverse(), 0.9f),
-      dir.lerp(dir.tangent().inverse(), 0.8f)
+      dir.lerp(dir.tangent(), 0.8f).normalize(),
+      dir.lerp(dir.tangent(), 0.9f).normalize(),
+      dir.lerp(dir.tangent(), 1.0f).normalize(),
+      dir.lerp(dir.tangent().inverse(), 0.9f).normalize(),
+      dir.lerp(dir.tangent().inverse(), 0.8f).normalize()
     };
     for(int i=0;i<shots.length;i++) {
       final Bullet b = new Bullet(game, game.createOid(), position.copy(), shots[i].scale(ACTION_THREE_SPEED).add(velocity), this);
@@ -111,7 +111,11 @@ public class Player extends GameObject {
           }
         }
         else if(obj.getType().equals("obj.bullet")) {
-          obj.setVelocity(obj.getPosition().subtract(position).normalize().scale((obj.getVelocity().magnitude()*1.5f)+3.0f));
+          if(((Bullet)obj).getOwner() != this) {
+            obj.setVelocity(obj.getPosition().subtract(position).normalize().scale((obj.getVelocity().magnitude()*1.5f)+3.0f));
+            ((Bullet)obj).setOwner(this);
+            ((Bullet)obj).resetLife();
+          }
         }
       }
     }
