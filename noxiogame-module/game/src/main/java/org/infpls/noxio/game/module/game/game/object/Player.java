@@ -1,9 +1,7 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import org.infpls.noxio.game.module.game.game.*;
-import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
-import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
 
 public class Player extends GameObject {
   private static final float SPEED = 1.1f, FRICTION = 0.88f;
