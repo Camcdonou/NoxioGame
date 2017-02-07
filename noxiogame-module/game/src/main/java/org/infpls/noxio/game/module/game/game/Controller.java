@@ -3,14 +3,17 @@ package org.infpls.noxio.game.module.game.game;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
+import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
 
 public class Controller {
+  private final NoxioGame game;
   private final String user, sid;
   private GameObject object;
   private Vec2 mouse;
   private Action action;
   private final Score score;
-  public Controller(final String user, final String sid) {
+  public Controller(final NoxioGame game, final String user, final String sid) {
+    this.game = game;
     this.user = user;
     this.sid = sid;
     this.mouse = new Vec2();
@@ -42,14 +45,14 @@ public class Controller {
     }
   }
   
-  public Packet setControl(GameObject object) {
+  public void setControl(GameObject object) {
     this.object = object;
-    return new PacketI03(object.getOid()).setSrcSid(sid);
+    game.lobby.sendPacket(new PacketI03(object.getOid()), sid);
   }
   
-  public Packet objectDestroyed() {
+  public void objectDestroyed() {
     this.object = null;
-    return new PacketI03(-1).setSrcSid(sid);
+    game.lobby.sendPacket(new PacketI03(-1), sid);
   }
   
   public void destroy() {

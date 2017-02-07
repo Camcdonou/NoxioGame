@@ -1,9 +1,6 @@
 package org.infpls.noxio.game.module.game.game.object;
 
-import java.util.*;
-
 import org.infpls.noxio.game.module.game.game.NoxioGame;
-import org.infpls.noxio.game.module.game.session.Packet;
 
 public abstract class GameObject {
   protected final NoxioGame game; /* Parent Game */
@@ -35,7 +32,7 @@ public abstract class GameObject {
     this.velocity = velocity;
   }
   
-  public abstract void step(final List<Packet> updates);
+  public abstract void step();
   
   public void setPosition(final Vec2 a) { position = a; }
   public void setVelocity(final Vec2 a) { velocity = a; }
@@ -46,7 +43,7 @@ public abstract class GameObject {
   public final Vec2 getVelocity() { return velocity; }
   
   public boolean isDead() { return dead; } /* If this method returns true the object is destroyed on the next game tick. */
-  public Packet kill(GameObject killer) { dead = true; return null; }
+  public void kill(GameObject killer) { dead = true; }
   public void kill() { dead = true; } /* Marks as dead and does whatever dead things do */
   public void destroy() { } /* Called right before removing the object from the game */
 }
