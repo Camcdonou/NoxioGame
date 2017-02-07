@@ -73,7 +73,7 @@ public class GameLobby {
           case "e02" : {
             if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
             leave(evt.getSession());
-            evt.getSession().sendPacket(new PacketG08()); /* This the only packet we dont send in a blob because it's the leaving packet. */
+            evt.getSession().sendPacket(new PacketG08()); /* This is one of the few packets we dont send in a blob because it has an odd state. */
             break;
           }
           case "e03" : {
@@ -87,7 +87,7 @@ public class GameLobby {
         newGame();
         packets.pop();
         for(int i=0;i<players.size();i++) {
-          sendPacket(new PacketG17(), players.get(i));
+          players.get(i).sendPacket(new PacketG17()); /* This is one of the few packets we dont send in a blob because it has an odd state. */
           loading.add(players.get(i)); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
           /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
         }
