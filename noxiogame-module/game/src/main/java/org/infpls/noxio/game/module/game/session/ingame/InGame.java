@@ -31,21 +31,17 @@ public class InGame extends SessionState {
     < g08 left game lobby
     > g09 client game closed (ready to change state)
   
-    < g10 create object
-    < g11 delete object
-    < g12 update object pos/vel
-    < g13 shine ability used (visual effect)
-    < g14 scoreboard update
-    < g15 sys message
+    < g10 the game update packet - see NoxioGame & Controller class for details
+  
+    < g15 message
     < g16 game over
     < g17 new game
-    < g18 game rules (custom gametype settings such as kills to win or number of teams)
-  
-    > i00 mouse active
+    
     > i01 mouse neutral
     > i02 player request spawn
     < i03 player object control
-    > i10 player use action
+    > i04 mouse move walk
+    > i05 mouse move run
   */
   
   @Override
@@ -64,10 +60,10 @@ public class InGame extends SessionState {
         /* Ingame Type Packets gxx */
         
         /* Input Type Packets ixx */
-        case "i00" : { lobby.pushPacket(gson.fromJson(data, PacketI00.class).setSrcSid(session.getSessionId())); break; }
         case "i01" : { lobby.pushPacket(gson.fromJson(data, PacketI01.class).setSrcSid(session.getSessionId())); break; }
         case "i02" : { lobby.pushPacket(gson.fromJson(data, PacketI02.class).setSrcSid(session.getSessionId())); break; }
-        case "i10" : { lobby.pushPacket(gson.fromJson(data, PacketI10.class).setSrcSid(session.getSessionId())); break; }
+        case "i04" : { lobby.pushPacket(gson.fromJson(data, PacketI04.class).setSrcSid(session.getSessionId())); break; }
+        case "i05" : { lobby.pushPacket(gson.fromJson(data, PacketI05.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(Exception ex) { /* @FIXME IOException | NullPointerException | JsonParseException */

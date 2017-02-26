@@ -3,45 +3,56 @@ package org.infpls.noxio.game.module.game.game;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
-import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
 
 public class Controller {
   private final NoxioGame game;
   private final String user, sid;
   private GameObject object;
-  private Vec2 mouse;
-  private Action action;
+  private Vec2 direction;
+  private float speed;
   private final Score score;
+  
+  private static final float VIEW_DISTANCE = 25.0f; /* Anything farther than this is out of view and not updated */
+  
   public Controller(final NoxioGame game, final String user, final String sid) {
     this.game = game;
     this.user = user;
     this.sid = sid;
-    this.mouse = new Vec2();
+    this.direction = new Vec2(); this.speed = 1.0f;
     this.score = new Score(user);
+  }
+  /* Generates a game update data for the player of this controller */
+  /* Game updates are generated per controller so we can cull offscreen objects. */
+  /* VIEW_DISTANCE is the value we use for screen culling */
+  /* Table of different data structures that are generated --
+      OBJ::UPDATE - obj;<int oid>;<vec2 pos>;<vec2 vel>; (VARIABLE LENGTH!!! allows any number of extra fields after the intial 3)
+  */
+  public void generateUpdateData(final StringBuilder sb) {
+    if(object != null) {
+      for(int i=0;i<game.objects.size();i++) {
+        GameObject obj = game.objects.get(i);
+        if(obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE) {
+          obj.generateUpdateData(sb);
+        }
+      }
+    }
   }
   
   public void handlePacket(Packet p) {
     switch(p.getType()) {
-      case "i00" : { mouse = ((PacketI00)p).getPos();  break; }
-      case "i01" : { mouse = null; break; }
-      case "i10" : { PacketI10 pp = (PacketI10)p; action = new Action(pp.getAction(), pp.getPos()); break; }
+      case "i04" : { direction = ((PacketI04)p).getPos(); speed = 0.5f; break; }
+      case "i05" : { direction = ((PacketI05)p).getPos(); speed = 1.0f; break; }
+      case "i01" : { direction = null; break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
   }
   
   public void step() {
-    if(object != null && mouse != null) {
-      if(object.getType().equals("obj.player")) {
+    if(object != null && direction != null) {
+      if(object.getType().equals("obj.player") && direction.magnitude() > 0) {
         Player p = (Player)object;
-        p.move(mouse.subtract(p.getPosition()).normalize());
+        p.move(direction.normalize().scale(speed));
       }
-    }
-    if(object != null && action != null) {
-      if(object.getType().equals("obj.player")) {
-        Player p = (Player)object;
-        p.setAction(action);
-      }
-      action = null;
     }
   }
   

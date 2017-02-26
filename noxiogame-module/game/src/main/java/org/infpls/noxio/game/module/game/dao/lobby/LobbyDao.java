@@ -7,12 +7,12 @@ public class LobbyDao {
   
   public LobbyDao() {
     lobbies = new ArrayList();
-    lobbies.add(new GameLobby("Test Game 1", false));
-    lobbies.add(new GameLobby("Test Game 2", false));
+    lobbies.add(new OfficialLobby("Test Game 1"));
+    lobbies.add(new OfficialLobby("Test Game 2"));
   }
   
   public GameLobby createLobby(final String name) {
-    GameLobby lobby = new GameLobby(name, true);
+    GameLobby lobby = new CustomLobby(name);
     lobbies.add(lobby);
     return lobby;
   }

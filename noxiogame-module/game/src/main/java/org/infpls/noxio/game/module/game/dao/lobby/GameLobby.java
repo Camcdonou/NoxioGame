@@ -8,26 +8,36 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
-public class GameLobby {
-  private final String lid; //Lobby ID
+/* On next work day.
+   ? - Fill out the Gametype sub types so they do something.
+   1 - Clean up PacketG10 some it's a bit of a mess
+   2 - Clean up stuff in general maybe.... (client...)
+   3 - Client util lib... (Vec2 math, Vec3 math)...
+   4 - Map file resources and loading on server side and conversion system to send to client
+   5 - Collision
+   6 - Lol text rendering
+   7 - Lol menus
+   8 - Lol fullscreen
+*/
+
+public abstract class GameLobby {
+  protected final String lid; //Lobby ID
   
-  private final String name;
-  private final boolean autoClose; //Automatically close this lobby if it's empty.
+  protected final String name;
   
-  private final int maxPlayers;
-  private final List<NoxioSession> players, loading; //@FIXME Access to this should be synchronized or it might RIP
+  protected final int maxPlayers;
+  protected final List<NoxioSession> players, loading; //@FIXME Access to this should be synchronized or it might RIP
   
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
-  private NoxioGame game; /* The actual game object */
+  protected NoxioGame game; /* The actual game object */
   
   private final PacketSync packets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
   private final EventSync events; /* Second verse same as the first. */
   
-  private boolean closed; //Clean this shit up!
-  public GameLobby(final String name, final boolean autoClose) {
+  protected boolean closed; //Clean this shit up!
+  public GameLobby(final String name) {
     lid = Salt.generate();
     this.name = name;
-    this.autoClose = autoClose;
     maxPlayers = 16; //Lol
     players = new ArrayList();
     loading = new ArrayList();
@@ -39,8 +49,12 @@ public class GameLobby {
     outAll = new ArrayList();
     outDirect = new HashMap();
     
-    game = new NoxioGame(this);
+    game = new Deathmatch(this);
     loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
+  }
+  
+  private void newGame() {
+    game = new Deathmatch(this);
   }
   
   /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */
@@ -93,8 +107,10 @@ public class GameLobby {
         }
         return; /* Screw you guys I'm going home. */
       }
+      
       game.handlePackets(packets.pop());
       game.step();
+      game.generateUpdatePackets();
       
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
@@ -122,12 +138,8 @@ public class GameLobby {
       /* @FIXME do something? Probably handle server side GAME errors by closing the lobby and kicking players to menu. */
     }
   }
-  
-  private void newGame() {
-    game = new NoxioGame(this);
-  }
-  
-  private boolean connect(NoxioSession player) throws IOException {
+   
+  protected boolean connect(NoxioSession player) throws IOException {
     if(closed) { return false; }
     if(players.size() >= maxPlayers) { return false; }
     if(players.contains(player)) { player.close("Lobby Doppleganger Error."); return false; }
@@ -141,32 +153,17 @@ public class GameLobby {
   private boolean join(NoxioSession player) throws IOException {
     if(closed) { return false; }
     if(players.size() >= maxPlayers) { return false; }
-    if(!players.contains(player) || !loading.contains(player)) { player.close("Lobby Ghost Error."); return false; }
+    if(!players.contains(player) || !loading.contains(player)) { remove(player); player.close("Lobby Ghost Error."); return false; } /* A thing that can happen and cause null pointers. Only possible if load times are long on clients are long and they leave lobby and come back AFAIK */
     loading.remove(player);
     game.join(player);
     updatePlayerList(player.getUser() + " joined the game.");
     return true;
   }
   
-  private void leave(NoxioSession player) throws IOException {
-    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
-    while(loading.remove(player));
-    game.leave(player);
-    outDirect.remove(player);
-    if(players.size() < 1 && autoClose) { close(); }
-    if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }
-  }
+  protected abstract void leave(NoxioSession player) throws IOException;
+  public abstract void remove(NoxioSession player) throws IOException;
   
-  public void remove(NoxioSession player) throws IOException { /* Similar to leave but called from the destroy() of a session. */
-    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
-    while(loading.remove(player));
-    game.leave(player);
-    outDirect.remove(player);
-    if(players.size() < 1 && autoClose) { close(); }
-    if(players.size() >= 1) { updatePlayerList(player.getUser() + " disconnected."); }
-  }
-  
-  private void close() throws IOException {
+  protected void close() throws IOException {
     closed = true;
     for(int i=0;i<players.size();i++) {
       players.get(i).leaveGame(); /* @FIXME maybe give leaveGame a message parameter to tell people why they were removed if there is a reason */
@@ -174,7 +171,7 @@ public class GameLobby {
     game.close();
   }
   
-  private void updatePlayerList(final String message) throws IOException {
+  protected void updatePlayerList(final String message) throws IOException {
     List<String> playerList = new ArrayList();
     for(int i=0;i<players.size();i++) {
       playerList.add(players.get(i).getUser());
@@ -185,8 +182,8 @@ public class GameLobby {
     }
   }
   
-  private List<Packet> outAll;
-  private Map<NoxioSession, List<Packet>> outDirect;
+  protected List<Packet> outAll;
+  protected Map<NoxioSession, List<Packet>> outDirect;
   /* Send a packet to everyone in the lobby */
   public void sendPacket(final Packet p) { /* @FIXME catching exceptions here in these 3 methods is bad nono */
     outAll.add(p);
@@ -198,6 +195,7 @@ public class GameLobby {
       final NoxioSession player = players.get(i);
       if(!loading.contains(player) && player.getSessionId().equals(sid)) {
         outDirect.get(player).add(p);
+        return;
       }
     }
   }
@@ -211,9 +209,9 @@ public class GameLobby {
   public void pushEvent(final SessionEvent evt) { events.push(evt); }
   
   //@FIXME Not a great way to do this. Need to seperate Offical Server into it's own type. Seperate from a user server. Also the host being the person in slot 0 is kinda dumb maybe.
-  public String getHostName() { return autoClose ? (players.size() > 0 ? players.get(0).getUser() : "N/A") : "Official Server"; }
+  public abstract NoxioSession getHost();
   public String getLid() { return lid; }
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", getHostName(), players.size(), maxPlayers); }
+  public abstract GameLobbyInfo getInfo();
   public boolean isClosed() { return closed; }
   
   /* @FIXME This might be the worst way to do this in the universe. It might be fine. No way to know really. 

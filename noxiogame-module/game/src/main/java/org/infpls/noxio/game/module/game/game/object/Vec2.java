@@ -23,4 +23,8 @@ public final class Vec2 {
   public float distance(final Vec2 b) { return subtract(b).magnitude(); }
   public Vec2 tangent() { return new Vec2(y*-1, x); }
   public Vec2 copy() { return new Vec2(x, y); }
+  
+  @Override
+  public String toString() { return x + "," + y; }
+  public void toString(final StringBuilder sb) { sb.append(x); sb.append(","); sb.append(y); }
 }

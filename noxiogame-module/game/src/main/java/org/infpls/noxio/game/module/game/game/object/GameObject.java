@@ -10,13 +10,6 @@ public abstract class GameObject {
   
   protected boolean dead;
   protected Vec2 position, velocity;
-  public GameObject(final NoxioGame game, final long oid, final String type) {
-    this.game = game;
-    this.oid = oid; this.type = type;
-    this.dead = false;
-    this.position = new Vec2();
-    this.velocity = new Vec2();
-  }
   public GameObject(final NoxioGame game, final long oid, final String type, final Vec2 position) {
     this.game = game;
     this.oid = oid; this.type = type;
@@ -33,6 +26,7 @@ public abstract class GameObject {
   }
   
   public abstract void step();
+  public abstract void generateUpdateData(final StringBuilder sb);
   
   public void setPosition(final Vec2 a) { position = a; }
   public void setVelocity(final Vec2 a) { velocity = a; }
