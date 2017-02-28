@@ -21,7 +21,7 @@ public class InGame extends SessionState {
   
   /* Packet Info [ < outgoing | > incoming ]
     > g00 client ready
-    < g01 game info
+    < g01 game info && map file
     > g02 close
     > g03 leave game
     < g04 players list

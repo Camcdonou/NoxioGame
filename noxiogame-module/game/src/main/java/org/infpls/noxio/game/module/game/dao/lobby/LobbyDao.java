@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.dao.lobby;
 
+import java.io.IOException;
 import java.util.*;
 
 public class LobbyDao {
@@ -7,11 +8,16 @@ public class LobbyDao {
   
   public LobbyDao() {
     lobbies = new ArrayList();
-    lobbies.add(new OfficialLobby("Test Game 1"));
-    lobbies.add(new OfficialLobby("Test Game 2"));
+    try {
+      lobbies.add(new OfficialLobby("Test Game 1"));
+      lobbies.add(new OfficialLobby("Test Game 2"));
+    }
+    catch(IOException ex) {
+      ex.printStackTrace();
+    }
   }
   
-  public GameLobby createLobby(final String name) {
+  public GameLobby createLobby(final String name) throws IOException {
     GameLobby lobby = new CustomLobby(name);
     lobbies.add(lobby);
     return lobby;

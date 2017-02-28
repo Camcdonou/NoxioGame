@@ -8,7 +8,7 @@ import org.infpls.noxio.game.module.game.session.ingame.PacketG15;
 
 public class CustomLobby extends GameLobby {
   protected NoxioSession hostPlayer;
-  public CustomLobby(final String name) {
+  public CustomLobby(final String name) throws IOException {
     super(name);
     hostPlayer = null;
   }

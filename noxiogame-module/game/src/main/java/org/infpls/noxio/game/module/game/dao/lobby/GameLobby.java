@@ -10,14 +10,15 @@ import org.infpls.noxio.game.module.game.util.Salt;
 
 /* On next work day.
    ? - Fill out the Gametype sub types so they do something.
-   1 - Clean up PacketG10 some it's a bit of a mess
-   2 - Clean up stuff in general maybe.... (client...)
-   3 - Client util lib... (Vec2 math, Vec3 math)...
-   4 - Map file resources and loading on server side and conversion system to send to client
+   & - Gametype/map dependency needs to be worked out. Also MapDao or whatever
+   1 - Clean up PacketG10 some it's a bit of a mess ##ONGOING
+   2 - Clean up stuff in general maybe.... (client...) ##ONGOING
+   4 - Map files need to static mesh support and game object spawning and gametype info added to their spec
    5 - Collision
    6 - Lol text rendering
-   7 - Lol menus
-   8 - Lol fullscreen
+   7 - Lol menus, fullscreen 
+   8 - PARTICLE SYSTEMS AND SOUND AND HDR
+   9 - Object creation permutations
 */
 
 public abstract class GameLobby {
@@ -35,7 +36,7 @@ public abstract class GameLobby {
   private final EventSync events; /* Second verse same as the first. */
   
   protected boolean closed; //Clean this shit up!
-  public GameLobby(final String name) {
+  public GameLobby(final String name) throws IOException {
     lid = Salt.generate();
     this.name = name;
     maxPlayers = 16; //Lol
@@ -49,12 +50,12 @@ public abstract class GameLobby {
     outAll = new ArrayList();
     outDirect = new HashMap();
     
-    game = new Deathmatch(this);
+    newGame();
     loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
   }
   
-  private void newGame() {
-    game = new Deathmatch(this);
+  private void newGame() throws IOException {
+    game = new Deathmatch(this, "test"); /* @FIXME */
   }
   
   /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */
@@ -72,7 +73,7 @@ public abstract class GameLobby {
             }
             else { 
               GameLobbyInfo info = getInfo();
-              evt.getSession().sendPacket(new PacketG01(info.getName(), info.getMaxPlayers()));
+              evt.getSession().sendPacket(new PacketG01(info.getName(), info.getMaxPlayers(), game.map));
             }
             break;
           }
@@ -100,8 +101,9 @@ public abstract class GameLobby {
       if(game.isGameOver()) {
         newGame();
         packets.pop();
+        GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
-          players.get(i).sendPacket(new PacketG17()); /* This is one of the few packets we dont send in a blob because it has an odd state. */
+          players.get(i).sendPacket(new PacketG17(info.getName(), info.getMaxPlayers(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
           loading.add(players.get(i)); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
           /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
         }
@@ -176,10 +178,12 @@ public abstract class GameLobby {
     for(int i=0;i<players.size();i++) {
       playerList.add(players.get(i).getUser());
     }
-    for(int i=0;i<players.size();i++) {
-      players.get(i).sendPacket(new PacketG04(playerList));
-      players.get(i).sendPacket(new PacketG15(message));
-    }
+    sendPacket(new PacketG04(playerList));
+    sendPacket(new PacketG15(message));
+//    for(int i=0;i<players.size();i++) {
+//      players.get(i).sendPacket(new PacketG04(playerList));
+//      players.get(i).sendPacket(new PacketG15(message));
+//    }
   }
   
   protected List<Packet> outAll;

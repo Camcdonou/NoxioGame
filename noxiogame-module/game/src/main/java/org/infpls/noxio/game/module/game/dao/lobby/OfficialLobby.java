@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class OfficialLobby extends GameLobby {
-  public OfficialLobby(final String name) {
+  public OfficialLobby(final String name) throws IOException {
     super(name);
   }
   

@@ -15,19 +15,22 @@ public abstract class NoxioGame {
   private boolean gameOver;
   private int resetTimer;
   
+  public final NoxioMap map;
+  
   protected final List<Controller> controllers; /* Player controller objects */
   public final List<GameObject> objects; /* All game objects */
   
   private int idGen; /* Used to generate OIDs for objects. */
-  public NoxioGame(final GameLobby lobby) {
+  public NoxioGame(final GameLobby lobby, final String mapName) throws IOException {
     this.lobby = lobby;
+    
+    map = new NoxioMap(mapName);
     
     controllers = new ArrayList();
     objects = new ArrayList();
     
     created = new ArrayList();
     deleted = new ArrayList();
-    messages = new ArrayList();
     
     gameOver = false;
   }
@@ -78,10 +81,8 @@ public abstract class NoxioGame {
   /* Table of different data structures that are generated --
       OBJ::CREATE   -  crt;<int oid>;<string type>;<vec2 pos>;<vec2 vel>;
       OBJ::DELETE   -  del;<int oid>;
-      SYS::MESSAGE  -  msg;<string message>;
   */
   private final List<GameObject> created, deleted;
-  private final List<String> messages;
   public void generateUpdatePackets() {
     final StringBuilder sb = new StringBuilder();
     for(int i=0;i<created.size();i++) {
@@ -97,12 +98,8 @@ public abstract class NoxioGame {
       sb.append("del"); sb.append(";");
       sb.append(obj.getOid()); sb.append(";");
     }
-    for(int i=0;i<messages.size();i++) {
-      sb.append("msg"); sb.append(";");
-      sb.append(messages.get(i)); sb.append(";");
-    }
     
-    created.clear(); deleted.clear(); messages.clear();
+    created.clear(); deleted.clear();
     
     final String globalData = sb.toString();
     for(int i=0;i<controllers.size();i++) {
