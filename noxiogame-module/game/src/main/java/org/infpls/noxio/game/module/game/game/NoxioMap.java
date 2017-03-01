@@ -2,6 +2,8 @@ package org.infpls.noxio.game.module.game.game;
 
 import java.io.*;
 import java.util.*;
+import org.infpls.noxio.game.module.game.game.object.Line2;
+import org.infpls.noxio.game.module.game.game.object.Vec2;
 import org.springframework.core.io.*;
 
 public class NoxioMap {
@@ -46,7 +48,7 @@ public class NoxioMap {
     map = new int[bounds[1]][bounds[0]];
     for(int i=0;i<bounds[1];i++) {
       for(int j=0;j<bounds[0];j++) {
-       map[i][j] = Integer.parseInt(m[k++]);
+       map[bounds[1]-i-1][j] = Integer.parseInt(m[k++]); //Read map y backwards because GL renders from bottom not top
       }
     }
     
@@ -56,7 +58,7 @@ public class NoxioMap {
     collision = new int[bounds[1]][bounds[0]];
     for(int i=0;i<bounds[1];i++) {
       for(int j=0;j<bounds[0];j++) {
-       collision[i][j] = Integer.parseInt(c[k++]);
+       collision[bounds[1]-i-1][j] = Integer.parseInt(c[k++]); //Read map y backwards because GL renders from bottom not top
       }
     }
   }
@@ -75,6 +77,44 @@ public class NoxioMap {
     return sb.toString();
   }
   
+  /* Returns walls facing the normal of <Line2 direction> (@FIXME not doing this yet) within the <float radius> of the <Line2 direction> */
+  public List<Line2> getWallsNear(final Line2 direction, float radius) {
+    final List<int[]> tilesHit = new ArrayList();
+    final Vec2 dirNorm = direction.b.subtract(direction.a).normalize();
+    final int steps = (int)Math.floor(direction.a.subtract(direction.b).magnitude());
+    for(int s=0;s<=steps;s++) {
+      final Vec2 step = direction.a.add(dirNorm.scale(s));
+      final int x = (int)Math.floor(step.x);
+      final int y = (int)Math.floor(step.y);
+      for(int i=0;i<5;i++) {
+        for(int j=0;j<5;j++) {
+          boolean dupe = false;
+          for(int k=0;k<tilesHit.size();k++) {
+            final int[] chk = tilesHit.get(k);
+            if(chk[0]==x+i-2 && chk[1]==y+j-2) { dupe=true; break; }
+          }
+          if(dupe || !(x+i-2<bounds[0]) || !(y+j-2<bounds[1]) || !(x+i-2>=0) || !(y+j-2>=0)) { break; } // Out of bounds & duplicate check
+          tilesHit.add(new int[]{x+i-2,y+j-2}); /* @FIXME does not account for radius properly */
+        }
+      }
+    }
+    final List<Line2> walls = new ArrayList();
+    for(int i=0;i<tilesHit.size();i++) {
+      final int[] tile = tilesHit.get(i);
+      switch(collision[tile[1]][tile[0]]) {
+        /* No Collision */
+        case 0 : { break; }
+        /* Solid 1x1 Block */
+        case 1 : { final Line2[] lines = CollisionDef.createSolidBlock(new Vec2(tile[0],tile[1])); for(int j=0;j<lines.length;j++) { walls.add(lines[j]); } break; }
+        /* Solid 1x1 Pit */
+        case 2 : { break; }
+        /* Default to No Collision */
+        default : { break; }
+      }
+    }
+    return walls;
+  }
+  
   public String getName() { return name; }
   public String getDescription() { return description; }
   public List<String> getGametypes() { return gametypes; }
@@ -90,5 +130,16 @@ public class NoxioMap {
     }
     public String getModel() { return model; }
     public String getMaterial() { return material; }
+  }
+  
+  public static class CollisionDef {
+    public static Line2[] createSolidBlock(final Vec2 pos) {
+      return new Line2[] {
+        new Line2(new Vec2(-0.5f,-0.5f).add(pos), new Vec2( 0.5f,-0.5f).add(pos)),
+        new Line2(new Vec2( 0.5f,-0.5f).add(pos), new Vec2( 0.5f, 0.5f).add(pos)),
+        new Line2(new Vec2( 0.5f, 0.5f).add(pos), new Vec2(-0.5f, 0.5f).add(pos)),
+        new Line2(new Vec2(-0.5f, 0.5f).add(pos), new Vec2(-0.5f,-0.5f).add(pos))
+      };
+    }
   }
 }

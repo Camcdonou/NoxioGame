@@ -159,7 +159,7 @@ public abstract class NoxioGame {
     if(c.getControlled() != null) { return; } /* Already controlling an object */
     
     long oid = createOid();
-    Player player = new Player(this, oid, new Vec2(4.5f, 4.5f));
+    Player player = new Player(this, oid, new Vec2(5.5f, 5.5f));
     addObject(player);
     c.setControl(player);
   }

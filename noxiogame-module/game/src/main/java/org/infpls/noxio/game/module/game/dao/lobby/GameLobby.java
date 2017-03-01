@@ -13,8 +13,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
    & - Gametype/map dependency needs to be worked out. Also MapDao or whatever
    1 - Clean up PacketG10 some it's a bit of a mess ##ONGOING
    2 - Clean up stuff in general maybe.... (client...) ##ONGOING
-   4 - Map files need to static mesh support and game object spawning and gametype info added to their spec
-   5 - Collision
+   4 - Map files need static mesh support and game object spawning and gametype info added to their spec
+   5 - Collision optimization
    6 - Lol text rendering
    7 - Lol menus, fullscreen 
    8 - PARTICLE SYSTEMS AND SOUND AND HDR

@@ -49,9 +49,10 @@ public class Controller {
   
   public void step() {
     if(object != null && direction != null) {
-      if(object.getType().equals("obj.player") && direction.magnitude() > 0) {
+      if(object.getType().equals("obj.mobile.player")) {
         Player p = (Player)object;
-        p.move(direction.normalize().scale(speed));
+        final Vec2 move = direction.normalize().scale(speed);
+        if(!(move.isNaN() || move.isZero())) { p.move(direction.normalize().scale(speed)); }
       }
     }
   }
