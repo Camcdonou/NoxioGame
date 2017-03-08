@@ -9,16 +9,19 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
 /* On next work day.
+   # - RequestAnimFrame + Delta Time Interpolation (remember camera needs it)
    ? - Fill out the Gametype sub types so they do something.
    & - Gametype/map dependency needs to be worked out. Also MapDao or whatever
    1 - Clean up PacketG10 some it's a bit of a mess ##ONGOING
    2 - Clean up stuff in general maybe.... (client...) ##ONGOING
    4 - Map files need static mesh support and game object spawning and gametype info added to their spec
    5 - Collision optimization
-   6 - Lol text rendering
-   7 - Lol menus, fullscreen 
+   6 - UI Scaling so text remains readable?
    8 - PARTICLE SYSTEMS AND SOUND AND HDR
    9 - Object creation permutations
+   10 - (UPDATE: ITS COLLISION RELATED? happened again when i had 2 player objects run into each other) saw a rare bug where a lobby borked and appeared to have its game loop stopped but no exceptions, no idea what happned. showed 2 players even after logging out.
+   11 - shadow map size needs to be added as a uniform to allow proper sampling (ACTUALLY JUST REFACTOR AND RENAME AND UPDATE THAT LOL )
+   12 - maybe adjust center point based on camera angle. (maaaaaaaaaaaaaaybe)
 */
 
 public abstract class GameLobby {
@@ -55,7 +58,7 @@ public abstract class GameLobby {
   }
   
   private void newGame() throws IOException {
-    game = new Deathmatch(this, "test"); /* @FIXME */
+    game = new Deathmatch(this, "bigtest"); /* @FIXME */
   }
   
   /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */

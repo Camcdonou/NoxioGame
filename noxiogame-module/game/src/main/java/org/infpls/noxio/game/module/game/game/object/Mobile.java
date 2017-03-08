@@ -23,8 +23,8 @@ public abstract class Mobile extends GameObject {
           final float dist = position.distance(obj.getPosition());
           final Vec2 norm = position.subtract(obj.getPosition()).normalize();
           final float weightOffset = weight/(((Mobile)obj).getWeight()+weight);
-          final float aoi = 1.0f-Math.abs((velocity.normalize().isNaN() ? new Vec2(0.0f, 1.0f) : velocity.normalize()).dot(norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm));
-          setVelocity(velocity.scale((aoi*0.25f)+0.75f)); // Pushing another object head on slows this object down
+          //final float aoi = 1.0f-Math.abs((velocity.normalize().isNaN() ? new Vec2(0.0f, 1.0f) : velocity.normalize()).dot(norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm));
+          //setVelocity(velocity.scale((aoi*0.25f)+0.75f)); // Pushing another object head on slows this object down BUGGED!
           final Vec2 push = (norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm).scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
           setVelocity(velocity.add(push));
         }
