@@ -17,7 +17,7 @@ public abstract class Mobile extends GameObject {
     /* Check if any other objects are close enough to push this one */
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
-      if(obj != this && obj.getType().contains("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
+      if(obj != this && obj.getType().startsWith("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
         final float combinedRadius = radius+((Mobile)obj).getRadius();
         if(position.distance(obj.getPosition()) < combinedRadius) {
           final float dist = position.distance(obj.getPosition());
@@ -35,6 +35,11 @@ public abstract class Mobile extends GameObject {
       final Vec2 to = position.add(velocity);
       final List<Line2> walls = game.map.getWallsNear(new Line2(position, to), radius);
       final List<Intersection.Instance> intersections = new ArrayList();
+      /* Test for passthrough */
+      for(int i=0;i<walls.size();i++) {
+        final Intersection.Instance intersection = Intersection.lineLine(new Line2(position, to), walls.get(i));
+        if(intersection != null) { setPosition(position.lerp(intersection.intersection, 0.5f)); kill(); return; } /* In the event of a pass through kill this mobile. It hit a wall really hard. */
+      }
       /* Test for collisions */
       for(int i=0;i<walls.size();i++) {
         Intersection.Instance intersection = Intersection.lineCircle(to, walls.get(i), radius);

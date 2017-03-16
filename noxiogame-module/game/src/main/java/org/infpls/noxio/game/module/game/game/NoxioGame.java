@@ -65,12 +65,10 @@ public abstract class NoxioGame {
      if(resetTimer > 0) { resetTimer--; }
     }
     for(int i=0;i<objects.size();i++) {
-      GameObject obj = objects.get(i);
+      final GameObject obj = objects.get(i);
       if(obj.isDead()) {
         deleteObject(obj); i--;
         obj.destroy();
-        Controller c = getControllerByObject(obj);
-        if(c != null) { c.objectDestroyed(); }
       }
       else { obj.step(); }
     }
@@ -108,6 +106,13 @@ public abstract class NoxioGame {
       controllers.get(i).generateUpdateData(sbc);
       Packet p = new PacketG10(sbc.toString());
       lobby.sendPacket(p, controllers.get(i).getSid());
+    }
+  }
+  
+  /* Called after sending data to clients. Used for final cleanup of each tick. */
+  public void post() {
+    for(int i=0;i<objects.size();i++) {
+      objects.get(i).post();
     }
   }
   

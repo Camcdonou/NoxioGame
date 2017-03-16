@@ -5,10 +5,13 @@ import org.infpls.noxio.game.module.game.session.Packet;
 
 public class PacketI04 extends Packet {
   private final Vec2 pos;
-  public PacketI04(final float x, final float y) {
+  private final float speed;
+  public PacketI04(final Vec2 pos, final float speed) {
     super("i04");
-    this.pos = new Vec2(x, y);
+    this.pos = pos;
+    this.speed = speed;
   }
   
   public Vec2 getPos() { return pos; }
+  public float getSpeed() { return speed; }
 }

@@ -6,11 +6,15 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 
 public class Controller {
   private final NoxioGame game;
-  private final String user, sid;
-  private GameObject object;
-  private Vec2 direction;
-  private float speed;
-  private final Score score;
+  private final String user, sid;   // Username and Session ID of the player
+  
+  private GameObject object;        // Object this controller is controlling
+  
+  private Vec2 direction;           // Player movement direction
+  private float speed;              // Player movement speed
+  private String ability;           /* @FIXME RENAME TO ACTION AND EFFECT LOL */
+  
+  private final Score score;        // DEPRECATED
   
   private static final float VIEW_DISTANCE = 25.0f; /* Anything farther than this is out of view and not updated */
   
@@ -18,7 +22,10 @@ public class Controller {
     this.game = game;
     this.user = user;
     this.sid = sid;
-    this.direction = new Vec2(); this.speed = 1.0f;
+    
+    this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
+    this.ability = null;
+
     this.score = new Score(user);
   }
   /* Generates a game update data for the player of this controller */
@@ -31,28 +38,35 @@ public class Controller {
     if(object != null) {
       for(int i=0;i<game.objects.size();i++) {
         GameObject obj = game.objects.get(i);
-        if(obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE) {
+        if(obj == object || obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE) {
           obj.generateUpdateData(sb);
         }
+      }
+    }
+    else { /* @FIXME when the controller has no object it disables the VIEW_DISTANCE cull */
+      for(int i=0;i<game.objects.size();i++) {
+        GameObject obj = game.objects.get(i);
+        obj.generateUpdateData(sb);
       }
     }
   }
   
   public void handlePacket(Packet p) {
     switch(p.getType()) {
-      case "i04" : { direction = ((PacketI04)p).getPos(); speed = 0.5f; break; }
-      case "i05" : { direction = ((PacketI05)p).getPos(); speed = 1.0f; break; }
-      case "i01" : { direction = null; break; }
+      case "i01" : { direction = ((PacketI01)p).getPos().normalize(); speed = 0.0f; break; }
+      case "i04" : { direction = ((PacketI04)p).getPos().normalize(); speed = Math.min(Math.max(((PacketI04)p).getSpeed(), 0.33f), 1.0f); break; }
+      case "i05" : { ability = ((PacketI05)p).getAbility(); break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
   }
   
   public void step() {
-    if(object != null && direction != null) {
+    if(object != null) {
+      if(object.isDead()) { objectDestroyed(); return; }
       if(object.getType().equals("obj.mobile.player")) {
         Player p = (Player)object;
-        final Vec2 move = direction.normalize().scale(speed);
-        if(!(move.isNaN() || move.isZero())) { p.move(direction.normalize().scale(speed)); }
+        p.setInput(direction, speed);
+        if(ability != null) { p.setAction(ability); ability = null; }
       }
     }
   }
@@ -62,7 +76,7 @@ public class Controller {
     game.lobby.sendPacket(new PacketI03(object.getOid()), sid);
   }
   
-  public void objectDestroyed() {
+  private void objectDestroyed() {
     this.object = null;
     game.lobby.sendPacket(new PacketI03(-1), sid);
   }

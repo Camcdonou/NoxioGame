@@ -4,6 +4,29 @@ import org.infpls.noxio.game.module.game.game.object.*;
 
 public class Intersection {
   
+  public static Instance lineLine(final Line2 A, final Line2 B) {
+    float s1_x, s1_y, s2_x, s2_y;
+    float i_x, i_y;
+    s1_x = A.b.x - A.a.x;     s1_y = A.b.y - A.a.y;
+    s2_x = B.b.x - B.a.x;     s2_y = B.b.y - B.a.y;
+
+    float s, t;
+    s = (-s1_y * (A.a.x - B.a.x) + s1_x * (A.a.y - B.a.y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = ( s2_x * (A.a.y - B.a.y) - s2_y * (A.a.x - B.a.x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+    {
+        // Collision detected
+        i_x = A.a.x + (t * s1_x);
+        i_y = A.a.y + (t * s1_y);
+        final Vec2 intersection = new Vec2(i_x, i_y);
+        final Vec2 normal = intersection.subtract(A.a).normalize();
+        return new Instance(intersection, normal, intersection.distance(A.a));
+    }
+
+    return null; // No collision
+  }
+  
   public static Instance lineCircle(final Vec2 P, final Line2 L, float r) {
     final Vec2 nearest = lineNearestPoint(P, L);
     if(nearest.equals(L.a)) {

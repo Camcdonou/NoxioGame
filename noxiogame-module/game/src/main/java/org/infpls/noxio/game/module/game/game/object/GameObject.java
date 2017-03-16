@@ -26,6 +26,7 @@ public abstract class GameObject {
   }
   
   public abstract void step();
+  public void post() {};
   public abstract void generateUpdateData(final StringBuilder sb);
   
   public void setPosition(final Vec2 a) { position = a; }

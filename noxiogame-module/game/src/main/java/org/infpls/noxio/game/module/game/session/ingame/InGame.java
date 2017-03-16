@@ -40,8 +40,8 @@ public class InGame extends SessionState {
     > i01 mouse neutral
     > i02 player request spawn
     < i03 player object control
-    > i04 mouse move walk
-    > i05 mouse move run
+    > i04 mouse move
+    > i05 use ability
   */
   
   @Override
@@ -60,7 +60,7 @@ public class InGame extends SessionState {
         /* Ingame Type Packets gxx */
         
         /* Input Type Packets ixx */
-        case "i01" : { lobby.pushPacket(gson.fromJson(data, PacketI01.class).setSrcSid(session.getSessionId())); break; }
+        case "i01" : { lobby.pushPacket(gson.fromJson(data, PacketI01.class).setSrcSid(session.getSessionId())); break; } /* @FIXME cleanup */
         case "i02" : { lobby.pushPacket(gson.fromJson(data, PacketI02.class).setSrcSid(session.getSessionId())); break; }
         case "i04" : { lobby.pushPacket(gson.fromJson(data, PacketI04.class).setSrcSid(session.getSessionId())); break; }
         case "i05" : { lobby.pushPacket(gson.fromJson(data, PacketI05.class).setSrcSid(session.getSessionId())); break; }
