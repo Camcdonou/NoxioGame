@@ -3,6 +3,7 @@ package org.infpls.noxio.game.module.game.game;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
+import org.infpls.noxio.game.module.game.session.*;
 
 public class Controller {
   private final NoxioGame game;
@@ -56,6 +57,7 @@ public class Controller {
       case "i01" : { direction = ((PacketI01)p).getPos().normalize(); speed = 0.0f; break; }
       case "i04" : { direction = ((PacketI04)p).getPos().normalize(); speed = Math.min(Math.max(((PacketI04)p).getSpeed(), 0.33f), 1.0f); break; }
       case "i05" : { ability = ((PacketI05)p).getAbility(); break; }
+      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { System.out.println(host.getSessionId() + " vs. " + sid); if(host.getSessionId().equals(sid)) { game.gameOver(); } } break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
   }

@@ -49,8 +49,8 @@ public class CustomLobby extends GameLobby {
   }
     
   @Override
-  public NoxioSession getHost() { return null; }
+  public NoxioSession getHost() { return hostPlayer; }
   
   @Override
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", hostPlayer == null ? "N/A" : hostPlayer.getUser(), players.size(), maxPlayers); }
+  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", hostPlayer == null ? "N/A" : getHost().getUser(), players.size(), maxPlayers); }
 }

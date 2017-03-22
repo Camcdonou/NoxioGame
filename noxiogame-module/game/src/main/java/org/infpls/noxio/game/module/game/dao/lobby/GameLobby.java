@@ -10,7 +10,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
 
 /* On next work day.
    # - RequestAnimFrame + Delta Time Interpolation (remember camera & particles & lights needs it)
-   $ - Sound position & ETC. Real map for testing n' stuff. Decals. Then make the game fully playable. <-------------------
+   $ - Real map for testing n' stuff. Decals. Then make the game fully playable. <-------------------
    ? - Fill out the Gametype sub types so they do something.
    & - Gametype/map dependency needs to be worked out. Also MapDao or whatever
    1 - Clean up PacketG10 AND INPUT PACKETS some it's a bit of a mess ##ONGOING
@@ -61,7 +61,7 @@ public abstract class GameLobby {
   }
   
   private void newGame() throws IOException {
-    game = new Deathmatch(this, "bigtest"); /* @FIXME */
+    game = new Deathmatch(this, "final"); /* @FIXME */
   }
   
   /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */

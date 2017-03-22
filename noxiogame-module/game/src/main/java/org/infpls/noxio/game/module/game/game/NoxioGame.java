@@ -45,6 +45,7 @@ public abstract class NoxioGame {
           case "i02" : { spawnPlayer((PacketI02)p);  break; }
           case "i04" : { c.handlePacket(p); break; }
           case "i05" : { c.handlePacket(p); break; }
+          case "i06" : { c.handlePacket(p); break; }
           default : { /* @FIXME ERROR REPORT */ break; }
         }
       }
