@@ -9,6 +9,7 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
 /* On next work day.
+   ! - INPUT IS SO FUCKING WEIRD LOL to many references to handle to many things in weird ways. pls fix.
    # - RequestAnimFrame + Delta Time Interpolation (remember camera & particles & lights needs it)
    $ - Real map for testing n' stuff. Decals. Then make the game fully playable. <-------------------
    ? - Fill out the Gametype sub types so they do something.
@@ -25,6 +26,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
    11 - shadow map size needs to be added as a uniform to allow proper sampling (ACTUALLY JUST REFACTOR AND RENAME AND UPDATE THAT LOL )
    12 - maybe adjust center point based on camera angle. (maaaaaaaaaaaaaaybe)
    13 - make a nice actual map for benchmarking
+   14 - SKYBOXES OR SOMETHING...
 */
 
 public abstract class GameLobby {

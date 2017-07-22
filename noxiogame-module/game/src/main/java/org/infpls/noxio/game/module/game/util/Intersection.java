@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.util;
 
+import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 
 public class Intersection {
@@ -52,6 +53,23 @@ public class Intersection {
     }
   }
   
+  public static Instance polygonCircle(final Vec2 P, final Polygon G, float r) {
+    final List<Instance> hits = new ArrayList();
+    for(int i=0;i<G.v.length;i++) {
+      final Line2 L = new Line2(G.v[i], G.v[i+1<G.v.length?i+1:0]);
+      final Instance inst = lineCircle(P, L, r);
+      if(inst != null) { hits.add(inst); }
+    }
+    if(hits.size() < 1) { return null; }
+    Instance nearest = hits.get(0);
+    for(int i=1;i<hits.size();i++) {
+      if(hits.get(i).distance < nearest.distance) {
+        nearest = hits.get(i);
+      }
+    }
+    return nearest;
+  }
+  
   private static Vec2 lineNearestPoint(final Vec2 P, final Line2 L) {   
     final Vec2 v = L.b.subtract(L.a);
     final Vec2 w = P.subtract(L.a);
@@ -62,6 +80,20 @@ public class Intersection {
     float b = c1 / c2;
     return L.a.add(v.scale(b));
   }
+  
+  public static boolean pointInPolygon(final Vec2 P, final Polygon G) {
+  boolean c = false;
+  int nvert = G.v.length;
+  for (int i=0, j=nvert-1;i<nvert;j=i++) {
+    if (
+      ((G.v[i].y>P.y) != (G.v[j].y>P.y)) &&
+      (P.x < (G.v[j].x-G.v[i].x) * (P.y-G.v[i].y) / (G.v[j].y-G.v[i].y) + G.v[i].x)
+    ) {
+      c = !c;
+    }
+  }
+  return c;
+};
   
   public static class Instance {
     public final Vec2 intersection, normal;
