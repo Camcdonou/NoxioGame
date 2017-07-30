@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.game;
 
+import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
@@ -13,7 +14,7 @@ public class Controller {
   
   private Vec2 direction;           // Player movement direction
   private float speed;              // Player movement speed
-  private String ability;           /* @FIXME RENAME TO ACTION AND EFFECT LOL */
+  private final List<String> action;           /* @FIXME RENAME TO ACTION AND EFFECT LOL */
   
   private final Score score;        // DEPRECATED
   
@@ -25,7 +26,7 @@ public class Controller {
     this.sid = sid;
     
     this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
-    this.ability = null;
+    this.action = new ArrayList();
 
     this.score = new Score(user);
   }
@@ -56,8 +57,8 @@ public class Controller {
     switch(p.getType()) {
       case "i01" : { direction = ((PacketI01)p).getPos().normalize(); speed = 0.0f; break; }
       case "i04" : { direction = ((PacketI04)p).getPos().normalize(); speed = Math.min(Math.max(((PacketI04)p).getSpeed(), 0.33f), 1.0f); break; }
-      case "i05" : { ability = ((PacketI05)p).getAbility(); break; }
-      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { System.out.println(host.getSessionId() + " vs. " + sid); if(host.getSessionId().equals(sid)) { game.gameOver(); } } break; }
+      case "i05" : { action.add(((PacketI05)p).getAbility()); break; }
+      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { System.out.println(host.getSessionId() + " vs. " + sid); if(host.getSessionId().equals(sid)) { game.gameOver("Game reset by lobby owner!"); } } break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
   }
@@ -68,7 +69,8 @@ public class Controller {
       if(object.getType().equals("obj.mobile.player")) {
         Player p = (Player)object;
         p.setInput(direction, speed);
-        if(ability != null) { p.setAction(ability); ability = null; }
+        for(int i=0;i<action.size();i++) { p.queueAction(action.get(i)); }
+        action.clear();
       }
     }
   }

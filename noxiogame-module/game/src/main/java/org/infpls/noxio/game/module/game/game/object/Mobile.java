@@ -9,14 +9,14 @@ import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 public abstract class Mobile extends GameObject {
   private final float radius, weight, friction;
   private float height, vspeed;
-  private static final float AIR_DRAG = 0.97f, AIR_CONTROL = 0.3f;
+  private boolean grounded;
+  private static final float AIR_DRAG = 0.98f;
   public Mobile(final NoxioGame game, final long oid, final String type, final Vec2 position, final float radius, final float weight, final float friction) {
     super(game, oid, type, position);
+    this.height = 0.0f; this.vspeed = 0.0f; this.grounded = false;
     this.radius = radius; this.weight = weight; this.friction = friction;
   }
   
-  /* @FIXME optimization. This is probaly slow due to how complex it is. */
-  /* @FIXME on high velocity movements (magnitude >= 1.0f) we need to add ray test to prevent pass through */
   public void physics() {
     /* -- Objects -- */
     for(int i=0;i<game.objects.size();i++) {
@@ -37,13 +37,13 @@ public abstract class Mobile extends GameObject {
     /* -- Intersection -- */
     
     /* -- Movement  -- */
+    final Vec2 to = position.add(velocity);
+    final List<Polygon> walls = game.map.getNearWalls(to, radius);
+    final List<Polygon> floors = game.map.getNearFloors(to, radius);
+    float impact = 0.0f;
     if(velocity.magnitude() > 0.00001) {
-      final Vec2 to = position.add(velocity);
-      final List<Polygon> walls = game.map.getNearWalls(to, radius);
-      final List<Polygon> floors = game.map.getNearFloors(to, radius);
       
       boolean move = true;
-      float impact = 0.0f;
       for(int i=0;i<walls.size();i++) {
         final Polygon w = walls.get(i);
         if(Intersection.pointInPolygon(to, w)) {
@@ -78,34 +78,51 @@ public abstract class Mobile extends GameObject {
       if(move) {
         setPosition(to);
       }
-      
-      /* Height */
-      boolean falling = true;
-      if(height > -0.4f) {
-      for(int i=0;i<floors.size();i++) {
-        if(Intersection.pointInPolygon(position, floors.get(i))) {
-          falling = false; break;
-        }
-      }
-      }
-      if(falling || vspeed > 0.0f) {
-        vspeed -= 0.025f;
-        height += vspeed;
-      }
-      else {
-        vspeed = 0.0f;
-        height = 0.0f;
-      }
-      
-      /* Final */
-      
-      if(impact > 0.5f || height < -2.0f) {
-        kill();
+    }
+    
+    /* Height */
+    boolean floorBounded = false;
+    for(int i=0;i<floors.size();i++) {
+      if(Intersection.pointInPolygon(position, floors.get(i))) {
+        floorBounded = true; break;
       }
     }
-    setVelocity(velocity.scale(friction));
+    if(floorBounded) {
+      if(height > -0.4f && height <= 0.0f) {
+        if(vspeed < 0.0f) {
+          height = 0.0f; vspeed = 0.0f;       // Grounded not moving up
+          grounded = true;
+        }
+        else {
+          height += vspeed; vspeed -= 0.03f; // Grounded but above floor
+          grounded = false;
+        }
+      }
+      else {
+        height += vspeed; vspeed -= 0.03f;   // Falling while below floor @FIXME check for full passthrough at high speeds?
+        grounded = false;
+      }
+    }
+    else {
+      height += vspeed; vspeed -= 0.03f;     // Falling
+      grounded = false;
+    }
+
+    /* Final */
+
+    if(impact > 0.75f || height < -6.0f) {
+      kill();
+    }
+    
+    if(isGrounded()) { setVelocity(velocity.scale(friction)); } // No ice skating on the lawn!
+    else { setVelocity(velocity.scale(AIR_DRAG)); }             // No friction while moving airborne, but air drag is accounted.
   }
+  
+  public void popup(float power) { vspeed += (power > 0.0f ? power : 0.0f); }
+  public boolean isGrounded() { return grounded; }
   
   public float getRadius() { return radius; }
   public float getWeight() { return weight; }
+  public float getHeight() { return height; }
+  public float getVSpeed() { return vspeed; }
 }

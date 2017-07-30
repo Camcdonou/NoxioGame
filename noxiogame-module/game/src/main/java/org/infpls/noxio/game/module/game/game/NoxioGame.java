@@ -141,7 +141,7 @@ public abstract class NoxioGame {
   }
   
   /* Returns controller for given SID */
-  private Controller getController(final String sid) {
+  public Controller getController(final String sid) {
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getSid().equals(sid)) {
         return controllers.get(i);
@@ -151,7 +151,7 @@ public abstract class NoxioGame {
   }
   
   /* Returns controller for given Object */
-  private Controller getControllerByObject(final GameObject obj) {
+  public Controller getControllerByObject(final GameObject obj) {
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getControlled() == obj) {
         return controllers.get(i);
@@ -160,12 +160,14 @@ public abstract class NoxioGame {
     return null;
   }
 
-  private void spawnPlayer(PacketI02 p) {
+  protected void spawnPlayer(PacketI02 p) {
     Controller c = getController(p.getSrcSid());
     if(c.getControlled() != null) { return; } /* Already controlling an object */
     
+    final Vec2 sp = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f);
+    
     long oid = createOid();
-    Player player = new Player(this, oid, new Vec2(5.5f, 5.5f));
+    Player player = new Player(this, oid, sp);
     addObject(player);
     c.setControl(player);
   }
@@ -176,6 +178,7 @@ public abstract class NoxioGame {
       GameObject obj = objects.get(i);
       generateJoinPacket(player);
     }
+    updateScore();
   }
   
   public void leave(final NoxioSession player) {
@@ -186,10 +189,15 @@ public abstract class NoxioGame {
         return;
       }
     }
+    updateScore();
   }
   
-  public void gameOver() {
-    lobby.sendPacket(new PacketG16());
+  public abstract void reportKill(Controller killer, GameObject killed);
+  public abstract void reportObjective(Controller player, GameObject objective);
+  public abstract void updateScore();
+  
+  public void gameOver(String message) {
+    lobby.sendPacket(new PacketG16(message));
     gameOver = true; resetTimer = 150;
   }
   

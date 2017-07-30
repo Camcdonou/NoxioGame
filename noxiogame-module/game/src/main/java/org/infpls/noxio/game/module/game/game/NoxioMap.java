@@ -153,6 +153,14 @@ public class NoxioMap {
     return sb.toString();
   }
   
+  public List<Spawn> getSpawns(final String type) {
+    final List<Spawn> sps = new ArrayList();
+    for(int i=0;i<spawns.size();i++) {
+      if(spawns.get(i).getType().equals(type)) { sps.add(spawns.get(i)); }
+    }
+    return sps;
+  }
+  
   public String getName() { return name; }
   public String getDescription() { return description; }
   public List<String> getGametypes() { return gametypes; }

@@ -4,26 +4,31 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Player extends Mobile {
-  private static final float MAX_SPEED = 0.025f; // Max movement speed
+  private static final float MAX_SPEED = 0.0375f; // Max movement speed
   private static final int BLIP_COOLDOWN_LENGTH = 10, DASH_COOLDOWN_LENGTH = 15, TAUNT_COOLDOWN_LENGTH = 30, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30, DASH_POWER_MAX = 60, DASH_POWER_ADD = 30, DASH_STUN_TIME = 30;
   private static final float BLIP_IMPULSE = 0.85f, DASH_IMPULSE = 0.25f, BLIP_OUTER_RADIUS = 0.1f;
+  private static final float JUMP_HEIGHT = 0.175f, AIR_CONTROL = 0.2f;
   
   private Vec2 look;                       // Normalized direction player is facing
   private float speed;                     // Current scalar of max movement speed <0.0 to 1.0>
-  private String action;                   // Action to be performed on the next frame
+  private final List<String> action;             // Action to be performed on the next frame
   private final List<String> effects;      // List of actions performed that will be sent to the client on the next update
+  
+  private Controller tagged;
   
   private int blipCooldown, dashCooldown, tauntCooldown, blipPower, dashPower;
   private int stunTimer;
   private int spawnProtection;
   public Player(final NoxioGame game, final long oid, final Vec2 position) {
-    super(game, oid, "obj.mobile.player", position, 0.5f, 1.0f, 0.88f);
+    super(game, oid, "obj.mobile.player", position, 0.5f, 1.0f, 0.725f);
     
     look =  new Vec2(0.0f, 1.0f);
     speed = 0.0f;
     
-    action = null;
+    action = new ArrayList();
     effects = new ArrayList();
+    
+    tagged = null;
     
     blipCooldown = 0; dashCooldown = 0; tauntCooldown = 0;
     blipPower = BLIP_POWER_MAX; dashPower = 0;
@@ -40,26 +45,29 @@ public class Player extends Mobile {
   }
   
   /* Sets player action. This will be processed on the next step() */
-  public void setAction(final String action) {
+  public void queueAction(final String a) {
     if(stunTimer > 0) { return; }
-    this.action = action;
+    action.add(a);
   }
   
   /* Applies player inputs to the object. */
   public void movement() {
-    setVelocity(velocity.add(look.scale(MAX_SPEED*speed)));
+    if(isGrounded()) { setVelocity(velocity.add(look.scale(MAX_SPEED*speed))); }
+    else { setVelocity(velocity.add(look.scale(MAX_SPEED*speed).scale(AIR_CONTROL))); } // Reduced control while airborne
   }
   
   /* Performs action. */
   public void actions() {
-    if(action == null) { return; }
-    switch(action) {
-      case "blip" : { blip(); break; }
-      case "dash" : { dash(); break; }
-      case "taunt" : { taunt(); break; }
-      default : { break; }
+    for(int i=0;i<action.size();i++) {
+      switch(action.get(i)) {
+        case "blip" : { blip(); break; }
+        case "dash" : { dash(); break; }
+        case "taunt" : { taunt(); break; }
+        case "jump" : { jump(); break; }
+        default : { break; }
+      }
     }
-    action = null;
+    action.clear();
   }
   
   @Override
@@ -85,13 +93,15 @@ public class Player extends Mobile {
    
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<vec2 look>;<float speed>;<string[] effects>
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string[] effects>
   */
   public void generateUpdateData(final StringBuilder sb) {
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
+    sb.append(getHeight()); sb.append(";");
+    sb.append(getVSpeed()); sb.append(";");
     look.toString(sb); sb.append(";");
     sb.append(speed); sb.append(";");
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
@@ -112,12 +122,20 @@ public class Player extends Mobile {
             }
             final Vec2 normal = mob.getPosition().subtract(position).normalize();
             mob.setVelocity(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)));
+            final Controller c = game.getControllerByObject(this);
+            if(c != null) { mob.tag(c); }
           }
         }
       }
       blipPower = 0;
       effects.add("blip");
     }
+  }
+  
+  public void jump() {
+    if(!isGrounded()) { return; }
+    popup(JUMP_HEIGHT);
+    effects.add("jump");
   }
   
   public void dash() {
@@ -143,10 +161,15 @@ public class Player extends Mobile {
   }
   
   @Override
-  public void kill(GameObject killer) {
-    if(spawnProtection < 1) { dead = true; }
-  }
+  public void tag(final Controller player) {
+    tagged = player;
+  } 
   
   @Override
-  public void kill() { dead = true; }
+  public void kill() {
+    dead = true;
+    if(tagged != null) {
+      game.reportKill(tagged, this);
+    }
+  }
 }

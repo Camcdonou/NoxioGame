@@ -33,6 +33,7 @@ public class InGame extends SessionState {
   
     < g10 the game update packet - see NoxioGame & Controller class for details
   
+    < g14 score
     < g15 message
     < g16 game over
     < g17 new game

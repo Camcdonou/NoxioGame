@@ -1,5 +1,7 @@
 package org.infpls.noxio.game.module.game.game;
 
+/* @TODO: Refactor to PlayerScore/GameScore as we should seperate indiviual stats from game objective state */
+
 public class Score {
   private final String user;
   private int kills, deaths;

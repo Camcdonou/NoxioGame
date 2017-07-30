@@ -1,6 +1,7 @@
 package org.infpls.noxio.game.module.game.game.object;
 
 import org.infpls.noxio.game.module.game.game.NoxioGame;
+import org.infpls.noxio.game.module.game.game.Controller;
 
 public abstract class GameObject {
   protected final NoxioGame game; /* Parent Game */
@@ -38,7 +39,7 @@ public abstract class GameObject {
   public final Vec2 getVelocity() { return velocity; }
   
   public boolean isDead() { return dead; } /* If this method returns true the object is destroyed on the next game tick. */
-  public void kill(GameObject killer) { dead = true; }
+  public void tag(final Controller player) { } /* When an offensive action hits this object the player who performed it is recorded and credited for points if it causes death. */
   public void kill() { dead = true; } /* Marks as dead and does whatever dead things do */
   public void destroy() { } /* Called right before removing the object from the game */
 }
