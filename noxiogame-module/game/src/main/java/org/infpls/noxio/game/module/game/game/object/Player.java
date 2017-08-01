@@ -93,9 +93,14 @@ public class Player extends Mobile {
    
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string[] effects>
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<string[] effects>
   */
   public void generateUpdateData(final StringBuilder sb) {
+    final Controller c = game.getControllerByObject(this);
+    final String name;
+    if(c != null) { name = c.getUser(); }
+    else { name = ""; }
+    
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
     position.toString(sb); sb.append(";");
@@ -104,6 +109,7 @@ public class Player extends Mobile {
     sb.append(getVSpeed()); sb.append(";");
     look.toString(sb); sb.append(";");
     sb.append(speed); sb.append(";");
+    sb.append(name); sb.append(";");
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }
