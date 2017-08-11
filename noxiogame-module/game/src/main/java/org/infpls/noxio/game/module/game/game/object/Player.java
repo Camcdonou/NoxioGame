@@ -117,19 +117,21 @@ public class Player extends Mobile {
   public void blip() {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
-      for(int i=0;i<game.objects.size();i++) {
-        GameObject obj = game.objects.get(i);
-        if(obj != this && obj.getType().startsWith("obj.mobile")) {
-          Mobile mob = (Mobile)obj;
-          if(mob.getPosition().distance(position) < mob.getRadius() + getRadius() + BLIP_OUTER_RADIUS) {
-            if(obj.getType().startsWith("obj.mobile.player")) {
-              Player ply = (Player)obj;
-              ply.stun(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX));
+      if(getHeight() > -0.5) {
+        for(int i=0;i<game.objects.size();i++) {
+          GameObject obj = game.objects.get(i);
+          if(obj != this && obj.getType().startsWith("obj.mobile")) {
+            final Mobile mob = (Mobile)obj;
+            if(mob.getPosition().distance(position) < mob.getRadius() + getRadius() + BLIP_OUTER_RADIUS && mob.getHeight() > -0.5) {
+              if(obj.getType().startsWith("obj.mobile.player")) {
+                final Player ply = (Player)obj;
+                ply.stun(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX));
+              }
+              final Vec2 normal = mob.getPosition().subtract(position).normalize();
+              mob.setVelocity(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)));
+              final Controller c = game.getControllerByObject(this);
+              if(c != null) { mob.tag(c); }
             }
-            final Vec2 normal = mob.getPosition().subtract(position).normalize();
-            mob.setVelocity(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)));
-            final Controller c = game.getControllerByObject(this);
-            if(c != null) { mob.tag(c); }
           }
         }
       }

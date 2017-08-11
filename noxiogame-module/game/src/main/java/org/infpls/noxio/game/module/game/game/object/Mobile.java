@@ -19,18 +19,21 @@ public abstract class Mobile extends GameObject {
   
   public void physics() {
     /* -- Objects -- */
-    for(int i=0;i<game.objects.size();i++) {
-      final GameObject obj = game.objects.get(i);
-      if(obj != this && obj.getType().startsWith("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
-        final float combinedRadius = radius+((Mobile)obj).getRadius();
-        if(position.distance(obj.getPosition()) < combinedRadius) {
-          final float dist = position.distance(obj.getPosition());
-          final Vec2 norm = position.subtract(obj.getPosition()).normalize();
-          final float weightOffset = weight/(((Mobile)obj).getWeight()+weight);
-          //final float aoi = 1.0f-Math.abs((velocity.normalize().isNaN() ? new Vec2(0.0f, 1.0f) : velocity.normalize()).dot(norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm));
-          //setVelocity(velocity.scale((aoi*0.25f)+0.75f)); // Pushing another object head on slows this object down BUGGED!
-          final Vec2 push = (norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm).scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
-          setVelocity(velocity.add(push));
+    if(height > -0.5) {                                             // If this object is to low we ignore object collision.
+      for(int i=0;i<game.objects.size();i++) {
+        final GameObject obj = game.objects.get(i);
+        if(obj != this && obj.getType().startsWith("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
+          final Mobile mob = (Mobile)obj;
+          final float combinedRadius = radius+mob.getRadius();
+          if(position.distance(mob.getPosition()) < combinedRadius && mob.getHeight() > -0.5) {
+            final float dist = position.distance(obj.getPosition());
+            final Vec2 norm = position.subtract(obj.getPosition()).normalize();
+            final float weightOffset = weight/(mob.getWeight()+weight);
+            //final float aoi = 1.0f-Math.abs((velocity.normalize().isNaN() ? new Vec2(0.0f, 1.0f) : velocity.normalize()).dot(norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm));
+            //setVelocity(velocity.scale((aoi*0.25f)+0.75f)); // Pushing another object head on slows this object down BUGGED!
+            final Vec2 push = (norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm).scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
+            setVelocity(velocity.add(push));
+          }
         }
       }
     }
