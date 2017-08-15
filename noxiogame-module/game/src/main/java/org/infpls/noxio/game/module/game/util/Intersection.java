@@ -21,7 +21,7 @@ public class Intersection {
         i_x = A.a.x + (t * s1_x);
         i_y = A.a.y + (t * s1_y);
         final Vec2 intersection = new Vec2(i_x, i_y);
-        final Vec2 normal = intersection.subtract(A.a).normalize();
+        final Vec2 normal = B.normal(); // WRONG! @FIXME
         return new Instance(intersection, normal, intersection.distance(A.a));
     }
 
@@ -58,6 +58,23 @@ public class Intersection {
     for(int i=0;i<G.v.length;i++) {
       final Line2 L = new Line2(G.v[i], G.v[i+1<G.v.length?i+1:0]);
       final Instance inst = lineCircle(P, L, r);
+      if(inst != null) { hits.add(inst); }
+    }
+    if(hits.size() < 1) { return null; }
+    Instance nearest = hits.get(0);
+    for(int i=1;i<hits.size();i++) {
+      if(hits.get(i).distance < nearest.distance) {
+        nearest = hits.get(i);
+      }
+    }
+    return nearest;
+  }
+  
+  public static Instance polygonLine(final Line2 P, final Polygon G) {
+    final List<Instance> hits = new ArrayList();
+    for(int i=0;i<G.v.length;i++) {
+      final Line2 L = new Line2(G.v[i], G.v[i+1<G.v.length?i+1:0]);
+      final Instance inst = lineLine(P, L);
       if(inst != null) { hits.add(inst); }
     }
     if(hits.size() < 1) { return null; }

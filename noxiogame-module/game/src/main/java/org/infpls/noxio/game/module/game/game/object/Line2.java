@@ -6,4 +6,8 @@ public class Line2 {
     this.a = a.copy();
     this.b = b.copy();
   }
+  
+  public Vec2 normal() {
+    return new Vec2(b.y-a.y, -1*(b.x-a.x)).normalize();
+  };
 }

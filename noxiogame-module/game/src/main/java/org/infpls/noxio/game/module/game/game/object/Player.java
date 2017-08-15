@@ -141,7 +141,7 @@ public class Player extends Mobile {
   }
   
   public void jump() {
-    if(!isGrounded()) { return; }
+    if(!isGrounded() || getVSpeed() != 0f) { return; }
     popup(JUMP_HEIGHT);
     effects.add("jump");
   }
