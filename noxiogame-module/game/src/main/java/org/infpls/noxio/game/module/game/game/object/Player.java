@@ -15,12 +15,32 @@ public class Player extends Mobile {
   private final List<String> effects;      // List of actions performed that will be sent to the client on the next update
   
   private Controller tagged;
+  private Flag holding;
   
   private int blipCooldown, dashCooldown, tauntCooldown, blipPower, dashPower;
   private int stunTimer;
   private int spawnProtection;
   public Player(final NoxioGame game, final long oid, final Vec2 position) {
-    super(game, oid, "obj.mobile.player", position, 0.5f, 1.0f, 0.725f);
+    super(game, oid, "obj.mobile.player", position, false, 0.5f, 1.0f, 0.725f);
+    
+    look =  new Vec2(0.0f, 1.0f);
+    speed = 0.0f;
+    
+    action = new ArrayList();
+    effects = new ArrayList();
+    
+    tagged = null;
+    holding = null;
+    
+    blipCooldown = 0; dashCooldown = 0; tauntCooldown = 0;
+    blipPower = BLIP_POWER_MAX; dashPower = 0;
+    
+    stunTimer = 0;
+    spawnProtection = 66;
+  }
+  
+  public Player(final NoxioGame game, final long oid, final Vec2 position, final int team) {
+    super(game, oid, "obj.mobile.player", position, false, 0.5f, 1.0f, 0.725f);
     
     look =  new Vec2(0.0f, 1.0f);
     speed = 0.0f;
@@ -35,6 +55,7 @@ public class Player extends Mobile {
     
     stunTimer = 0;
     spawnProtection = 66;
+    setTeam(team);
   }
   
   /* Sets player inputs. These will be processed on the next step() */
@@ -75,6 +96,7 @@ public class Player extends Mobile {
     movement();   // Apply player movement input
     physics();    // Object physics and collision
     actions();    // Perform action
+    pickup();
     
     /* Timers */
     if(blipCooldown > 0) { blipCooldown--; }
@@ -86,6 +108,26 @@ public class Player extends Mobile {
     if(spawnProtection > 0) { spawnProtection--; }
   }
   
+  /* Picup flag or whatever if you move over it */
+  public void pickup() {
+    for(int i=0;i<game.objects.size();i++) {
+      if(game.objects.get(i).getType().equals("obj.mobile.flag")) {
+        final Flag flag = (Flag)(game.objects.get(i));
+        if(holding==null && flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
+          if(flag.pickup(this, getTeam())) { holding = flag; }
+        }
+      }
+    }
+  }
+  
+  /* Do not call this?!?!?!? */
+  public void drop() {
+    if(holding==null) { return; }
+    final Flag f = holding;
+    holding = null;
+    f.drop();
+  }
+
   @Override
   public void post() {
     effects.clear();
@@ -103,6 +145,7 @@ public class Player extends Mobile {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
+    sb.append(getTeam()); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");
@@ -148,6 +191,7 @@ public class Player extends Mobile {
   
   public void dash() {
     if(dashCooldown <= 0 && dashPower < DASH_POWER_MAX) {
+      drop();
       dashCooldown = DASH_COOLDOWN_LENGTH;
       dashPower += DASH_POWER_ADD;
       setVelocity(velocity.add(look.scale(DASH_IMPULSE)));
@@ -171,13 +215,16 @@ public class Player extends Mobile {
   @Override
   public void tag(final Controller player) {
     tagged = player;
-  } 
+  }
   
   @Override
   public void kill() {
     dead = true;
+    drop();
     if(tagged != null) {
       game.reportKill(tagged, this);
     }
   }
+  
+  public Flag getHolding() { return holding; }
 }

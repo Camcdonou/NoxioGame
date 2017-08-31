@@ -9,24 +9,24 @@ import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 public abstract class Mobile extends GameObject {
   private final float radius, weight, friction;
   private float height, vspeed;
-  private boolean grounded;
+  private boolean intangible, grounded;
   
   private static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;
-  public Mobile(final NoxioGame game, final long oid, final String type, final Vec2 position, final float radius, final float weight, final float friction) {
+  public Mobile(final NoxioGame game, final long oid, final String type, final Vec2 position, final boolean intangible, final float radius, final float weight, final float friction) {
     super(game, oid, type, position);
-    this.height = 0.0f; this.vspeed = 0.0f; this.grounded = false;
+    this.height = 0.0f; this.vspeed = 0.0f; this.grounded = false; this.intangible = intangible;
     this.radius = radius; this.weight = weight; this.friction = friction;
   }
   
   public void physics() {
     /* -- Objects -- */
-    if(height > -0.5) {                                             // If this object is to low we ignore object collision.
+    if(height > -0.5 && !intangible) {                                             // If this object is to low we ignore object collision.
       for(int i=0;i<game.objects.size();i++) {
         final GameObject obj = game.objects.get(i);
         if(obj != this && obj.getType().startsWith("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
           final Mobile mob = (Mobile)obj;
           final float combinedRadius = radius+mob.getRadius();
-          if(position.distance(mob.getPosition()) < combinedRadius && mob.getHeight() > -0.5) {
+          if(position.distance(mob.getPosition()) < combinedRadius && mob.getHeight() > -0.5 && !mob.isIntangible()) {
             final float dist = position.distance(obj.getPosition());
             final Vec2 norm = position.subtract(obj.getPosition()).normalize();
             final float weightOffset = weight/(mob.getWeight()+weight);
@@ -148,9 +148,12 @@ public abstract class Mobile extends GameObject {
   
   public void popup(float power) { vspeed += (power > 0.0f ? power : 0.0f); }
   public boolean isGrounded() { return grounded; }
+  public boolean isIntangible() { return intangible; }
   
   public float getRadius() { return radius; }
   public float getWeight() { return weight; }
   public float getHeight() { return height; }
   public float getVSpeed() { return vspeed; }
+  public void setHeight(final float h) { height = h; }
+  public void setVSpeed(final float s) { vspeed = s; }
 }

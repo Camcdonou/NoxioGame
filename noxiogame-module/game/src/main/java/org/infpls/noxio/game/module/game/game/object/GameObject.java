@@ -9,6 +9,8 @@ public abstract class GameObject {
   protected final long oid; /* Object ID */
   private final String type; /* Object Type */
   
+  private int team;
+  
   protected boolean dead;
   protected Vec2 position, velocity;
   public GameObject(final NoxioGame game, final long oid, final String type, final Vec2 position) {
@@ -17,6 +19,7 @@ public abstract class GameObject {
     this.dead = false;
     this.position = position;
     this.velocity = new Vec2();
+    this.team = -1;
   }
   public GameObject(final NoxioGame game, final long oid, final String type, final Vec2 position, final Vec2 velocity) {
     this.game = game;
@@ -37,6 +40,9 @@ public abstract class GameObject {
   public final String getType() { return type; }
   public final Vec2 getPosition() { return position; }
   public final Vec2 getVelocity() { return velocity; }
+  
+  public final int getTeam() { return team; }
+  public final void setTeam(final int t) { team = t; }
   
   public boolean isDead() { return dead; } /* If this method returns true the object is destroyed on the next game tick. */
   public void tag(final Controller player) { } /* When an offensive action hits this object the player who performed it is recorded and credited for points if it causes death. */

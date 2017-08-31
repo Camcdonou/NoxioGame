@@ -6,10 +6,11 @@ import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.session.*;
 
-public class Controller {
+final public class Controller {
   private final NoxioGame game;
   private final String user, sid;   // Username and Session ID of the player
   
+  private int team;                 // Team this player is on, -1 if no teams.
   private GameObject object;        // Object this controller is controlling
   
   private Vec2 direction;           // Player movement direction
@@ -18,7 +19,7 @@ public class Controller {
   
   private final Score score;        // DEPRECATED
   
-  private static final float VIEW_DISTANCE = 25.0f; /* Anything farther than this is out of view and not updated */
+  private static final float VIEW_DISTANCE = 12.0f; /* Anything farther than this is out of view and not updated */
   
   public Controller(final NoxioGame game, final String user, final String sid) {
     this.game = game;
@@ -28,13 +29,28 @@ public class Controller {
     this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
     this.action = new ArrayList();
 
-    this.score = new Score(user);
+    this.score = new Score();
+    this.team = -1;
   }
+  
+  public Controller(final NoxioGame game, final String user, final String sid, final int team) {
+    this.game = game;
+    this.user = user;
+    this.sid = sid;
+    
+    this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
+    this.action = new ArrayList();
+
+    this.score = new Score();
+    this.team = team;
+  }
+  
   /* Generates a game update data for the player of this controller */
   /* Game updates are generated per controller so we can cull offscreen objects. */
   /* VIEW_DISTANCE is the value we use for screen culling */
   /* Table of different data structures that are generated --
       OBJ::UPDATE - obj;<int oid>;<vec2 pos>;<vec2 vel>; (VARIABLE LENGTH!!! allows any number of extra fields after the intial 3)
+      OBJ::HIDE   - hid;<int oid>;
   */
   public void generateUpdateData(final StringBuilder sb) {
     if(object != null) {
@@ -42,6 +58,10 @@ public class Controller {
         GameObject obj = game.objects.get(i);
         if(obj == object || obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE) {
           obj.generateUpdateData(sb);
+        }
+        else {
+          sb.append("hid;");
+          sb.append(obj.getOid()); sb.append(";");
         }
       }
     }
@@ -93,6 +113,8 @@ public class Controller {
   
   public String getUser() { return user; }
   public String getSid() { return sid; }
+  public int getTeam() { return team; }
+  public void setTeam(final int t) { team = t; if(object!=null) { object.setTeam(team); } }
   public GameObject getControlled() { return object; }
   public Score getScore() { return score; }
 }

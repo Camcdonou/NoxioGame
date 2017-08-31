@@ -41,11 +41,18 @@ public abstract class GameLobby {
   private final PacketSync packets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
   private final EventSync events; /* Second verse same as the first. */
   
+  private final GameSettings settings;
+  private final NoxioMap map;
+  
   protected boolean closed; //Clean this shit up!
-  public GameLobby(final String name) throws IOException {
+  public GameLobby(final GameSettings settings) throws IOException {
     lid = Salt.generate();
-    this.name = name;
-    maxPlayers = 16; //Lol
+    this.settings = settings;
+    
+    name = settings.get("game_name", "Default Name");
+    map = new NoxioMap(settings.get("map_name", "final"));
+    maxPlayers = settings.get("max_players", 6);
+    
     players = new ArrayList();
     loading = new ArrayList();
     closed = false;
@@ -61,7 +68,13 @@ public abstract class GameLobby {
   }
   
   private void newGame() throws IOException {
-    game = new Deathmatch(this, "final"); /* @FIXME */
+    final String gametype = settings.get("gametype", "Deathmatch");
+    switch(gametype) {
+      case "Deathmatch" : { game = new Deathmatch(this, map, settings); break; }
+      case "TeamDeathmatch" : { game = new TeamDeathmatch(this, map, settings); break; }
+      case "CaptureTheFlag" : { game = new CaptureTheFlag(this, map, settings); break; }
+      default : { game = new Deathmatch(this, map, settings); break; }
+    }
   }
   
   /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */

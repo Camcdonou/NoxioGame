@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class OfficialLobby extends GameLobby {
-  public OfficialLobby(final String name) throws IOException {
-    super(name);
+  public OfficialLobby(final GameSettings settings) throws IOException {
+    super(settings);
   }
   
   @Override
@@ -30,5 +30,5 @@ public class OfficialLobby extends GameLobby {
   public NoxioSession getHost() { return null; }
   
   @Override
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", "Official Server", players.size(), maxPlayers); }
+  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, game.gametypeName(), "Official Server", players.size(), maxPlayers); }
 }

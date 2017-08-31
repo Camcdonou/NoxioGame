@@ -8,8 +8,8 @@ import org.infpls.noxio.game.module.game.session.ingame.PacketG15;
 
 public class CustomLobby extends GameLobby {
   protected NoxioSession hostPlayer;
-  public CustomLobby(final String name) throws IOException {
-    super(name);
+  public CustomLobby(final GameSettings settings) throws IOException {
+    super(settings);
     hostPlayer = null;
   }
   
@@ -52,5 +52,5 @@ public class CustomLobby extends GameLobby {
   public NoxioSession getHost() { return hostPlayer; }
   
   @Override
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, "STUB", hostPlayer == null ? "N/A" : getHost().getUser(), players.size(), maxPlayers); }
+  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, game.gametypeName(), hostPlayer == null ? "N/A" : getHost().getUser(), players.size(), maxPlayers); }
 }

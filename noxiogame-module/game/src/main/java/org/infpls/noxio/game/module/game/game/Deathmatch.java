@@ -3,17 +3,18 @@ package org.infpls.noxio.game.module.game.game;
 import java.io.IOException;
 import java.util.*;
 import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
+import org.infpls.noxio.game.module.game.dao.lobby.GameSettings;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 
 public class Deathmatch extends NoxioGame {
   
-  private int scoreToWin;
+  private final int scoreToWin;
   
-  public Deathmatch(final GameLobby lobby, final String mapName) throws IOException {
-    super(lobby, mapName);
+  public Deathmatch(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
+    super(lobby, map, settings);
     
-    scoreToWin = 20;
+    scoreToWin = settings.get("score_to_win", 15);
   }
   
   @Override
@@ -65,13 +66,22 @@ public class Deathmatch extends NoxioGame {
   
   @Override
   public void updateScore() {
-    final List<Score> scores = new ArrayList();
-    for(int i = 0;i<controllers.size();i++) { scores.add(controllers.get(i).getScore()); }
-    lobby.sendPacket(new PacketG14("Deathmatch", "First to " + scoreToWin + " kills wins!", scores, scoreToWin));
+    final List<ScoreBoard> scores = new ArrayList();
+    for(int i = 0;i<controllers.size();i++) {
+      final Controller c = controllers.get(i);
+      final Score s = controllers.get(i).getScore();
+      scores.add(
+        new ScoreBoard(c.getUser(), s.getKills() + "/" + s.getDeaths(), (float)s.getKills()/scoreToWin, new Color3())
+      );
+    }
+    lobby.sendPacket(new PacketG14("Deathmatch", "First to " + scoreToWin + " kills wins!", scores));
   }
 
   @Override
-  public void reportObjective(Controller player, GameObject objective) {
+  public void reportObjective(final Controller player, final GameObject objective) {
     /* Deathmatch has no objective so this is ignored! */
   }
+  
+  @Override
+  public String gametypeName() { return "Deathmatch"; }
 }

@@ -113,7 +113,7 @@ public class NoxioMap {
       for(int j=4, k=0;j<spwn.length;j++, k++) {
         sgts[k] = spwn[j];
       }
-      spawns.add(new Spawn(spwn[0], Integer.parseInt(spwn[1]), new Vec2(Float.parseFloat(spwn[2]), Float.parseFloat(spwn[3])), sgts));
+      spawns.add(new Spawn(spwn[0], Integer.parseInt(spwn[1]), new Vec2(Float.parseFloat(spwn[2])-0.5f, Float.parseFloat(spwn[3])-0.5f), sgts));
     }
   }
   
@@ -157,6 +157,14 @@ public class NoxioMap {
     final List<Spawn> sps = new ArrayList();
     for(int i=0;i<spawns.size();i++) {
       if(spawns.get(i).getType().equals(type)) { sps.add(spawns.get(i)); }
+    }
+    return sps;
+  }
+  
+  public List<Spawn> getSpawns(final String type, final int team) {
+    final List<Spawn> sps = new ArrayList();
+    for(int i=0;i<spawns.size();i++) {
+      if(spawns.get(i).getType().equals(type) && spawns.get(i).getTeam() == team) { sps.add(spawns.get(i)); }
     }
     return sps;
   }

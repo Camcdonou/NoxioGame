@@ -7,7 +7,7 @@ import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
-import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
+import org.infpls.noxio.game.module.game.dao.lobby.*;
 
 public abstract class NoxioGame {
   public final GameLobby lobby;
@@ -21,10 +21,10 @@ public abstract class NoxioGame {
   public final List<GameObject> objects; /* All game objects */
   
   private int idGen; /* Used to generate OIDs for objects. */
-  public NoxioGame(final GameLobby lobby, final String mapName) throws IOException {
+  public NoxioGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     this.lobby = lobby;
     
-    map = new NoxioMap(mapName);
+    this.map = map;
     
     controllers = new ArrayList();
     objects = new ArrayList();
@@ -117,7 +117,7 @@ public abstract class NoxioGame {
     }
   }
   
-  private void generateJoinPacket(NoxioSession player) {
+  protected void generateJoinPacket(NoxioSession player) {
     final StringBuilder sb = new StringBuilder();
     for(int i=0;i<objects.size();i++) {
       final GameObject obj = objects.get(i);
@@ -192,8 +192,8 @@ public abstract class NoxioGame {
     updateScore();
   }
   
-  public abstract void reportKill(Controller killer, GameObject killed);
-  public abstract void reportObjective(Controller player, GameObject objective);
+  public abstract void reportKill(final Controller killer, final GameObject killed);
+  public abstract void reportObjective(final Controller player, final GameObject objective);
   public abstract void updateScore();
   
   public void gameOver(String message) {
@@ -207,4 +207,17 @@ public abstract class NoxioGame {
   
   public boolean isGameOver() { return resetTimer < 1 && gameOver; }
   public final long createOid() { return idGen++; } /* @FIXME maybe use GUID instead... this could save bandwidth though... */
+  public abstract String gametypeName();
+  
+  public class ScoreBoard {
+    public final String name, score;
+    public final float meter;
+    public final Color3 color;
+    public ScoreBoard(final String name, final String score, final float meter, final Color3 color) {
+      this.name = name;
+      this.score = score;
+      this.meter = meter;
+      this.color = color;
+    }
+  }
 }
