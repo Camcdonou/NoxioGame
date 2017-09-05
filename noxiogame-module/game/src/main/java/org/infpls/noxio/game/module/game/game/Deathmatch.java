@@ -51,6 +51,11 @@ public class Deathmatch extends NoxioGame {
     }
     return d/j;
   }
+  
+  @Override
+  public void requestTeamChange(final Controller controller) {
+    /* No teams, ignore */
+  }
 
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
@@ -58,7 +63,7 @@ public class Deathmatch extends NoxioGame {
     if(killer != null && victim != null) {
       killer.getScore().kill();
       victim.getScore().death();
-      lobby.sendPacket(new PacketG15(killer.getUser() + " killed " + victim.getUser() + "."));
+      sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
       updateScore();
       if(killer.getScore().getKills() >= scoreToWin) { gameOver(killer.getUser() + " wins!"); }
     }

@@ -17,7 +17,9 @@ final public class Controller {
   private float speed;              // Player movement speed
   private final List<String> action;           /* @FIXME RENAME TO ACTION AND EFFECT LOL */
   
-  private final Score score;        // DEPRECATED
+  private final Score score;        // DEPRECATED??
+  
+  private final List<String> whisper; /* Messages sent directly to this controller */
   
   private static final float VIEW_DISTANCE = 12.0f; /* Anything farther than this is out of view and not updated */
   
@@ -30,6 +32,7 @@ final public class Controller {
     this.action = new ArrayList();
 
     this.score = new Score();
+    this.whisper = new ArrayList();
     this.team = -1;
   }
   
@@ -42,6 +45,7 @@ final public class Controller {
     this.action = new ArrayList();
 
     this.score = new Score();
+    this.whisper = new ArrayList();
     this.team = team;
   }
   
@@ -49,8 +53,9 @@ final public class Controller {
   /* Game updates are generated per controller so we can cull offscreen objects. */
   /* VIEW_DISTANCE is the value we use for screen culling */
   /* Table of different data structures that are generated --
-      OBJ::UPDATE - obj;<int oid>;<vec2 pos>;<vec2 vel>; (VARIABLE LENGTH!!! allows any number of extra fields after the intial 3)
-      OBJ::HIDE   - hid;<int oid>;
+      OBJ::UPDATE  - obj;<int oid>;<vec2 pos>;<vec2 vel>; (VARIABLE LENGTH!!! allows any number of extra fields after the intial 3)
+      OBJ::HIDE    - hid;<int oid>;
+      SYS::WHISPER - wsp;<string txt>;
   */
   public void generateUpdateData(final StringBuilder sb) {
     if(object != null) {
@@ -71,6 +76,10 @@ final public class Controller {
         obj.generateUpdateData(sb);
       }
     }
+    for(int i=0;i<whisper.size();i++) {
+      sb.append("wsp;"); sb.append(whisper.get(i)); sb.append(";");
+    }
+    whisper.clear();
   }
   
   public void handlePacket(Packet p) {
@@ -78,7 +87,7 @@ final public class Controller {
       case "i01" : { direction = ((PacketI01)p).getPos().normalize(); speed = 0.0f; break; }
       case "i04" : { direction = ((PacketI04)p).getPos().normalize(); speed = Math.min(Math.max(((PacketI04)p).getSpeed(), 0.33f), 1.0f); break; }
       case "i05" : { action.add(((PacketI05)p).getAbility()); break; }
-      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { System.out.println(host.getSessionId() + " vs. " + sid); if(host.getSessionId().equals(sid)) { game.gameOver("Game reset by lobby owner!"); } } break; }
+      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { if(host.getSessionId().equals(sid)) { game.gameOver("Game reset by lobby owner!"); } else { whisper("Only the lobby host can reset!"); } } break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
   }
@@ -111,10 +120,11 @@ final public class Controller {
     }
   }
   
+  public void whisper(final String msg) { whisper.add(msg); }
   public String getUser() { return user; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }
-  public void setTeam(final int t) { team = t; if(object!=null) { object.setTeam(team); } }
+  public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } }
   public GameObject getControlled() { return object; }
   public Score getScore() { return score; }
 }

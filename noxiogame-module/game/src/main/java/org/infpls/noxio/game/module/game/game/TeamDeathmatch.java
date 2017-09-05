@@ -12,12 +12,14 @@ public class TeamDeathmatch extends NoxioGame {
   
   private int[] scores;
   private final int scoreToWin;
+  private final boolean autoBalanceTeams;
   
   public TeamDeathmatch(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings);
     
     scores = new int[]{0,0};
     scoreToWin = settings.get("score_to_win", 25);
+    autoBalanceTeams = settings.get("auto_balance_teams", 1)==1;
   }
   
   @Override
@@ -57,6 +59,23 @@ public class TeamDeathmatch extends NoxioGame {
     }
     return d/j;
   }
+  
+  @Override
+  public void requestTeamChange(final Controller controller) {
+    if(autoBalanceTeams) {
+      int a=0, b=0;
+      for(int i=0;i<controllers.size();i++) {
+        if(controllers.get(i).getTeam()==0) { a++; }
+        else { b++; }
+      }
+      if(a<b && controller.getTeam()==1) { controller.setTeam(0); sendMessage(controller.getUser() + " switched to Red Team."); }
+      else if(b<a && controller.getTeam()==0) { controller.setTeam(1); sendMessage(controller.getUser() + " switched to Blue Team."); }
+      else { controller.whisper("Teams are unbalanced, can't switch."); }
+    }
+    else {
+      controller.setTeam(controller.getTeam()==0?1:0);
+    }
+  }
 
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
@@ -67,11 +86,11 @@ public class TeamDeathmatch extends NoxioGame {
         victim.getScore().death();
         if(killer.getTeam()==0) { scores[0]++; }
         else { scores[1]++; }
-        lobby.sendPacket(new PacketG15(killer.getUser() + " killed " + victim.getUser() + "."));
+        sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
       }
       else {
         victim.getScore().death();
-        lobby.sendPacket(new PacketG15(killer.getUser() + " betrayed " + victim.getUser() + "."));
+        sendMessage(killer.getUser() + " betrayed " + victim.getUser() + ".");
       }
       updateScore();
       if(killer.getScore().getKills() >= scoreToWin) { gameOver(killer.getUser() + " wins!"); }

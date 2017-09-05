@@ -46,6 +46,7 @@ public abstract class NoxioGame {
           case "i04" : { c.handlePacket(p); break; }
           case "i05" : { c.handlePacket(p); break; }
           case "i06" : { c.handlePacket(p); break; }
+          case "i07" : { requestTeamChange(c); break; }
           default : { /* @FIXME ERROR REPORT */ break; }
         }
       }
@@ -192,9 +193,16 @@ public abstract class NoxioGame {
     updateScore();
   }
   
+  public abstract void requestTeamChange(final Controller controller);
+  
   public abstract void reportKill(final Controller killer, final GameObject killed);
   public abstract void reportObjective(final Controller player, final GameObject objective);
   public abstract void updateScore();
+  
+  /* Send a message that will appear in all players chatlog */
+  public void sendMessage(final String msg) {
+    lobby.sendPacket(new PacketG15(msg));
+  }
   
   public void gameOver(String message) {
     lobby.sendPacket(new PacketG16(message));
