@@ -17,6 +17,10 @@ final public class Controller {
   private float speed;              // Player movement speed
   private final List<String> action;           /* @FIXME RENAME TO ACTION AND EFFECT LOL */
   
+  private int respawnTimer;
+  private int respawnPenalty;
+  private boolean penalized;
+  
   private final Score score;        // DEPRECATED??
   
   private final List<String> whisper; /* Messages sent directly to this controller */
@@ -31,6 +35,10 @@ final public class Controller {
     this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
     this.action = new ArrayList();
 
+    this.respawnTimer = 0;
+    this.respawnPenalty = 0;
+    this.penalized = false;
+    
     this.score = new Score();
     this.whisper = new ArrayList();
     this.team = -1;
@@ -44,6 +52,10 @@ final public class Controller {
     this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
     this.action = new ArrayList();
 
+    this.respawnTimer = 0;
+    this.respawnPenalty = 0;
+    this.penalized = false;
+    
     this.score = new Score();
     this.whisper = new ArrayList();
     this.team = team;
@@ -87,12 +99,13 @@ final public class Controller {
       case "i01" : { direction = ((PacketI01)p).getPos().normalize(); speed = 0.0f; break; }
       case "i04" : { direction = ((PacketI04)p).getPos().normalize(); speed = Math.min(Math.max(((PacketI04)p).getSpeed(), 0.33f), 1.0f); break; }
       case "i05" : { action.add(((PacketI05)p).getAbility()); break; }
-      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { if(host.getSessionId().equals(sid)) { game.gameOver("Game reset by lobby owner!"); } else { whisper("Only the lobby host can reset!"); } } break; }
+      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { if(host.getSessionId().equals(sid)) { game.gameOver("Game reset by lobby owner!"); } else { whisper("Only the lobby host can reset!"); } } else { whisper("Only the lobby host can reset!"); } break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
   }
   
   public void step() {
+    if(respawnTimer > 0) { respawnTimer--; }
     if(object != null) {
       if(object.isDead()) { objectDestroyed(); return; }
       if(object.getType().equals("obj.mobile.player")) {
@@ -112,6 +125,8 @@ final public class Controller {
   private void objectDestroyed() {
     this.object = null;
     game.lobby.sendPacket(new PacketI03(-1), sid);
+    game.lobby.sendPacket(new PacketI08(respawnTimer = game.respawnTime + (penalized?(game.penaltyTime * respawnPenalty):0)), sid);
+    penalized = false;
   }
   
   public void destroy() {
@@ -120,11 +135,13 @@ final public class Controller {
     }
   }
   
+  public void penalize() { penalized = true; respawnPenalty++; }
+  public boolean respawnReady() { return respawnTimer<=0; }
   public void whisper(final String msg) { whisper.add(msg); }
   public String getUser() { return user; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }
-  public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } }
+  public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } game.sendMessage(getUser() + " joined " + (team==0?"Red":"Blue") + " Team."); }
   public GameObject getControlled() { return object; }
   public Score getScore() { return score; }
 }

@@ -10,7 +10,7 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 
 public class CaptureTheFlag extends NoxioGame {
   
-  private int[] scores;
+  private final int[] scores;
   private final int scoreToWin;
   private final boolean autoBalanceTeams;
   
@@ -34,9 +34,8 @@ public class CaptureTheFlag extends NoxioGame {
   }
   
   @Override
-  protected void spawnPlayer(PacketI02 p) {
-    Controller c = getController(p.getSrcSid());
-    if(c.getControlled() != null) { return; } /* Already controlling an object */
+  protected void spawnPlayer(final Controller c) {
+    if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
     List<NoxioMap.Spawn> spawns = map.getSpawns("player");
@@ -81,6 +80,7 @@ public class CaptureTheFlag extends NoxioGame {
       }
       if(a<b && controller.getTeam()==1) { controller.setTeam(0); }
       else if(b<a && controller.getTeam()==0) { controller.setTeam(1); }
+      else { controller.whisper("Teams are unbalanced, can't switch."); }
     }
     else {
       controller.setTeam(controller.getTeam()==0?1:0);
@@ -91,9 +91,16 @@ public class CaptureTheFlag extends NoxioGame {
   public void reportKill(final Controller killer, final GameObject killed) {
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
-      killer.getScore().kill();
-      victim.getScore().death();
-      sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
+      if(killer.getTeam() != victim.getTeam()) {
+        killer.getScore().kill();
+        victim.getScore().death();
+        sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
+      }
+      else {
+        victim.getScore().death();
+        killer.penalize();
+        sendMessage(killer.getUser() + " betrayed " + victim.getUser() + ".");
+      }
       updateScore();
     }
   }

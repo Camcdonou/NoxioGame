@@ -18,9 +18,8 @@ public class Deathmatch extends NoxioGame {
   }
   
   @Override
-  protected void spawnPlayer(PacketI02 p) {
-    Controller c = getController(p.getSrcSid());
-    if(c.getControlled() != null) { return; } /* Already controlling an object */
+  protected void spawnPlayer(final Controller c) {
+    if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
     List<NoxioMap.Spawn> spawns = map.getSpawns("player");

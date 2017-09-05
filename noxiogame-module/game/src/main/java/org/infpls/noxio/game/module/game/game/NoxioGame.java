@@ -12,9 +12,12 @@ import org.infpls.noxio.game.module.game.dao.lobby.*;
 public abstract class NoxioGame {
   public final GameLobby lobby;
   
+  public final int respawnTime;       // Number of frames that a respawn takes
+  public final int penaltyTime;       // Number of extra frames you wait if penalized for team kill or w/e
+  
   private boolean gameOver;
   private int resetTimer;
-  
+   
   public final NoxioMap map;
   
   protected final List<Controller> controllers; /* Player controller objects */
@@ -32,6 +35,9 @@ public abstract class NoxioGame {
     created = new ArrayList();
     deleted = new ArrayList();
     
+    respawnTime = settings.get("respawn_time", 30);
+    penaltyTime = settings.get("penalty_time", 90);
+    
     gameOver = false;
   }
     
@@ -42,7 +48,7 @@ public abstract class NoxioGame {
       if(c != null) {
         switch(p.getType()) {
           case "i01" : { c.handlePacket(p); break; }
-          case "i02" : { spawnPlayer((PacketI02)p);  break; }
+          case "i02" : { spawnPlayer(c);  break; }
           case "i04" : { c.handlePacket(p); break; }
           case "i05" : { c.handlePacket(p); break; }
           case "i06" : { c.handlePacket(p); break; }
@@ -161,17 +167,7 @@ public abstract class NoxioGame {
     return null;
   }
 
-  protected void spawnPlayer(PacketI02 p) {
-    Controller c = getController(p.getSrcSid());
-    if(c.getControlled() != null) { return; } /* Already controlling an object */
-    
-    final Vec2 sp = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f);
-    
-    long oid = createOid();
-    Player player = new Player(this, oid, sp);
-    addObject(player);
-    c.setControl(player);
-  }
+  protected abstract void spawnPlayer(final Controller c);
   
   public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(this, player.getUser(), player.getSessionId()));

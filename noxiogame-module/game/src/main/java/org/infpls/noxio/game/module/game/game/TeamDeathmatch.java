@@ -23,9 +23,8 @@ public class TeamDeathmatch extends NoxioGame {
   }
   
   @Override
-  protected void spawnPlayer(PacketI02 p) {
-    Controller c = getController(p.getSrcSid());
-    if(c.getControlled() != null) { return; } /* Already controlling an object */
+  protected void spawnPlayer(final Controller c) {
+    if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
     List<NoxioMap.Spawn> spawns = map.getSpawns("player");
@@ -68,8 +67,8 @@ public class TeamDeathmatch extends NoxioGame {
         if(controllers.get(i).getTeam()==0) { a++; }
         else { b++; }
       }
-      if(a<b && controller.getTeam()==1) { controller.setTeam(0); sendMessage(controller.getUser() + " switched to Red Team."); }
-      else if(b<a && controller.getTeam()==0) { controller.setTeam(1); sendMessage(controller.getUser() + " switched to Blue Team."); }
+      if(a<b && controller.getTeam()==1) { controller.setTeam(0); }
+      else if(b<a && controller.getTeam()==0) { controller.setTeam(1); }
       else { controller.whisper("Teams are unbalanced, can't switch."); }
     }
     else {
@@ -90,6 +89,7 @@ public class TeamDeathmatch extends NoxioGame {
       }
       else {
         victim.getScore().death();
+        killer.penalize();
         sendMessage(killer.getUser() + " betrayed " + victim.getUser() + ".");
       }
       updateScore();

@@ -45,6 +45,7 @@ public class InGame extends SessionState {
     > i05 use ability
     > i06 request new game
     > i07 request team change
+    < i08 respawn timer
   */
   
   @Override
@@ -68,7 +69,7 @@ public class InGame extends SessionState {
         case "i04" : { lobby.pushPacket(gson.fromJson(data, PacketI04.class).setSrcSid(session.getSessionId())); break; }
         case "i05" : { lobby.pushPacket(gson.fromJson(data, PacketI05.class).setSrcSid(session.getSessionId())); break; }
         case "i06" : { lobby.pushPacket(gson.fromJson(data, PacketI06.class).setSrcSid(session.getSessionId())); break; }
-        case "i07" : { lobby.pushPacket(gson.fromJson(data, PacketI06.class).setSrcSid(session.getSessionId())); break; }
+        case "i07" : { lobby.pushPacket(gson.fromJson(data, PacketI07.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(Exception ex) { /* @FIXME IOException | NullPointerException | JsonParseException */
