@@ -51,7 +51,8 @@ public class Flag extends Mobile {
    
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<string[] effects>
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<int onBase>;<string[] effects>
+     Note: onBase is an int where 1 is true, 0 is false. Booleans suck for networking with javscript
   */
   public void generateUpdateData(final StringBuilder sb) {
     final Controller c = game.getControllerByObject(this);
@@ -66,17 +67,23 @@ public class Flag extends Mobile {
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");
     sb.append(getVSpeed()); sb.append(";");
+    sb.append(onBase()?1:0); sb.append(";");
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }
   
-  public boolean pickup(final Player p, final int team) {
-    if(getTeam() == team && !isHeld() && !onBase()) { kill(); return false; }
+  public boolean pickup(final Player p) {
     if(dropCooldown > 0) { return false; }
     if(isHeld()) { return false; }
-    if(getTeam() == team) { return false; }
+    if(getTeam() == p.getTeam()) { return false; }
     held = p;
     return true;
+  }
+  
+  public void reset(final Player p) {
+    if(getTeam() == p.getTeam() && !isHeld()) {
+      kill();
+    }
   }
   
   public void drop() {
@@ -87,6 +94,13 @@ public class Flag extends Mobile {
   
   public void reportObjective(final Player p) {
     game.reportObjective(game.getControllerByObject(p), this);
+  }
+  
+  @Override
+  public void knockback(final Vec2 impulse, final Player player) {
+    if(getTeam() != player.getTeam()) {
+      setVelocity(velocity.add(impulse));
+    }
   }
   
   @Override

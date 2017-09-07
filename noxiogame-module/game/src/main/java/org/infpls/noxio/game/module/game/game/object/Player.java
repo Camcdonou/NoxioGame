@@ -108,13 +108,16 @@ public class Player extends Mobile {
     if(spawnProtection > 0) { spawnProtection--; }
   }
   
-  /* Picup flag or whatever if you move over it */
+  /* Pickup flag or whatever if you move over it */
   public void pickup() {
     for(int i=0;i<game.objects.size();i++) {
       if(game.objects.get(i).getType().equals("obj.mobile.flag")) {
         final Flag flag = (Flag)(game.objects.get(i));
         if(holding==null && flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
-          if(flag.pickup(this, getTeam())) { holding = flag; }
+          if(flag.pickup(this)) { holding = flag; }
+        }
+        if(flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
+          flag.reset(this);
         }
       }
     }
@@ -171,7 +174,7 @@ public class Player extends Mobile {
                 ply.stun(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX));
               }
               final Vec2 normal = mob.getPosition().subtract(position).normalize();
-              mob.setVelocity(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)));
+              mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
               final Controller c = game.getControllerByObject(this);
               if(c != null) { mob.tag(c); }
             }

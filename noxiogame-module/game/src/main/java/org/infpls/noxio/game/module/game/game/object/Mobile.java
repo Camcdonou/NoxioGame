@@ -146,6 +146,7 @@ public abstract class Mobile extends GameObject {
     return 0f;
   }
   
+  public void knockback(final Vec2 impulse, final Player player) { setVelocity(velocity.add(impulse)); }
   public void popup(float power) { vspeed += (power > 0.0f ? power : 0.0f); }
   public boolean isGrounded() { return grounded; }
   public boolean isIntangible() { return intangible; }

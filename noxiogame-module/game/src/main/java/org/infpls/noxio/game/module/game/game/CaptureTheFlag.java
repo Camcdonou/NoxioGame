@@ -128,7 +128,7 @@ public class CaptureTheFlag extends NoxioGame {
 //      final Score s = controllers.get(i).getScore();
 //      scs.add(new ScoreBoard(c.getUser(), s.getObjectives() + "/" + s.getKills() + "/" + s.getDeaths(), 0.0f, new Color3()));
 //    }
-    lobby.sendPacket(new PacketG14("Capture The Flag", "First team to " + scoreToWin + " captures wins!", scs));
+    lobby.sendPacket(new PacketG14("Capture The Flag", "First team to " + scoreToWin + " wins!", scs));
   }
   
   @Override

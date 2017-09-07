@@ -73,7 +73,7 @@ final public class Controller {
     if(object != null) {
       for(int i=0;i<game.objects.size();i++) {
         GameObject obj = game.objects.get(i);
-        if(obj == object || obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE) {
+        if(obj == object || obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE || obj.getType().equals("obj.mobile.flag")) { // @TODO: Add a "globalize" flag to ojbects and cehck that
           obj.generateUpdateData(sb);
         }
         else {
