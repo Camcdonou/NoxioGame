@@ -110,6 +110,7 @@ public class Flag extends Mobile {
     setVelocity(new Vec2());
     setHeight(0f);
     setVSpeed(0f);
+    dropCooldown = 0;
   }
   
   public boolean isHeld() { return held!=null; }

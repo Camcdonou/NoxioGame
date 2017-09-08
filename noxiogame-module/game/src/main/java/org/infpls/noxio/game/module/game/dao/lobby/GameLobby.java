@@ -156,6 +156,7 @@ public abstract class GameLobby {
         catch(IOException ioex) { System.err.println("Bad stuff be happening here!"); ioex.printStackTrace(); }
       }
       System.err.println("## CRITICAL ## Game step exception!");
+      System.err.println("## STATE    ## lobbyName=" + name + "gameOver=" + game.isGameOver());
       ex.printStackTrace();
       /* @FIXME do something? Probably handle server side GAME errors by closing the lobby and kicking players to menu. */
     }
@@ -263,15 +264,15 @@ public abstract class GameLobby {
           lobby.step(lastStepTime);
           lastStepTime = System.currentTimeMillis() - now;
         }
-        try {
-          long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
-          sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
-        }
-        catch(InterruptedException ex) {
-          System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
-          ex.printStackTrace();
+        //try {
+          //long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
+          //sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
+        //}
+        //catch(InterruptedException ex) {
+        //  System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
+        //  ex.printStackTrace();
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
-        }
+        //}
       }
     }
   }
