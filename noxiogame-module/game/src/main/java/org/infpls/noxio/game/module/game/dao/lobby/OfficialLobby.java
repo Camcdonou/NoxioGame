@@ -14,7 +14,7 @@ public class OfficialLobby extends GameLobby {
     while(loading.remove(player));
     game.leave(player);
     outDirect.remove(player);
-    if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }
+    if(players.size() >= 1) { game.sendMessage(player.getUser() + " left the game."); }
   }
   
   @Override
@@ -23,7 +23,7 @@ public class OfficialLobby extends GameLobby {
     while(loading.remove(player));
     game.leave(player);
     outDirect.remove(player);
-    if(players.size() >= 1) { updatePlayerList(player.getUser() + " disconnected."); }
+    if(players.size() >= 1) { game.sendMessage(player.getUser() + " disconnected."); }
   }
   
   @Override

@@ -23,7 +23,7 @@ public class TeamDeathmatch extends NoxioGame {
   }
   
   @Override
-  protected void spawnPlayer(final Controller c) {
+  protected void spawnPlayer(final Controller c, final Queue<String> q) {
     if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
@@ -60,19 +60,19 @@ public class TeamDeathmatch extends NoxioGame {
   }
   
   @Override
-  public void requestTeamChange(final Controller controller) {
+  public void requestTeamChange(final Controller c, final Queue<String> q) {
     if(autoBalanceTeams) {
       int a=0, b=0;
       for(int i=0;i<controllers.size();i++) {
         if(controllers.get(i).getTeam()==0) { a++; }
         else { b++; }
       }
-      if(a<b && controller.getTeam()==1) { controller.setTeam(0); }
-      else if(b<a && controller.getTeam()==0) { controller.setTeam(1); }
-      else { controller.whisper("Teams are unbalanced, can't switch."); }
+      if(a<b && c.getTeam()==1) { c.setTeam(0); }
+      else if(b<a && c.getTeam()==0) { c.setTeam(1); }
+      else { c.whisper("Teams are unbalanced, can't switch."); }
     }
     else {
-      controller.setTeam(controller.getTeam()==0?1:0);
+      c.setTeam(c.getTeam()==0?1:0);
     }
   }
 
@@ -104,12 +104,16 @@ public class TeamDeathmatch extends NoxioGame {
     scs.add(new ScoreBoard("Red Team", scores[0] + "", (float)scores[0]/scoreToWin, new Color3(1.0f, 0.5f, 0.5f)));
     scs.add(new ScoreBoard("Blue Team", scores[1] + "", (float)scores[1]/scoreToWin, new Color3(0.5f, 0.5f, 1.0f)));
     
-//    for(int i = 0;i<controllers.size();i++) {
-//      final Controller c = controllers.get(i);
-//      final Score s = controllers.get(i).getScore();
-//      scs.add(new ScoreBoard(c.getUser(), s.getObjectives() + "/" + s.getKills() + "/" + s.getDeaths(), 0.0f, new Color3()));
-//    }
-    lobby.sendPacket(new PacketG14("Team Deathmatch", "First team to " + scoreToWin + " kills wins!", scs));
+    final StringBuilder sb = new StringBuilder();
+    sb.append("scr;Team Deathmatch;First team to "); sb.append(scoreToWin); sb.append(" wins!;");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).name); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).score); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).meter); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.r); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.g); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.b); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    
+    update.add(sb.toString());
   }
 
   @Override

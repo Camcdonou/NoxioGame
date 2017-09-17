@@ -2,7 +2,6 @@ package org.infpls.noxio.game.module.game.game.object;
 
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.NoxioGame;
-import org.infpls.noxio.game.module.game.session.ingame.PacketG15;
 import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 

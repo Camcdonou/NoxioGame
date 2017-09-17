@@ -2,9 +2,8 @@ package org.infpls.noxio.game.module.game.game;
 
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
-import org.infpls.noxio.game.module.game.session.Packet;
-import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.session.*;
+import org.infpls.noxio.game.module.game.util.Parse;
 
 final public class Controller {
   private final NoxioGame game;
@@ -23,7 +22,7 @@ final public class Controller {
   
   private final Score score;        // DEPRECATED??
   
-  private final List<String> whisper; /* Messages sent directly to this controller */
+  private final List<String> update; // List of "impulse" updates on this frame. These are things that happen as single events such as whispers.
   
   private static final float VIEW_DISTANCE = 12.0f; /* Anything farther than this is out of view and not updated */
   
@@ -40,7 +39,7 @@ final public class Controller {
     this.penalized = false;
     
     this.score = new Score();
-    this.whisper = new ArrayList();
+    this.update = new ArrayList();
     this.team = -1;
   }
   
@@ -57,7 +56,7 @@ final public class Controller {
     this.penalized = false;
     
     this.score = new Score();
-    this.whisper = new ArrayList();
+    this.update = new ArrayList();
     this.team = team;
   }
   
@@ -65,9 +64,11 @@ final public class Controller {
   /* Game updates are generated per controller so we can cull offscreen objects. */
   /* VIEW_DISTANCE is the value we use for screen culling */
   /* Table of different data structures that are generated --
-      OBJ::UPDATE  - obj;<int oid>;<vec2 pos>;<vec2 vel>; (VARIABLE LENGTH!!! allows any number of extra fields after the intial 3)
-      OBJ::HIDE    - hid;<int oid>;
-      SYS::WHISPER - wsp;<string txt>;
+      OBJ::UPDATE   - obj;<int oid>;<vec2 pos>;<vec2 vel>; (VARIABLE LENGTH!!! allows any number of extra fields after the intial 3)
+      OBJ::HIDE     - hid;<int oid>;
+      PLY::CONTROL  - ctl;<int oid>;
+      PLY::RSPWNTMR - rst;<int time>;
+      SYS::WHISPER  - wsp;<string txt>;
   */
   public void generateUpdateData(final StringBuilder sb) {
     if(object != null) {
@@ -88,20 +89,56 @@ final public class Controller {
         obj.generateUpdateData(sb);
       }
     }
-    for(int i=0;i<whisper.size();i++) {
-      sb.append("wsp;"); sb.append(whisper.get(i)); sb.append(";");
+    
+    for(int i=0;i<update.size();i++) {
+      sb.append(update.get(i));
     }
-    whisper.clear();
+    update.clear();
   }
   
-  public void handlePacket(Packet p) {
-    switch(p.getType()) {
-      case "i01" : { direction = ((PacketI01)p).getPos().normalize(); speed = 0.0f; break; }
-      case "i04" : { direction = ((PacketI04)p).getPos().normalize(); speed = Math.min(Math.max(((PacketI04)p).getSpeed(), 0.33f), 1.0f); break; }
-      case "i05" : { action.add(((PacketI05)p).getAbility()); break; }
-      case "i06" : { final NoxioSession host = game.lobby.getHost(); if(host != null) { if(host.getSessionId().equals(sid)) { game.gameOver("Game reset by lobby owner!"); } else { whisper("Only the lobby host can reset!"); } } else { whisper("Only the lobby host can reset!"); } break; }
+  public void handlePacket(final String id, final Queue<String> q) {
+    switch(id) {
+      case "01" : { inputMouseNeutral(q); break; }
+      case "04" : { inputMouse(q); break; }
+      case "05" : { inputAction(q); break; }
+      case "06" : { inputReset(q); break; }
       default : { /* @FIXME ERROR REPORT */ break; }
     }
+  }
+  
+  /* Handles i00->01 */
+  private void inputMouseNeutral(final Queue<String> q) {
+    final Vec2 pos = Parse.vec2(q.remove());
+    direction = pos.normalize(); speed = 0.0f;
+  }
+  
+  /* Handles i00->04 */
+  private void inputMouse(final Queue<String> q) {
+    final Vec2 pos = Parse.vec2(q.remove());
+    final float spd = Parse.f(q.remove());
+    direction = pos.normalize(); speed = Math.min(Math.max(spd, 0.33f), 1.0f);
+  }
+  
+  /* Handles i00->05 */
+  private void inputAction(final Queue<String> q) {
+    final String[] a = q.remove().split(",");
+    for(int i=0;i<a.length;i++) {
+      action.add(a[i]);
+    }
+  }
+  
+  /* Handles i00->06 */
+  private void inputReset(final Queue<String> q) {
+    final NoxioSession host = game.lobby.getHost();
+    if(host != null) {
+      if(host.getSessionId().equals(sid)) {
+        game.gameOver("Game reset by lobby owner!");
+      }
+      else {
+        whisper("Only the lobby host can reset!");
+      }
+    }
+    else { whisper("Only the lobby host can reset!"); } 
   }
   
   public void step() {
@@ -117,27 +154,28 @@ final public class Controller {
     }
   }
   
-  public void setControl(GameObject object) {
-    this.object = object;
-    game.lobby.sendPacket(new PacketI03(object.getOid()), sid);
+  public void setControl(GameObject obj) {
+    object = obj;
+    update.add("ctl;"+obj.getOid()+";");
   }
   
   private void objectDestroyed() {
-    this.object = null;
-    game.lobby.sendPacket(new PacketI03(-1), sid);
-    game.lobby.sendPacket(new PacketI08(respawnTimer = game.respawnTime + (penalized?(game.penaltyTime * respawnPenalty):0)), sid);
+    object = null;
+    respawnTimer = game.respawnTime + (penalized?(game.penaltyTime * respawnPenalty):0);
     penalized = false;
+    update.add("ctl;-1;");
+    update.add("rst;"+respawnTimer+";");
   }
   
   public void destroy() {
-    if(this.object != null) {
-      this.object.kill();
+    if(object != null) {
+      object.kill();
     }
   }
   
   public void penalize() { penalized = true; respawnPenalty++; }
   public boolean respawnReady() { return respawnTimer<=0; }
-  public void whisper(final String msg) { whisper.add(msg); }
+  public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
   public String getUser() { return user; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }

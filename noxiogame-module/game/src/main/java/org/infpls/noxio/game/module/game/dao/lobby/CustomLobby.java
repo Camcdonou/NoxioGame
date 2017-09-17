@@ -4,7 +4,6 @@ import java.util.*;
 import java.io.IOException;
 
 import org.infpls.noxio.game.module.game.session.NoxioSession;
-import org.infpls.noxio.game.module.game.session.ingame.PacketG15;
 
 public class CustomLobby extends GameLobby {
   protected NoxioSession hostPlayer;
@@ -22,7 +21,7 @@ public class CustomLobby extends GameLobby {
     loading.add(player);
     outDirect.put(player, new ArrayList());
     if(hostPlayer == null) { hostPlayer = player; } /* The very first person to connect to a custom match is always the host. */
-    updatePlayerList(player.getUser() + " connected.");
+    game.sendMessage(player.getUser() + " connected.");
     return true;
   }
   
@@ -33,8 +32,8 @@ public class CustomLobby extends GameLobby {
     game.leave(player);
     outDirect.remove(player);
     if(players.size() < 1) { close(); return; }
-    if(players.size() >= 1) { updatePlayerList(player.getUser() + " left the game."); }
-    if(player == hostPlayer) { hostPlayer = players.get(0); sendPacket(new PacketG15(hostPlayer.getUser() + " is now the lobby host.")); }
+    if(players.size() >= 1) { game.sendMessage(player.getUser() + " left the game."); }
+    if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getUser() + " is now the lobby host."); }
   }
   
   @Override
@@ -44,8 +43,8 @@ public class CustomLobby extends GameLobby {
     game.leave(player);
     outDirect.remove(player);
     if(players.size() < 1) { close(); return; }
-    if(players.size() >= 1) { updatePlayerList(player.getUser() + " disconnected."); }
-    if(player == hostPlayer) { hostPlayer = players.get(0); sendPacket(new PacketG15(hostPlayer.getUser() + " is now the lobby host.")); }
+    if(players.size() >= 1) { game.sendMessage(player.getUser() + " disconnected."); }
+    if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getUser() + " is now the lobby host."); }
   }
     
   @Override

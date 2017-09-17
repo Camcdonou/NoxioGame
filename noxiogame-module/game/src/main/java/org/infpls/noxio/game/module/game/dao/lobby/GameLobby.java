@@ -131,7 +131,7 @@ public abstract class GameLobby {
       
       game.handlePackets(packets.pop()); // Player Input
       game.step();                       // Game tick
-      game.generateUpdatePackets();      // Send updates to players
+      game.generateUpdatePackets(tick);  // Send updates to players
       game.post();                       // Clean up
       
       for(int i=0;i<players.size();i++) {
@@ -145,7 +145,6 @@ public abstract class GameLobby {
         final NoxioSession player = players.get(i);
         if(!loading.contains(player)) {
           player.sendPacket(new PacketS01(outDirect.get(player)));
-          player.sendPacket(new PacketG05(tick, System.currentTimeMillis()));
         }
         outDirect.get(player).clear();
       }
@@ -169,7 +168,7 @@ public abstract class GameLobby {
     players.add(player);
     loading.add(player);
     outDirect.put(player, new ArrayList());
-    updatePlayerList(player.getUser() + " connected.");
+    game.sendMessage(player.getUser() + " connected.");
     return true;
   }
   
@@ -179,7 +178,7 @@ public abstract class GameLobby {
     if(!players.contains(player) || !loading.contains(player)) { remove(player); player.close("Lobby Ghost Error."); return false; } /* A thing that can happen and cause null pointers. Only possible if load times are long on clients are long and they leave lobby and come back AFAIK */
     loading.remove(player);
     game.join(player);
-    updatePlayerList(player.getUser() + " joined the game.");
+    game.sendMessage(player.getUser() + " joined the game.");
     return true;
   }
   
@@ -192,19 +191,6 @@ public abstract class GameLobby {
       players.get(i).leaveGame(); /* @FIXME maybe give leaveGame a message parameter to tell people why they were removed if there is a reason */
     }
     game.close();
-  }
-  
-  protected void updatePlayerList(final String message) throws IOException {
-    List<String> playerList = new ArrayList();
-    for(int i=0;i<players.size();i++) {
-      playerList.add(players.get(i).getUser());
-    }
-    sendPacket(new PacketG04(playerList));
-    sendPacket(new PacketG15(message));
-//    for(int i=0;i<players.size();i++) {
-//      players.get(i).sendPacket(new PacketG04(playerList));
-//      players.get(i).sendPacket(new PacketG15(message));
-//    }
   }
   
   protected List<Packet> outAll;
@@ -264,15 +250,15 @@ public abstract class GameLobby {
           lobby.step(lastStepTime);
           lastStepTime = System.currentTimeMillis() - now;
         }
-        //try {
-          //long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
-          //sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
-        //}
-        //catch(InterruptedException ex) {
-        //  System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
-        //  ex.printStackTrace();
+        try {
+          long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
+          sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
+        }
+        catch(InterruptedException ex) {
+          System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
+          ex.printStackTrace();
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
-        //}
+        }
       }
     }
   }
