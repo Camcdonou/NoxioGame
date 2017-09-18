@@ -136,14 +136,14 @@ public abstract class GameLobby {
       
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
-        if(!loading.contains(player)) {
+        if(!loading.contains(player) && !outAll.isEmpty()) {
           player.sendPacket(new PacketS01(outAll));
         }
       }
       outAll.clear();
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
-        if(!loading.contains(player)) {
+        if(!loading.contains(player) && !outDirect.get(player).isEmpty()) {
           player.sendPacket(new PacketS01(outDirect.get(player)));
         }
         outDirect.get(player).clear();
