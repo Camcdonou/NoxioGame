@@ -20,6 +20,8 @@ public class NoxioMap {
   private final List<Polygon> floor;  // Floor collision data
   private final List<Polygon> wall;   // Wall collision data
   
+  private final String cache;         // Asset cache for client
+  
   public NoxioMap(final String mapName) throws IOException {
     final String data = readFile("map/" + mapName + ".map");
     final String[] fields = data.split("\\|");
@@ -115,6 +117,9 @@ public class NoxioMap {
       }
       spawns.add(new Spawn(spwn[0], Integer.parseInt(spwn[1]), new Vec2(Float.parseFloat(spwn[2])-0.5f, Float.parseFloat(spwn[3])-0.5f), sgts));
     }
+    
+    /* Field#9 - Cache */
+    cache = fields[9];
   }
   
   /* Return a list of all floors that are within range of potential interaction with the given position and radius */
