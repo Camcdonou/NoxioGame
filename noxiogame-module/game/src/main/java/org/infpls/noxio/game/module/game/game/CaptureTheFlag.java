@@ -142,10 +142,7 @@ public class CaptureTheFlag extends NoxioGame {
       else { t--; }
     }
     controllers.add(new Controller(this, player.getUser(), player.getSessionId(), t<0?0:1));
-    for(int i=0;i<objects.size();i++) {
-      GameObject obj = objects.get(i);
-      generateJoinPacket(player);
-    }
+    generateJoinPacket(player);
     updateScore();
   }
   

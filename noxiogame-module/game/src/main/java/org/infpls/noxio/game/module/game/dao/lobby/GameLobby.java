@@ -179,6 +179,10 @@ public abstract class GameLobby {
     loading.remove(player);
     game.join(player);
     game.sendMessage(player.getUser() + " joined the game.");
+    //@TODO: REMOVE THIS TESTING STUFF
+    game.getController(player.getSessionId()).whisper("Controls:");
+    game.getController(player.getSessionId()).whisper("R-Mouse = Move, ESC = Menu");
+    game.getController(player.getSessionId()).whisper("F = Shine, Shift = Dash, Space = Jump");
     return true;
   }
   

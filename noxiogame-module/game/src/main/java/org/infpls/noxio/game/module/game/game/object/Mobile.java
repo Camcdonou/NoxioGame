@@ -19,10 +19,10 @@ public abstract class Mobile extends GameObject {
   
   public void physics() {
     /* -- Objects -- */
-    if(height > -0.5 && !intangible) {                                             // If this object is to low we ignore object collision.
+    if(height > -0.5 && !intangible) {                                          // If this object is to low we ignore object collision.
       for(int i=0;i<game.objects.size();i++) {
         final GameObject obj = game.objects.get(i);
-        if(obj != this && obj.getType().startsWith("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
+        if(obj != this && obj.getType().startsWith("obj.mobile")) {             // Object must be something physical (IE a barrel or a pillar or a player)
           final Mobile mob = (Mobile)obj;
           final float combinedRadius = radius+mob.getRadius();
           if(position.distance(mob.getPosition()) < combinedRadius && mob.getHeight() > -0.5 && !mob.isIntangible()) {
@@ -79,12 +79,8 @@ public abstract class Mobile extends GameObject {
     }
     
     /* Height */
-    boolean floorBounded = false;
-    for(int i=0;i<floors.size();i++) {
-      if(Intersection.pointInPolygon(position, floors.get(i))) {
-        floorBounded = true; break;
-      }
-    }
+    boolean floorBounded = collideFloors(position, floors);
+    
     if(floorBounded) {
       if(height > -0.4f && height <= 0.0f) {
         if(vspeed < 0.0f) {
@@ -143,6 +139,20 @@ public abstract class Mobile extends GameObject {
       return 1f-aoi;
     }
     return 0f;
+  }
+  
+  /* This fuction is simple and just returns a boolean true/false if the object is over solid ground */
+  private boolean collideFloors(final Vec2 pos, final List<Polygon> floors) {
+    for(int i=0;i<floors.size();i++) {
+      if(Intersection.pointInPolygon(position, floors.get(i))) {
+        return true;
+      }
+      else {
+        final Instance inst = Intersection.polygonCircle(pos, floors.get(i), radius);
+        if(inst != null && inst.distance < (radius*0.5)) { return true; }
+      }
+    }
+    return false;
   }
   
   public void knockback(final Vec2 impulse, final Player player) { setVelocity(velocity.add(impulse)); }

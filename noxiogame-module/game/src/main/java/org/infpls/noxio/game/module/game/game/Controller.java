@@ -152,6 +152,9 @@ final public class Controller {
         action.clear();
       }
     }
+    else { 
+      action.clear();
+    }
   }
   
   public void setControl(GameObject obj) {

@@ -187,10 +187,7 @@ public abstract class NoxioGame {
   
   public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(this, player.getUser(), player.getSessionId()));
-    for(int i=0;i<objects.size();i++) {
-      GameObject obj = objects.get(i);
-      generateJoinPacket(player);
-    }
+    generateJoinPacket(player);
     updateScore();
   }
   

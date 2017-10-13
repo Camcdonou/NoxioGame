@@ -9,6 +9,7 @@ public class Flag extends Mobile {
   
   private final List<String> effects;      // List of actions performed that will be sent to the client on the next update
   
+  private long lastHeld;
   private int dropCooldown, resetCooldown;
   private final static int DROP_COOLDOWN_TIME = 45, RESET_COOLDOWN_TIME = 900;
   public Flag(final NoxioGame game, final long oid, final Vec2 position, final int team) {
@@ -21,6 +22,7 @@ public class Flag extends Mobile {
     effects = new ArrayList();
     
     dropCooldown = 0;
+    lastHeld = -1;
   }
   
   @Override
@@ -73,10 +75,11 @@ public class Flag extends Mobile {
   }
   
   public boolean pickup(final Player p) {
-    if(dropCooldown > 0) { return false; }
+    if(dropCooldown > 0 && lastHeld == p.getOid()) { return false; }
     if(isHeld()) { return false; }
     if(getTeam() == p.getTeam()) { return false; }
     held = p;
+    lastHeld = held.getOid();
     return true;
   }
   

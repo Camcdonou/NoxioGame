@@ -6,7 +6,7 @@ import org.infpls.noxio.game.module.game.game.Controller;
 public abstract class GameObject {
   protected final NoxioGame game; /* Parent Game */
   
-  protected final long oid; /* Object ID */
+  protected final long oid; /* Object ID */                     /* @TODO: WHY TEH FUCK DID I MAKE THIS A LONG???????????????????? change to int pls */
   private final String type; /* Object Type */
   
   private int team;
