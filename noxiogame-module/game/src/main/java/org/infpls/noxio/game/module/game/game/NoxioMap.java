@@ -3,6 +3,7 @@ package org.infpls.noxio.game.module.game.game;
 import java.io.*;
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 import org.springframework.core.io.*;
 
 public class NoxioMap {
@@ -19,6 +20,8 @@ public class NoxioMap {
   private final int[][] map;          // 2D Array of tile indexes
   private final List<Polygon> floor;  // Floor collision data
   private final List<Polygon> wall;   // Wall collision data
+  
+  private final String cache;         // Asset cache for client
   
   public NoxioMap(final String mapName) throws IOException {
     final String data = readFile("map/" + mapName + ".map");
@@ -39,7 +42,7 @@ public class NoxioMap {
     tileSet = new ArrayList();
     for(int i=0;i<ts.length;i++) {
       final String[] t = ts[i].split(",");
-      if(t.length < 2) { continue; } /* @TODO: Error reporting... */
+      if(t.length < 2) { Oak.log("Error parsing map file: " + mapName + " FIELD_1 @NoxioMap.new", 2); continue; }
       tileSet.add(new Tile(t[0], t[1]));
     }
     
@@ -55,7 +58,7 @@ public class NoxioMap {
     map = new int[bounds[1]][bounds[0]];
     for(int i=0, k=0;i<bounds[1];i++) {
       for(int j=0;j<bounds[0];j++) {
-       map[bounds[1]-i-1][j] = Integer.parseInt(m[k++]); //Read map y backwards because GL renders from bottom not top
+       map[bounds[1]-i-1][j] = Integer.parseInt(m[k++]); // Read map y backwards because GL renders from bottom not top
       }
     }
     
@@ -64,7 +67,7 @@ public class NoxioMap {
     doodadSet = new ArrayList();
     for(int i=0;i<dp.length;i++) {
       final String[] d = ts[i].split(",");
-      if(d.length < 2) { continue; } /* @TODO: Error reporting... */
+      if(d.length < 2) { Oak.log("Error parsing map file: " + mapName + " FIELD_4 @NoxioMap.new", 2); continue; }
       doodadSet.add(new Tile(d[0], d[1]));
     }
     
@@ -73,7 +76,7 @@ public class NoxioMap {
     doodads = new ArrayList();
     for(int i=0;i<dds.length;i++) {
       final String[] d = dds[i].split(",");
-      if(d.length < 4) { continue; } /* @TODO: Error reporting... */
+      if(d.length < 4) { Oak.log("Error parsing map file: " + mapName + " FIELD_5 @NoxioMap.new", 2); continue; }
       doodads.add(new Doodad(Integer.parseInt(d[0]), new Vec2(Float.parseFloat(d[1]), Float.parseFloat(d[2])), Float.parseFloat(d[3])));
     }
     
@@ -82,7 +85,7 @@ public class NoxioMap {
     floor = new ArrayList();
     for(int i=0;i<cf.length;i++) {
       final String[] f = cf[i].split(",");
-      if(f.length < 6) { continue; } /* @TODO: Error reporting... */
+      if(f.length < 6) { Oak.log("Error parsing map file: " + mapName + " FIELD_6 @NoxioMap.new", 2); continue; }
       final Vec2[] p = new Vec2[f.length/2]; //If this isn't even then you are fucked in so many different ways.
       for(int j=0, k=0;j<f.length;j+=2) {
         p[k++] = new Vec2(Float.parseFloat(f[j])-0.5f, Float.parseFloat(f[j+1])-0.5f); /* @TODO: Offset is sort of??? Unexplained??? Map editor error? */
@@ -95,7 +98,7 @@ public class NoxioMap {
     wall = new ArrayList();
     for(int i=0;i<cw.length;i++) {
       final String[] w = cw[i].split(",");
-      if(w.length < 6) { continue; } /* @TODO: Error reporting... */
+      if(w.length < 6) { Oak.log("Error parsing map file: " + mapName + " FIELD_7 @NoxioMap.new", 2); continue; }
       final Vec2[] p = new Vec2[w.length/2]; //If this isn't even then you are fucked in so many different ways.
       for(int j=0, k=0;j<w.length;j+=2, k++) {
         p[k] = new Vec2(Float.parseFloat(w[j])-0.5f, Float.parseFloat(w[j+1])-0.5f); /* @TODO: Offset is sort of??? Unexplained??? Map editor error? */
@@ -108,13 +111,16 @@ public class NoxioMap {
     spawns = new ArrayList();
     for(int i=0;i<sps.length;i++) {
       final String[] spwn = sps[i].split(",");
-      if(spwn.length < 4) { continue; } /* @TODO: Error reporting... */
+      if(spwn.length < 4) { Oak.log("Error parsing map file: " + mapName + " FIELD_8 @NoxioMap.new", 2); continue; }
       final String[] sgts = new String[spwn.length-4];
       for(int j=4, k=0;j<spwn.length;j++, k++) {
         sgts[k] = spwn[j];
       }
       spawns.add(new Spawn(spwn[0], Integer.parseInt(spwn[1]), new Vec2(Float.parseFloat(spwn[2])-0.5f, Float.parseFloat(spwn[3])-0.5f), sgts));
     }
+    
+    /* Field#9 - Cache */
+    cache = fields[9];
   }
   
   /* Return a list of all floors that are within range of potential interaction with the given position and radius */

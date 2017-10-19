@@ -24,28 +24,23 @@ public class InGame extends SessionState {
     < g01 game info && map file
     > g02 close
     > g03 leave game
-    < g04 players list
-    < g05 game step finish / tells client to parse and render @FIXME still not 100% onboard with this style
-    < g06 failed to join game
+    < g06 transversal error
     > g07 load done
     < g08 left game lobby
     > g09 client game closed (ready to change state)
+    < g11 join success (tells client they can start gameplay. this prevents early input packets causing a kick)
   
     < g10 the game update packet - see NoxioGame & Controller class for details
   
-    < g14 score
-    < g15 message
-    < g16 game over
-    < g17 new game
+    < g17 new game                  
     
-    > i01 mouse neutral
-    > i02 player request spawn
-    < i03 player object control
-    > i04 mouse move
-    > i05 use ability
-    > i06 request new game
-    > i07 request team change
-    < i08 respawn timer
+    > i00 input data blob
+    -> 01 mouse neutral
+    -> 02 player request spawn
+    -> 04 mouse move
+    -> 05 use action
+    -> 06 request new game
+    -> 07 request team change
   */
   
   @Override
@@ -61,18 +56,16 @@ public class InGame extends SessionState {
         case "g03" : { leaveGame(gson.fromJson(data, PacketG03.class)); break; }
         case "g07" : { loadDone(gson.fromJson(data, PacketG07.class)); break; }
         case "g09" : { session.leaveGame(); break; }
+        
         /* Ingame Type Packets gxx */
         
         /* Input Type Packets ixx */
-        case "i01" : { lobby.pushPacket(gson.fromJson(data, PacketI01.class).setSrcSid(session.getSessionId())); break; } /* @FIXME cleanup */
-        case "i02" : { lobby.pushPacket(gson.fromJson(data, PacketI02.class).setSrcSid(session.getSessionId())); break; }
-        case "i04" : { lobby.pushPacket(gson.fromJson(data, PacketI04.class).setSrcSid(session.getSessionId())); break; }
-        case "i05" : { lobby.pushPacket(gson.fromJson(data, PacketI05.class).setSrcSid(session.getSessionId())); break; }
-        case "i06" : { lobby.pushPacket(gson.fromJson(data, PacketI06.class).setSrcSid(session.getSessionId())); break; }
-        case "i07" : { lobby.pushPacket(gson.fromJson(data, PacketI07.class).setSrcSid(session.getSessionId())); break; }
+        case "i00" : { lobby.pushPacket(gson.fromJson(data, PacketI00.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
-    } catch(Exception ex) { /* @FIXME IOException | NullPointerException | JsonParseException */
+    } catch(Exception ex) { /* IOException | NullPointerException | JsonParseException */
+      System.err.println("User: " + session.getUser() + " threw Exception @ InGame.handlePacket()");
+      ex.printStackTrace();
       close(ex);
     }
   }

@@ -16,7 +16,7 @@ public class LobbyDao {
       a.set("game_name", "DM Test #1");
       a.set("map_name", "final");
       a.set("gametype", "Deathmatch");
-      a.set("max_players", "4");
+      a.set("max_players", "3");
       a.set("score_to_win", "15");
       a.set("respawn_time", "30");
       
@@ -34,13 +34,6 @@ public class LobbyDao {
       c.set("score_to_win", "3");
       c.set("respawn_time", "90");
       
-      e.set("game_name", "DM Test #2");
-      e.set("map_name", "final");
-      e.set("gametype", "Deathmatch");
-      e.set("max_players", "16");
-      e.set("score_to_win", "15");
-      e.set("respawn_time", "30");
-      
       f.set("game_name", "TDM Test #2");
       f.set("map_name", "battle");
       f.set("gametype", "TeamDeathmatch");
@@ -49,15 +42,24 @@ public class LobbyDao {
       f.set("respawn_time", "90");
       
       g.set("game_name", "CTF Test #2");
-      g.set("map_name", "battle");
+      g.set("map_name", "war");
       g.set("gametype", "CaptureTheFlag");
-      g.set("max_players", "24");
-      g.set("score_to_win", "5");
-      g.set("respawn_time", "150");
+      g.set("max_players", "12");
+      g.set("score_to_win", "3");
+      g.set("respawn_time", "90");
+      
+      e.set("game_name", "CTF Test #3");
+      e.set("map_name", "war");
+      e.set("gametype", "CaptureTheFlag");
+      e.set("max_players", "32");
+      e.set("score_to_win", "5");
+      e.set("respawn_time", "150");
       
       
       lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c));
-      //lobbies.add(new OfficialLobby(e)); lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(g));
+      lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(g)); lobbies.add(new OfficialLobby(e));
+      
+      for(int i=0;i<lobbies.size();i++) { lobbies.get(i).start(); }
     }
     catch(IOException ex) {
       ex.printStackTrace();
@@ -69,6 +71,7 @@ public class LobbyDao {
     settings.set("game_name", name);
     GameLobby lobby = new CustomLobby(settings);
     lobbies.add(lobby);
+    lobby.start();
     return lobby;
   }
   

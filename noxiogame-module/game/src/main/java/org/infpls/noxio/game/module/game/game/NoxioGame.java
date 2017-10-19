@@ -8,8 +8,10 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class NoxioGame {
+  
   public final GameLobby lobby;
   
   public final int respawnTime;       // Number of frames that a respawn takes
@@ -20,9 +22,9 @@ public abstract class NoxioGame {
    
   public final NoxioMap map;
   
-  protected final List<Controller> controllers; /* Player controller objects */
-  public final List<GameObject> objects; /* All game objects */
-  
+  protected final List<Controller> controllers; // Player controller objects 
+  public final List<GameObject> objects;        // Objects populating the game world
+    
   private int idGen; /* Used to generate OIDs for objects. */
   public NoxioGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     this.lobby = lobby;
@@ -34,6 +36,7 @@ public abstract class NoxioGame {
     
     created = new ArrayList();
     deleted = new ArrayList();
+    update = new ArrayList();
     
     respawnTime = settings.get("respawn_time", 30);
     penaltyTime = settings.get("penalty_time", 90);
@@ -43,21 +46,22 @@ public abstract class NoxioGame {
     
   public void handlePackets(final List<Packet> packets) {
     for(int i=0;i<packets.size();i++) {
-      Packet p = packets.get(i);
-      Controller c = getController(p.getSrcSid());
-      if(c != null) {
-        switch(p.getType()) {
-          case "i01" : { c.handlePacket(p); break; }
-          case "i02" : { spawnPlayer(c);  break; }
-          case "i04" : { c.handlePacket(p); break; }
-          case "i05" : { c.handlePacket(p); break; }
-          case "i06" : { c.handlePacket(p); break; }
-          case "i07" : { requestTeamChange(c); break; }
-          default : { /* @FIXME ERROR REPORT */ break; }
+      Controller c = getController(packets.get(i).getSrcSid());
+      if(packets.get(i).getType().equals("i00") && c != null) {
+        final PacketI00 p = (PacketI00)(packets.get(i));
+        final String[] spl = p.getData().split(";");
+        final Queue<String> queue = new LinkedList(Arrays.asList(spl));
+        for(int j=0;j<queue.size();j++) {
+          final String id = queue.remove();
+          switch(id) {
+            case "02" : { spawnPlayer(c, queue);  break; }
+            case "07" : { requestTeamChange(c, queue); break; }
+            default : { c.handlePacket(id, queue); break; }
+          }
         }
       }
       else {
-        /* @FIXME */
+        Oak.log("Invalid User Input '" + packets.get(i).getType() + "' " + (c!=null?c.getUser():"<NULL_CONTROLLER>") + "@NoxioGame.handlePackets", 1);
       }
     }
   }
@@ -84,34 +88,49 @@ public abstract class NoxioGame {
   
   /* Generates the game update packet for all non-localized updates. */
   /* EX: chat messages, object creation, object deletion */
+  /* Arrays are commas seperated value lists such as 1,54,6,23,12 or big,fat,booty,blaster
   /* Table of different data structures that are generated --
       OBJ::CREATE   -  crt;<int oid>;<string type>;<vec2 pos>;<vec2 vel>;
-      OBJ::DELETE   -  del;<int oid>;
+      OBJ::DELETE   -  del;<int oid>;<vec2 pos>;
+      SYS::SCORE    -  scr;<String gametype>;<String description>;<String[] players>;<String[] scores>;<float[] meter>;<float[] r>;<float[] g>;<float[] b>;
+      SYS::MESSAGE  -  msg;<String message>;
+      SYS::GAMEOVER -  end;<String winner>;
+      DBG::TICK     -  tck;<long tick>;<long sent>;
   */
-  private final List<GameObject> created, deleted;
-  public void generateUpdatePackets() {
-    final StringBuilder sb = new StringBuilder();
+  private final List<GameObject> created, deleted;  // List of objects create/deleted on this frame. These changes come first in update data.
+  protected final List<String> update;                // List of "impulse" updates on this frame. These are things that happen as single events such as chat messages.
+  public void generateUpdatePackets(final long tick) {
+    final StringBuilder sba = new StringBuilder(); // Append to start
+    final StringBuilder sbb = new StringBuilder(); // Append to end
+    
+    sba.append("tck;"); sba.append(tick); sba.append(";");
     for(int i=0;i<created.size();i++) {
       final GameObject obj = created.get(i);
-      sb.append("crt"); sb.append(";");
-      sb.append(obj.getOid()); sb.append(";");
-      sb.append(obj.getType()); sb.append(";");
-      obj.getPosition().toString(sb); sb.append(";");
-      obj.getVelocity().toString(sb); sb.append(";");
+      sba.append("crt"); sba.append(";");
+      sba.append(obj.getOid()); sba.append(";");
+      sba.append(obj.getType()); sba.append(";");
+      obj.getPosition().toString(sba); sba.append(";");
+      obj.getVelocity().toString(sba); sba.append(";");
     }
     for(int i=0;i<deleted.size();i++) {
       final GameObject obj = deleted.get(i);
-      sb.append("del"); sb.append(";");
-      sb.append(obj.getOid()); sb.append(";");
+      sba.append("del"); sba.append(";");
+      sba.append(obj.getOid()); sba.append(";");
+      obj.getPosition().toString(sba); sba.append(";");
+    }
+    for(int i=0;i<update.size();i++) {
+      sbb.append(update.get(i));
     }
     
-    created.clear(); deleted.clear();
+    created.clear(); deleted.clear(); update.clear();
     
-    final String globalData = sb.toString();
+    final String globalPreData = sba.toString();
+    final String globalPostData = sbb.toString();
     for(int i=0;i<controllers.size();i++) {
       final StringBuilder sbc = new StringBuilder();
-      sbc.append(globalData);
+      sbc.append(globalPreData);
       controllers.get(i).generateUpdateData(sbc);
+      sbc.append(globalPostData);
       Packet p = new PacketG10(sbc.toString());
       lobby.sendPacket(p, controllers.get(i).getSid());
     }
@@ -167,14 +186,12 @@ public abstract class NoxioGame {
     return null;
   }
 
-  protected abstract void spawnPlayer(final Controller c);
+  public static float SPAWN_SAFE_RADIUS = 5.0f;
+  protected abstract void spawnPlayer(final Controller c, final Queue<String> q);
   
   public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(this, player.getUser(), player.getSessionId()));
-    for(int i=0;i<objects.size();i++) {
-      GameObject obj = objects.get(i);
-      generateJoinPacket(player);
-    }
+    generateJoinPacket(player);
     updateScore();
   }
   
@@ -189,7 +206,7 @@ public abstract class NoxioGame {
     updateScore();
   }
   
-  public abstract void requestTeamChange(final Controller controller);
+  public abstract void requestTeamChange(final Controller controller, final Queue<String> q);
   
   public abstract void reportKill(final Controller killer, final GameObject killed);
   public abstract void reportObjective(final Controller player, final GameObject objective);
@@ -197,11 +214,11 @@ public abstract class NoxioGame {
   
   /* Send a message that will appear in all players chatlog */
   public void sendMessage(final String msg) {
-    lobby.sendPacket(new PacketG15(msg));
+    update.add("msg;"+msg+";");
   }
   
-  public void gameOver(String message) {
-    lobby.sendPacket(new PacketG16(message));
+  public void gameOver(String msg) {
+    update.add("end;"+msg+";");
     gameOver = true; resetTimer = 150;
   }
   
@@ -210,7 +227,7 @@ public abstract class NoxioGame {
   }
   
   public boolean isGameOver() { return resetTimer < 1 && gameOver; }
-  public final long createOid() { return idGen++; } /* @FIXME maybe use GUID instead... this could save bandwidth though... */
+  public final int createOid() { return idGen++; }
   public abstract String gametypeName();
   
   public class ScoreBoard {

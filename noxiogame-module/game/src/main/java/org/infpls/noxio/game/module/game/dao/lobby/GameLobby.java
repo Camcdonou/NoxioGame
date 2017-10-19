@@ -9,6 +9,8 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
 /* On next work day.
+  death packet update position
+
    ! - INPUT IS SO FUCKING WEIRD LOL to many references to handle to many things in weird ways. pls fix.
    # - RequestAnimFrame + Delta Time Interpolation (remember camera & particles & lights needs it)
    ? - Fill out the Gametype sub types so they do something.
@@ -33,7 +35,7 @@ public abstract class GameLobby {
   protected final String name;
   
   protected final int maxPlayers;
-  protected final List<NoxioSession> players, loading; //@FIXME Access to this should be synchronized or it might RIP
+  protected final List<NoxioSession> players, loading;
   
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
   protected NoxioGame game; /* The actual game object */
@@ -64,8 +66,11 @@ public abstract class GameLobby {
     outDirect = new HashMap();
     
     newGame();
-    loop = new GameLoop(this); loop.start(); //@FIXME apparently a no no??
+    loop = new GameLoop(this);
   }
+  
+  /* It's apparently dangerous to start the thread in the constructor because ********REASONS********* so here we are! */
+  public void start() { loop.start(); }
   
   private void newGame() throws IOException {
     final String gametype = settings.get("gametype", "Deathmatch");
@@ -76,47 +81,10 @@ public abstract class GameLobby {
       default : { game = new Deathmatch(this, map, settings); break; }
     }
   }
-  
-  /* @FIXME this method is getting pretty THICC. Maybe put it on a diet or something... */
+
   public void step(final long tick) {
     try {
-      final List<SessionEvent> evts = events.pop();
-      for(int i=0;i<evts.size();i++) {
-        SessionEvent evt = evts.get(i);
-        switch(evt.getType()) {
-          case "e00" : {
-            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
-            if(!connect(evt.getSession())) {
-              sendPacket(new PacketG06("Failed to connect to game."), evt.getSession());
-              evt.getSession().leaveGame();
-            }
-            else { 
-              GameLobbyInfo info = getInfo();
-              evt.getSession().sendPacket(new PacketG01(info.getName(), info.getMaxPlayers(), game.map));
-            }
-            break;
-          }
-          case "e01" : {
-            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
-            if(!join(evt.getSession())) {
-              sendPacket(new PacketG06("Failed to join game."), evt.getSession());
-              evt.getSession().leaveGame();
-            }
-            break;
-          }
-          case "e02" : {
-            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
-            leave(evt.getSession());
-            evt.getSession().sendPacket(new PacketG08()); /* This is one of the few packets we dont send in a blob because it has an odd state. */
-            break;
-          }
-          case "e03" : {
-            remove(evt.getSession());
-            break;
-          }
-          default : { throw new IOException("Invalid SessionEvent type: " + evt.getType() + ". This really should never happen."); }
-        }
-      }
+      handleEvents();
       if(game.isGameOver()) {
         newGame();
         packets.pop();
@@ -131,21 +99,20 @@ public abstract class GameLobby {
       
       game.handlePackets(packets.pop()); // Player Input
       game.step();                       // Game tick
-      game.generateUpdatePackets();      // Send updates to players
+      game.generateUpdatePackets(tick);  // Send updates to players
       game.post();                       // Clean up
       
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
-        if(!loading.contains(player)) {
+        if(!loading.contains(player) && !outAll.isEmpty()) {
           player.sendPacket(new PacketS01(outAll));
         }
       }
       outAll.clear();
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
-        if(!loading.contains(player)) {
+        if(!loading.contains(player) && !outDirect.get(player).isEmpty()) {
           player.sendPacket(new PacketS01(outDirect.get(player)));
-          player.sendPacket(new PacketG05(tick, System.currentTimeMillis()));
         }
         outDirect.get(player).clear();
       }
@@ -158,8 +125,43 @@ public abstract class GameLobby {
       System.err.println("## CRITICAL ## Game step exception!");
       System.err.println("## STATE    ## lobbyName=" + name + "gameOver=" + game.isGameOver());
       ex.printStackTrace();
-      /* @FIXME do something? Probably handle server side GAME errors by closing the lobby and kicking players to menu. */
     }
+  }
+  
+  /* Handles user connection/join/leave events */
+  private void handleEvents() throws IOException { 
+      final List<SessionEvent> evts = events.pop();
+      for(int i=0;i<evts.size();i++) {
+        SessionEvent evt = evts.get(i);
+        switch(evt.getType()) {
+          case "e00" : {
+            if(!evt.getSession().isOpen()) { break; }                                     /* Check to make sure connection is still active. */
+            if(!connect(evt.getSession())) { evt.getSession().sendPacket(new PacketG06("Connection failed.")); evt.getSession().leaveGame(); }
+            else { GameLobbyInfo info = getInfo(); evt.getSession().sendPacket(new PacketG01(info.getName(), info.getMaxPlayers(), game.map)); }
+            break;
+          }
+          case "e01" : {
+            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
+            if(!join(evt.getSession())) {
+              remove(evt.getSession());
+              evt.getSession().sendPacket(new PacketG06("Failed to join game."));
+              evt.getSession().leaveGame();
+            }
+            else { sendPacket(new PacketG11(), evt.getSession()); }
+            break;
+          }
+          case "e02" : {
+            if(!evt.getSession().isOpen()) { break; } /* Check to make sure connection is still active. */
+            leave(evt.getSession()); evt.getSession().sendPacket(new PacketG08()); /* Sent immiedately as client is ready to change state. */
+            break;
+          }
+          case "e03" : {
+            remove(evt.getSession());
+            break;
+          }
+          default : { throw new IOException("Invalid SessionEvent type: " + evt.getType() + ". This really should never happen."); }
+        }
+      }
   }
    
   protected boolean connect(NoxioSession player) throws IOException {
@@ -169,17 +171,17 @@ public abstract class GameLobby {
     players.add(player);
     loading.add(player);
     outDirect.put(player, new ArrayList());
-    updatePlayerList(player.getUser() + " connected.");
+    game.sendMessage(player.getUser() + " connected.");
     return true;
   }
   
   private boolean join(NoxioSession player) throws IOException {
     if(closed) { return false; }
-    if(players.size() >= maxPlayers) { return false; }
-    if(!players.contains(player) || !loading.contains(player)) { remove(player); player.close("Lobby Ghost Error."); return false; } /* A thing that can happen and cause null pointers. Only possible if load times are long on clients are long and they leave lobby and come back AFAIK */
+    if(players.size() > maxPlayers) { return false; }
+    if(!players.contains(player) || !loading.contains(player)) { remove(player); player.close("Lobby Ghost Error."); return false; } /* A thing that can happen and cause null pointers. Only possible if load times are long on clients and they leave lobby and come back AFAIK */
     loading.remove(player);
     game.join(player);
-    updatePlayerList(player.getUser() + " joined the game.");
+    game.sendMessage(player.getUser() + " joined the game.");
     return true;
   }
   
@@ -189,33 +191,21 @@ public abstract class GameLobby {
   protected void close() throws IOException {
     closed = true;
     for(int i=0;i<players.size();i++) {
-      players.get(i).leaveGame(); /* @FIXME maybe give leaveGame a message parameter to tell people why they were removed if there is a reason */
+      players.get(i).leaveGame();
     }
     game.close();
-  }
-  
-  protected void updatePlayerList(final String message) throws IOException {
-    List<String> playerList = new ArrayList();
-    for(int i=0;i<players.size();i++) {
-      playerList.add(players.get(i).getUser());
-    }
-    sendPacket(new PacketG04(playerList));
-    sendPacket(new PacketG15(message));
-//    for(int i=0;i<players.size();i++) {
-//      players.get(i).sendPacket(new PacketG04(playerList));
-//      players.get(i).sendPacket(new PacketG15(message));
-//    }
   }
   
   protected List<Packet> outAll;
   protected Map<NoxioSession, List<Packet>> outDirect;
   /* Send a packet to everyone in the lobby */
-  public void sendPacket(final Packet p) { /* @FIXME catching exceptions here in these 3 methods is bad nono */
+  public void sendPacket(final Packet p) {
     outAll.add(p);
   }
   
   /* Send a packet to a specific player with the given SID */
   public void sendPacket(final Packet p, final String sid) {
+    try {
     for(int i=0;i<players.size();i++) {
       final NoxioSession player = players.get(i);
       if(!loading.contains(player) && player.getSessionId().equals(sid)) {
@@ -223,17 +213,23 @@ public abstract class GameLobby {
         return;
       }
     }
+    } catch(NullPointerException ex) {
+      System.err.println("Invalid user mapping: " + p.getType());
+    }
   }
   
   /* Send a packet to a specific player */
   public void sendPacket(final Packet p, final NoxioSession player) {
-    outDirect.get(player).add(p);
+    try {
+      outDirect.get(player).add(p);
+    } catch(NullPointerException ex) {
+      System.err.println("Invalid user mapping: " + p.getType());
+    }
   }
   
   public void pushPacket(final Packet p) { packets.push(p); }
   public void pushEvent(final SessionEvent evt) { events.push(evt); }
   
-  //@FIXME Not a great way to do this. Need to seperate Offical Server into it's own type. Seperate from a user server. Also the host being the person in slot 0 is kinda dumb maybe.
   public abstract NoxioSession getHost();
   public String getLid() { return lid; }
   public abstract GameLobbyInfo getInfo();
@@ -247,7 +243,7 @@ public abstract class GameLobby {
     private static final int TICK_RATE = 33;
     private final GameLobby lobby;
     
-    private long lastStepTime; /* @FIXME DEBUG */
+    private long lastStepTime;
     public GameLoop(final GameLobby lobby) {
       super();
       this.lobby = lobby;
@@ -264,15 +260,15 @@ public abstract class GameLobby {
           lobby.step(lastStepTime);
           lastStepTime = System.currentTimeMillis() - now;
         }
-        //try {
-          //long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
-          //sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
-        //}
-        //catch(InterruptedException ex) {
-        //  System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
-        //  ex.printStackTrace();
+        try {
+          long t = (last + GameLoop.TICK_RATE) - System.currentTimeMillis(); //Cannot use 'now' again because time may have passed during lobby.step();
+          sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
+        }
+        catch(InterruptedException ex) {
+          System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
+          ex.printStackTrace();
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
-        //}
+        }
       }
     }
   }

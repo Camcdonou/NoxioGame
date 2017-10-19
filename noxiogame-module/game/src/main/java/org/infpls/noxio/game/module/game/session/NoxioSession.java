@@ -22,7 +22,7 @@ public final class NoxioSession {
     this.webSocket = webSocket;
     this.dao = dao;
         
-    changeState(new Login(this, dao.getUserDao(), dao.getInfoDao()));
+    changeState("l");
   }
   
   public void handlePacket(final String data) throws IOException {
@@ -32,33 +32,42 @@ public final class NoxioSession {
   public void sendPacket(final Packet p) throws IOException {
     /* Due to the multi threaded nature of this application, it's possible a packet can attempt to be sent right as teh connection closes.
        This isOpen() is just a small prevention measure to stop lots of pointless exceptions. */
-    if(isOpen()) {
-      final Gson gson = new GsonBuilder().create();
-      webSocket.sendMessage(new TextMessage(gson.toJson(p)));
+    try {
+      if(isOpen()) {
+        final Gson gson = new GsonBuilder().create();
+        webSocket.sendMessage(new TextMessage(gson.toJson(p)));
+      }
+    }
+    catch(IllegalStateException iex) {
+      System.err.println("User closed connection during packet sending: " + p.getType());
     }
   }
   
-
-  private void changeState(final SessionState ss) throws IOException {
-    if(sessionState != null) { sessionState.destroy(); } 
-    if(ss == null) { throw new IOException("Null State Exception. What the fuck are you doing?"); } //I can't believe you've done this.
-    sessionState = ss;
+  private void changeState(final String id) throws IOException { changeState(id, null); }
+  private void changeState(final String id, final Object generic) throws IOException {
+    if(sessionState != null) { sessionState.destroy(); }
+    switch(id) { 
+      case "l" : { sessionState = new Login(this, dao.getUserDao(), dao.getInfoDao()); break; }
+      case "b" : { sessionState = new Lobby(this, dao.getLobbyDao()); break; }
+      case "g" : { sessionState = new InGame(this, (GameLobby)generic); break; }
+      default : throw new IOException("Invalid State Exception. What the fuck are you doing? @" + user);
+    }
   }
   
   public void leaveGame() throws IOException {
-    changeState(new Lobby(this, dao.getLobbyDao()));
+    changeState("b");
   }
   
   public void joinGame(final GameLobby gl) throws IOException {
     if(!loggedIn()) { throw new IOException("This session is not logged in!"); }
-    changeState(new InGame(this, gl));
+    changeState("g", gl);
   }
   
   public void login(final String user, final String sid) throws IOException {
     if(loggedIn()) { throw new IOException("This session is already logged in!"); }
     this.user = user;
     this.sid = sid;
-    changeState(new Lobby(this, dao.getLobbyDao()));
+    changeState("b");
   }
   
   public boolean loggedIn() {

@@ -18,46 +18,54 @@ public class Deathmatch extends NoxioGame {
   }
   
   @Override
-  protected void spawnPlayer(final Controller c) {
+  protected void spawnPlayer(final Controller c, final Queue<String> q) {
     if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
-    List<NoxioMap.Spawn> spawns = map.getSpawns("player");
-    if(spawns.size() < 1) { sp = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f); } // Fallback
+    final List<NoxioMap.Spawn> spawns = map.getSpawns("player");
+    if(spawns.isEmpty()) { sp = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f); } // Fallback
     else {
-      sp = spawns.get(0).getPos(); float d = averagePlayerDistance(sp);
-      for(int i=1;i<spawns.size();i++) {
-        float dn = averagePlayerDistance(spawns.get(i).getPos());
-        if(dn > d) { sp = spawns.get(i).getPos(); }
+      final List<NoxioMap.Spawn> crop = new ArrayList();
+      for(int i=0;i<spawns.size();i++) {
+        if(nearestPlayerDistance(spawns.get(i).getPos()) >= SPAWN_SAFE_RADIUS) {
+          crop.add(spawns.get(i));
+        }
+      }
+      if(crop.isEmpty()) {
+        sp = spawns.get((int)(Math.random()*spawns.size())).getPos();
+      }
+      else {
+        sp = crop.get((int)(Math.random()*crop.size())).getPos();
       }
     }
     
-    long oid = createOid();
+    int oid = createOid();
     Player player = new Player(this, oid, sp);
     addObject(player);
     c.setControl(player);
   }
   
   /* Used to find the spawn point that is the "safest" to spawn at. */
-  private float averagePlayerDistance(final Vec2 P) {
-    float d = 0f; int j = 0;
+  private float nearestPlayerDistance(final Vec2 P) {
+    float d = 0f;
     for(int i=0;i<controllers.size();i++) {
       GameObject obj = controllers.get(i).getControlled();
       if(obj != null) {
-        d += obj.getPosition().distance(P);
-        j++;
+        float k = obj.getPosition().distance(P);
+        if(k < d) { d = k; }
       }
     }
-    return d/j;
+    return d;
   }
   
   @Override
-  public void requestTeamChange(final Controller controller) {
+  public void requestTeamChange(final Controller c, final Queue<String> q) {
     /* No teams, ignore */
   }
 
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
+    if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
       killer.getScore().kill();
@@ -70,15 +78,23 @@ public class Deathmatch extends NoxioGame {
   
   @Override
   public void updateScore() {
-    final List<ScoreBoard> scores = new ArrayList();
+    final List<ScoreBoard> scs = new ArrayList();
     for(int i = 0;i<controllers.size();i++) {
       final Controller c = controllers.get(i);
       final Score s = controllers.get(i).getScore();
-      scores.add(
-        new ScoreBoard(c.getUser(), s.getKills() + "/" + s.getDeaths(), (float)s.getKills()/scoreToWin, new Color3())
-      );
+      scs.add(new ScoreBoard(c.getUser(), s.getKills() + "/" + s.getDeaths(), (float)s.getKills()/scoreToWin, new Color3()));
     }
-    lobby.sendPacket(new PacketG14("Deathmatch", "First to " + scoreToWin + " kills wins!", scores));
+    
+    final StringBuilder sb = new StringBuilder();
+    sb.append("scr;Deathmatch;First to "); sb.append(scoreToWin); sb.append(" wins!;");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).name); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).score); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).meter); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.r); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.g); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.b); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    
+    update.add(sb.toString());
   }
 
   @Override

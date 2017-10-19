@@ -20,7 +20,7 @@ public class Player extends Mobile {
   private int blipCooldown, dashCooldown, tauntCooldown, blipPower, dashPower;
   private int stunTimer;
   private int spawnProtection;
-  public Player(final NoxioGame game, final long oid, final Vec2 position) {
+  public Player(final NoxioGame game, final int oid, final Vec2 position) {
     super(game, oid, "obj.mobile.player", position, false, 0.5f, 1.0f, 0.725f);
     
     look =  new Vec2(0.0f, 1.0f);
@@ -39,7 +39,7 @@ public class Player extends Mobile {
     spawnProtection = 66;
   }
   
-  public Player(final NoxioGame game, final long oid, final Vec2 position, final int team) {
+  public Player(final NoxioGame game, final int oid, final Vec2 position, final int team) {
     super(game, oid, "obj.mobile.player", position, false, 0.5f, 1.0f, 0.725f);
     
     look =  new Vec2(0.0f, 1.0f);

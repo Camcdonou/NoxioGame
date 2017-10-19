@@ -2,7 +2,6 @@ package org.infpls.noxio.game.module.game.game.object;
 
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.NoxioGame;
-import org.infpls.noxio.game.module.game.session.ingame.PacketG15;
 import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
@@ -12,7 +11,7 @@ public abstract class Mobile extends GameObject {
   private boolean intangible, grounded;
   
   private static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;
-  public Mobile(final NoxioGame game, final long oid, final String type, final Vec2 position, final boolean intangible, final float radius, final float weight, final float friction) {
+  public Mobile(final NoxioGame game, final int oid, final String type, final Vec2 position, final boolean intangible, final float radius, final float weight, final float friction) {
     super(game, oid, type, position);
     this.height = 0.0f; this.vspeed = 0.0f; this.grounded = false; this.intangible = intangible;
     this.radius = radius; this.weight = weight; this.friction = friction;
@@ -20,10 +19,10 @@ public abstract class Mobile extends GameObject {
   
   public void physics() {
     /* -- Objects -- */
-    if(height > -0.5 && !intangible) {                                             // If this object is to low we ignore object collision.
+    if(height > -0.5 && !intangible) {                                          // If this object is to low we ignore object collision.
       for(int i=0;i<game.objects.size();i++) {
         final GameObject obj = game.objects.get(i);
-        if(obj != this && obj.getType().startsWith("obj.mobile")) { // Object must be something physical (IE a barrel or a pillar or a player)
+        if(obj != this && obj.getType().startsWith("obj.mobile")) {             // Object must be something physical (IE a barrel or a pillar or a player)
           final Mobile mob = (Mobile)obj;
           final float combinedRadius = radius+mob.getRadius();
           if(position.distance(mob.getPosition()) < combinedRadius && mob.getHeight() > -0.5 && !mob.isIntangible()) {
@@ -80,12 +79,8 @@ public abstract class Mobile extends GameObject {
     }
     
     /* Height */
-    boolean floorBounded = false;
-    for(int i=0;i<floors.size();i++) {
-      if(Intersection.pointInPolygon(position, floors.get(i))) {
-        floorBounded = true; break;
-      }
-    }
+    boolean floorBounded = collideFloors(position, floors);
+    
     if(floorBounded) {
       if(height > -0.4f && height <= 0.0f) {
         if(vspeed < 0.0f) {
@@ -98,8 +93,14 @@ public abstract class Mobile extends GameObject {
         }
       }
       else {
-        height += vspeed; vspeed -= 0.03f;   // Falling while below floor @FIXME check for full passthrough at high speeds?
-        grounded = false;
+        if(height > 0.0f && height + vspeed <= 0.0f) {     // Hit floor while falling
+          fatalImpact = vspeed >= FATAL_IMPACT_SPEED;
+          height = 0.0f;
+        }
+        else {
+          height += vspeed; vspeed -= 0.03f;   // Falling while below floor
+          grounded = false;
+        }
       }
     }
     else {
@@ -144,6 +145,20 @@ public abstract class Mobile extends GameObject {
       return 1f-aoi;
     }
     return 0f;
+  }
+  
+  /* This fuction is simple and just returns a boolean true/false if the object is over solid ground */
+  private boolean collideFloors(final Vec2 pos, final List<Polygon> floors) {
+    for(int i=0;i<floors.size();i++) {
+      if(Intersection.pointInPolygon(position, floors.get(i))) {
+        return true;
+      }
+      else {
+        final Instance inst = Intersection.polygonCircle(pos, floors.get(i), radius);
+        if(inst != null && inst.distance < (radius*0.5)) { return true; }
+      }
+    }
+    return false;
   }
   
   public void knockback(final Vec2 impulse, final Player player) { setVelocity(velocity.add(impulse)); }
