@@ -8,8 +8,10 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class NoxioGame {
+  
   public final GameLobby lobby;
   
   public final int respawnTime;       // Number of frames that a respawn takes
@@ -22,7 +24,7 @@ public abstract class NoxioGame {
   
   protected final List<Controller> controllers; // Player controller objects 
   public final List<GameObject> objects;        // Objects populating the game world
-  
+    
   private int idGen; /* Used to generate OIDs for objects. */
   public NoxioGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     this.lobby = lobby;
@@ -59,7 +61,7 @@ public abstract class NoxioGame {
         }
       }
       else {
-        /* @FIXME Error logging */
+        Oak.log("Invalid User Input '" + packets.get(i).getType() + "' " + (c!=null?c.getUser():"<NULL_CONTROLLER>") + "@NoxioGame.handlePackets", 1);
       }
     }
   }
@@ -89,7 +91,7 @@ public abstract class NoxioGame {
   /* Arrays are commas seperated value lists such as 1,54,6,23,12 or big,fat,booty,blaster
   /* Table of different data structures that are generated --
       OBJ::CREATE   -  crt;<int oid>;<string type>;<vec2 pos>;<vec2 vel>;
-      OBJ::DELETE   -  del;<int oid>;
+      OBJ::DELETE   -  del;<int oid>;<vec2 pos>;
       SYS::SCORE    -  scr;<String gametype>;<String description>;<String[] players>;<String[] scores>;<float[] meter>;<float[] r>;<float[] g>;<float[] b>;
       SYS::MESSAGE  -  msg;<String message>;
       SYS::GAMEOVER -  end;<String winner>;
@@ -114,6 +116,7 @@ public abstract class NoxioGame {
       final GameObject obj = deleted.get(i);
       sba.append("del"); sba.append(";");
       sba.append(obj.getOid()); sba.append(";");
+      obj.getPosition().toString(sba); sba.append(";");
     }
     for(int i=0;i<update.size();i++) {
       sbb.append(update.get(i));
@@ -183,6 +186,7 @@ public abstract class NoxioGame {
     return null;
   }
 
+  public static float SPAWN_SAFE_RADIUS = 5.0f;
   protected abstract void spawnPlayer(final Controller c, final Queue<String> q);
   
   public void join(final NoxioSession player) throws IOException {
@@ -223,7 +227,7 @@ public abstract class NoxioGame {
   }
   
   public boolean isGameOver() { return resetTimer < 1 && gameOver; }
-  public final long createOid() { return idGen++; } /* @FIXME maybe use GUID instead... this could save bandwidth though... */
+  public final int createOid() { return idGen++; }
   public abstract String gametypeName();
   
   public class ScoreBoard {

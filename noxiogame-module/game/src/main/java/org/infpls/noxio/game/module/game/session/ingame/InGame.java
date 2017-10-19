@@ -24,10 +24,11 @@ public class InGame extends SessionState {
     < g01 game info && map file
     > g02 close
     > g03 leave game
-    < g06 failed to join game
+    < g06 transversal error
     > g07 load done
     < g08 left game lobby
     > g09 client game closed (ready to change state)
+    < g11 join success (tells client they can start gameplay. this prevents early input packets causing a kick)
   
     < g10 the game update packet - see NoxioGame & Controller class for details
   
@@ -62,7 +63,9 @@ public class InGame extends SessionState {
         case "i00" : { lobby.pushPacket(gson.fromJson(data, PacketI00.class).setSrcSid(session.getSessionId())); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
-    } catch(Exception ex) { /* @FIXME IOException | NullPointerException | JsonParseException */
+    } catch(Exception ex) { /* IOException | NullPointerException | JsonParseException */
+      System.err.println("User: " + session.getUser() + " threw Exception @ InGame.handlePacket()");
+      ex.printStackTrace();
       close(ex);
     }
   }

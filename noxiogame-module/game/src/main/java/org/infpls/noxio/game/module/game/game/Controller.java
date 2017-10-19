@@ -3,7 +3,7 @@ package org.infpls.noxio.game.module.game.game;
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.*;
-import org.infpls.noxio.game.module.game.util.Parse;
+import org.infpls.noxio.game.module.game.util.*;
 
 final public class Controller {
   private final NoxioGame game;
@@ -14,7 +14,7 @@ final public class Controller {
   
   private Vec2 direction;           // Player movement direction
   private float speed;              // Player movement speed
-  private final List<String> action;           /* @FIXME RENAME TO ACTION AND EFFECT LOL */
+  private final List<String> action;
   
   private int respawnTimer;
   private int respawnPenalty;
@@ -74,7 +74,7 @@ final public class Controller {
     if(object != null) {
       for(int i=0;i<game.objects.size();i++) {
         GameObject obj = game.objects.get(i);
-        if(obj == object || obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE || obj.getType().equals("obj.mobile.flag")) { // @TODO: Add a "globalize" flag to ojbects and cehck that
+        if(obj == object || obj.isGlobal() || obj.getPosition().distance(object.getPosition()) <= VIEW_DISTANCE) {
           obj.generateUpdateData(sb);
         }
         else {
@@ -83,7 +83,7 @@ final public class Controller {
         }
       }
     }
-    else { /* @FIXME when the controller has no object it disables the VIEW_DISTANCE cull */
+    else { /* @FIXME: Fully flesh out spectating. */
       for(int i=0;i<game.objects.size();i++) {
         GameObject obj = game.objects.get(i);
         obj.generateUpdateData(sb);
@@ -102,7 +102,7 @@ final public class Controller {
       case "04" : { inputMouse(q); break; }
       case "05" : { inputAction(q); break; }
       case "06" : { inputReset(q); break; }
-      default : { /* @FIXME ERROR REPORT */ break; }
+      default : { Oak.log("Invalid User Input '" + id + "' " + user + "@Controller.handlePacket", 1); break; }
     }
   }
   

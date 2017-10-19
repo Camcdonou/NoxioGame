@@ -16,7 +16,7 @@ public class LobbyDao {
       a.set("game_name", "DM Test #1");
       a.set("map_name", "final");
       a.set("gametype", "Deathmatch");
-      a.set("max_players", "6");
+      a.set("max_players", "3");
       a.set("score_to_win", "15");
       a.set("respawn_time", "30");
       
@@ -58,6 +58,8 @@ public class LobbyDao {
       
       lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c));
       lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(g)); lobbies.add(new OfficialLobby(e));
+      
+      for(int i=0;i<lobbies.size();i++) { lobbies.get(i).start(); }
     }
     catch(IOException ex) {
       ex.printStackTrace();
@@ -69,6 +71,7 @@ public class LobbyDao {
     settings.set("game_name", name);
     GameLobby lobby = new CustomLobby(settings);
     lobbies.add(lobby);
+    lobby.start();
     return lobby;
   }
   

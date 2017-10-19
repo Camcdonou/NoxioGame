@@ -9,10 +9,10 @@ public class Flag extends Mobile {
   
   private final List<String> effects;      // List of actions performed that will be sent to the client on the next update
   
-  private long lastHeld;
+  private int lastHeld;
   private int dropCooldown, resetCooldown;
   private final static int DROP_COOLDOWN_TIME = 45, RESET_COOLDOWN_TIME = 900;
-  public Flag(final NoxioGame game, final long oid, final Vec2 position, final int team) {
+  public Flag(final NoxioGame game, final int oid, final Vec2 position, final int team) {
     super(game, oid, "obj.mobile.flag", position, true, 0.1f, 0.5f, 0.725f);
     
     base = position;
@@ -118,4 +118,7 @@ public class Flag extends Mobile {
   
   public boolean isHeld() { return held!=null; }
   public boolean onBase() { return position.equals(base); }
+  
+  @Override
+  public boolean isGlobal() { return true; }
 }
