@@ -6,15 +6,20 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
 public abstract class Mobile extends GameObject {
-  private final float radius, weight, friction;
+  protected float radius, weight, friction;
+  
   private float height, vspeed;
-  private boolean intangible, grounded;
+  protected boolean intangible, grounded;
   
   private static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;
-  public Mobile(final NoxioGame game, final int oid, final String type, final Vec2 position, final boolean intangible, final float radius, final float weight, final float friction) {
+  public Mobile(final NoxioGame game, final int oid, final String type, final Vec2 position) {
     super(game, oid, type, position);
-    this.height = 0.0f; this.vspeed = 0.0f; this.grounded = false; this.intangible = intangible;
-    this.radius = radius; this.weight = weight; this.friction = friction;
+    
+    /* Settings */
+    radius = 0.5f; weight = 1.0f; friction = 0.725f;
+    
+    /* States */
+    height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false;
   }
   
   public void physics() {

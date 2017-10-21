@@ -13,16 +13,22 @@ public class Flag extends Mobile {
   private int dropCooldown, resetCooldown;
   private final static int DROP_COOLDOWN_TIME = 45, RESET_COOLDOWN_TIME = 900;
   public Flag(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.flag", position, true, 0.1f, 0.5f, 0.725f);
-    
-    base = position;
-    held = null;
-    setTeam(team);
+    super(game, oid, "obj.mobile.flag", position);
     
     effects = new ArrayList();
     
-    dropCooldown = 0;
-    lastHeld = -1;
+    base = position;
+    held = null;
+    
+    /* Settings */
+    radius = 0.1f; weight = 0.5f; friction = 0.725f;
+    
+    /* State */
+    this.team = team;
+    intangible = true;
+    
+    /* Timers */
+    dropCooldown = 0; lastHeld = -1;
   }
   
   @Override
@@ -34,7 +40,7 @@ public class Flag extends Mobile {
       for(int i=0;i<game.objects.size();i++) {
         if(game.objects.get(i).getType().equals("obj.mobile.flag")) {
           final Flag f = (Flag)(game.objects.get(i));
-          if(f.getTeam() != getTeam() && f.onBase() && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) { f.reportObjective(held); kill(); }
+          if(f.team != team && f.onBase() && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) { f.reportObjective(held); kill(); }
         }
       }
     }
@@ -64,7 +70,7 @@ public class Flag extends Mobile {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
-    sb.append(getTeam()); sb.append(";");
+    sb.append(team); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");
@@ -77,14 +83,14 @@ public class Flag extends Mobile {
   public boolean pickup(final Player p) {
     if(dropCooldown > 0 && lastHeld == p.getOid()) { return false; }
     if(isHeld()) { return false; }
-    if(getTeam() == p.getTeam()) { return false; }
+    if(team == p.team) { return false; }
     held = p;
     lastHeld = held.getOid();
     return true;
   }
   
   public void reset(final Player p) {
-    if(getTeam() == p.getTeam() && !isHeld()) {
+    if(team == p.team && !isHeld()) {
       kill();
     }
   }
@@ -101,7 +107,7 @@ public class Flag extends Mobile {
   
   @Override
   public void knockback(final Vec2 impulse, final Player player) {
-    if(getTeam() != player.getTeam()) {
+    if(team != player.team) {
       setVelocity(velocity.add(impulse));
     }
   }

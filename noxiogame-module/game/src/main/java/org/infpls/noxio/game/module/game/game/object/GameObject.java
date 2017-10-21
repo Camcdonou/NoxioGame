@@ -6,10 +6,10 @@ import org.infpls.noxio.game.module.game.game.Controller;
 public abstract class GameObject {
   protected final NoxioGame game; /* Parent Game */
   
-  protected final int oid;       /* Object ID */
+  protected final int oid;        /* Object ID */
   private final String type;      /* Object Type */
   
-  private int team;               /* Team id for various uses, -1 is "No Team" id. */
+  protected int team;             /* Team id for various uses, -1 is "No Team" id. */
   
   protected boolean dead;
   protected Vec2 position, velocity;
@@ -41,9 +41,6 @@ public abstract class GameObject {
   public final String getType() { return type; }
   public final Vec2 getPosition() { return position; }
   public final Vec2 getVelocity() { return velocity; }
-  
-  public final int getTeam() { return team; }
-  public final void setTeam(final int t) { team = t; }
   
   public boolean isGlobal() { return false; } /* If this returns true this object ignores fog of war and is globally visible. */
   

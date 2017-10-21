@@ -145,7 +145,7 @@ final public class Controller {
     if(respawnTimer > 0) { respawnTimer--; }
     if(object != null) {
       if(object.isDead()) { objectDestroyed(); return; }
-      if(object.getType().equals("obj.mobile.player")) {
+      if(object.getType().startsWith("obj.mobile.player")) {
         Player p = (Player)object;
         p.setInput(direction, speed);
         for(int i=0;i<action.size();i++) { p.queueAction(action.get(i)); }

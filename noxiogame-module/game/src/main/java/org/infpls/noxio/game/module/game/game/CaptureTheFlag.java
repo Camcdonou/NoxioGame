@@ -55,7 +55,7 @@ public class CaptureTheFlag extends NoxioGame {
     }
     
     int oid = createOid();
-    Player player = new Player(this, oid, sp, c.getTeam());
+    Player player = new Fox(this, oid, sp, c.getTeam());
     addObject(player);
     c.setControl(player);
   }
