@@ -229,16 +229,5 @@ public abstract class NoxioGame {
   public boolean isGameOver() { return resetTimer < 1 && gameOver; }
   public final int createOid() { return idGen++; }
   public abstract String gametypeName();
-  
-  public class ScoreBoard {
-    public final String name, score;
-    public final float meter;
-    public final Color3 color;
-    public ScoreBoard(final String name, final String score, final float meter, final Color3 color) {
-      this.name = name;
-      this.score = score;
-      this.meter = meter;
-      this.color = color;
-    }
-  }
+  public abstract int objectiveBaseId();                                        // ID for gametype objective, 0 = none, 1 = ctf flags, etc...
 }

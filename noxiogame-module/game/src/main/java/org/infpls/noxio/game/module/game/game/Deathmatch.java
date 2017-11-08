@@ -80,21 +80,13 @@ public class Deathmatch extends NoxioGame {
   
   @Override
   public void updateScore() {
-    final List<ScoreBoard> scs = new ArrayList();
-    for(int i = 0;i<controllers.size();i++) {
-      final Controller c = controllers.get(i);
-      final Score s = controllers.get(i).getScore();
-      scs.add(new ScoreBoard(c.getUser(), s.getKills() + "/" + s.getDeaths(), (float)s.getKills()/scoreToWin, new Color3()));
-    }
-    
     final StringBuilder sb = new StringBuilder();
-    sb.append("scr;Deathmatch;First to "); sb.append(scoreToWin); sb.append(" wins!;");
-    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).name); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).score); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).meter); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.r); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.g); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<scs.size();i++) { sb.append(scs.get(i).color.b); if(i<scs.size()-1) { sb.append(","); } } sb.append(";");
+    sb.append("scr;");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getUser()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getTeam()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getScore().getKills()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getScore().getDeaths()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getScore().getObjectives()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
     
     update.add(sb.toString());
   }
@@ -106,4 +98,7 @@ public class Deathmatch extends NoxioGame {
   
   @Override
   public String gametypeName() { return "Deathmatch"; }
+
+  @Override
+  public int objectiveBaseId() { return 0; }
 }

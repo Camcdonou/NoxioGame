@@ -41,6 +41,7 @@ public class InGame extends SessionState {
     -> 05 use action
     -> 06 request new game
     -> 07 request team change
+    -> 08 chat message
   */
   
   @Override

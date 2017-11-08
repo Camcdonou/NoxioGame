@@ -102,6 +102,7 @@ final public class Controller {
       case "04" : { inputMouse(q); break; }
       case "05" : { inputAction(q); break; }
       case "06" : { inputReset(q); break; }
+      case "08" : { chatMessage(q); break; }
       default : { Oak.log("Invalid User Input '" + id + "' " + user + "@Controller.handlePacket", 1); break; }
     }
   }
@@ -139,6 +140,11 @@ final public class Controller {
       }
     }
     else { whisper("Only the lobby host can reset!"); } 
+  }
+  
+  private void chatMessage(final Queue<String> q) {
+    final String msg = q.remove();
+    game.sendMessage(this.user + " > " + msg);
   }
   
   public void step() {

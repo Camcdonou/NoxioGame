@@ -90,7 +90,7 @@ public abstract class GameLobby {
         packets.pop();
         GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
-          players.get(i).sendPacket(new PacketG17(info.getName(), info.getMaxPlayers(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
+          players.get(i).sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, settings.get("scoreToWin", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
           loading.add(players.get(i)); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
           /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
         }
@@ -118,13 +118,13 @@ public abstract class GameLobby {
       }
     }
     catch(Exception ex) {
-      for(int i=0;i<players.size();i++) {
-        try { players.get(i).close(ex); }
-        catch(IOException ioex) { System.err.println("Bad stuff be happening here!"); ioex.printStackTrace(); }
-      }
       System.err.println("## CRITICAL ## Game step exception!");
       System.err.println("## STATE    ## lobbyName=" + name + "gameOver=" + game.isGameOver());
       ex.printStackTrace();
+      for(int i=0;i<players.size();i++) {
+        try { players.get(i).close(ex); }
+        catch(Exception ioex) { System.err.println("Bad stuff be happening here!"); ioex.printStackTrace(); }
+      }
     }
   }
   
@@ -137,7 +137,9 @@ public abstract class GameLobby {
           case "e00" : {
             if(!evt.getSession().isOpen()) { break; }                                     /* Check to make sure connection is still active. */
             if(!connect(evt.getSession())) { evt.getSession().sendPacket(new PacketG06("Connection failed.")); evt.getSession().leaveGame(); }
-            else { GameLobbyInfo info = getInfo(); evt.getSession().sendPacket(new PacketG01(info.getName(), info.getMaxPlayers(), game.map)); }
+            else { GameLobbyInfo info = getInfo(); evt.getSession().sendPacket(
+              new PacketG01(name, game.gametypeName(), maxPlayers, settings.get("scoreToWin", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map));
+            }
             break;
           }
           case "e01" : {
