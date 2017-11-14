@@ -40,9 +40,7 @@ public class Deathmatch extends NoxioGame {
     }
     
     int oid = createOid();
-    Player player;
-    if(Math.random() > 0.5) { player = new Inferno(this, oid, sp); } /* TODO: DEBUG */
-    else                    { player = new Fox(this, oid, sp); }
+    Player player = makePlayerObject(q.remove(), sp);
     addObject(player);
     c.setControl(player);
   }

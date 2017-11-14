@@ -11,18 +11,7 @@ public class Fox extends Player {
   
   private int blipCooldown, dashCooldown, tauntCooldown, blipPower, dashPower;
   public Fox(final NoxioGame game, final int oid, final Vec2 position) {
-    super(game, oid, "obj.mobile.player.fox", position, -1);
-    
-    /* Settings */
-    radius = 0.5f; weight = 1.0f; friction = 0.725f;
-    moveSpeed = 0.0375f; jumpHeight = 0.175f;
-    
-    /* Timers */
-    blipCooldown = 0;
-    dashCooldown = 0;
-    tauntCooldown = 0;
-    blipPower = BLIP_POWER_MAX;
-    dashPower = 0;
+    this(game, oid, position, -1);
   }
   
   public Fox(final NoxioGame game, final int oid, final Vec2 position, final int team) {
@@ -30,7 +19,7 @@ public class Fox extends Player {
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
-    moveSpeed = 1.0f; jumpHeight = 1.0f;
+    moveSpeed = 0.0375f; jumpHeight = 0.175f;
     
     /* Timers */
     blipCooldown = 0;

@@ -9,24 +9,17 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
 /* On next work day.
-  death packet update position
-
    ! - INPUT IS SO FUCKING WEIRD LOL to many references to handle to many things in weird ways. pls fix.
    # - RequestAnimFrame + Delta Time Interpolation (remember camera & particles & lights needs it)
-   ? - Fill out the Gametype sub types so they do something.
    & - Gametype/map dependency needs to be worked out. Also MapDao or whatever
-   1 - Clean up PacketG10 AND INPUT PACKETS some it's a bit of a mess ##ONGOING
-   2 - Clean up stuff in general maybe.... (client...) ##ONGOING
    4 - Map files need static mesh support and game object spawning and gametype info added to their spec
-   6 - UI Scaling so text remains readable?
+   6 - UI Scaling
    8 - HDR
-   14 - Extend sound stuf https://www.html5rocks.com/en/tutorials/webaudio/games/ && https://www.html5rocks.com/en/tutorials/webaudio/intro/
+   14 - Extend sound stuf https://www.html5rocks.com/en/tutorials/webaudio/games/ && https://www.html5rocks.com/en/tutorials/webaudio/intro/ ?????
    9 - Object creation permutations
-   10 - (UPDATE: ITS COLLISION RELATED? happened again when i had 2 player objects run into each other) saw a rare bug where a lobby borked and appeared to have its game loop stopped but no exceptions, no idea what happned. showed 2 players even after logging out.
-   11 - shadow map size needs to be added as a uniform to allow proper sampling (ACTUALLY JUST REFACTOR AND RENAME AND UPDATE THAT LOL )
+   11 - shadow map size needs to be added as a uniform to allow proper sampling (ACTUALLY JUST REFACTOR AND RENAME AND UPDATE THAT )
    12 - maybe adjust center point based on camera angle. (maaaaaaaaaaaaaaybe)
-   13 - make a nice actual map for benchmarking
-   14 - SKYBOXES OR SOMETHING...
+   14 - SKY
 */
 
 public abstract class GameLobby {

@@ -8,14 +8,7 @@ public class Inferno extends Player {
 
   private int tauntCooldown;
   public Inferno(final NoxioGame game, final int oid, final Vec2 position) {
-    super(game, oid, "obj.mobile.player.inferno", position, -1);
-    
-    /* Settings */
-    radius = 0.5f; weight = 1.0f; friction = 0.725f;
-    moveSpeed = 0.0350f; jumpHeight = 0.250f;
-    
-    /* Timers */
-    tauntCooldown = 0;
+    this(game, oid, position, -1);
   }
   
   public Inferno(final NoxioGame game, final int oid, final Vec2 position, final int team) {
@@ -23,7 +16,7 @@ public class Inferno extends Player {
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
-    moveSpeed = 1.0f; jumpHeight = 1.0f;
+    moveSpeed = 0.0350f; jumpHeight = 0.250f;
     
     /* Timers */
     tauntCooldown = 0;

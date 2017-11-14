@@ -18,7 +18,7 @@ public class LobbyDao {
       a.set("gametype", "Deathmatch");
       a.set("teams", "0");
       a.set("max_players", "3");
-      a.set("score_to_win", "2");
+      a.set("score_to_win", "15");
       a.set("respawn_time", "30");
       
       b.set("game_name", "TDM Test #1");

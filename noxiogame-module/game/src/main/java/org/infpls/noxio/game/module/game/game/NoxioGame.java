@@ -188,6 +188,14 @@ public abstract class NoxioGame {
 
   public static float SPAWN_SAFE_RADIUS = 5.0f;
   protected abstract void spawnPlayer(final Controller c, final Queue<String> q);
+  protected final Player makePlayerObject(final String id, final Vec2 pos) { return makePlayerObject(id, pos, -1); }
+  protected final Player makePlayerObject(final String id, final Vec2 pos, final int team) {
+    switch(id) {
+      case "inf" : { return new Inferno(this, createOid(), pos, team); }
+      case "box" : { return new Fox(this, createOid(), pos, team); }
+      default : { return new Fox(this, createOid(), pos, team); }
+    }
+  }
   
   public void join(final NoxioSession player) throws IOException {
     controllers.add(new Controller(this, player.getUser(), player.getSessionId()));
@@ -226,7 +234,7 @@ public abstract class NoxioGame {
     /* Do things! */
   }
   
-  public boolean isGameOver() { return resetTimer < 1 && gameOver; }
+  public boolean isGameOver() { return resetTimer < 1 && gameOver; }            // @TODO: Kind of weird that this isnt actually game over but when to load new game
   public final int createOid() { return idGen++; }
   public abstract String gametypeName();
   public abstract int objectiveBaseId();                                        // ID for gametype objective, 0 = none, 1 = ctf flags, etc...

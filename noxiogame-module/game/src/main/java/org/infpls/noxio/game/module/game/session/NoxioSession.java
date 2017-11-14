@@ -38,8 +38,11 @@ public final class NoxioSession {
         webSocket.sendMessage(new TextMessage(gson.toJson(p)));
       }
     }
-    catch(IllegalStateException iex) {
+    catch(IllegalStateException | IOException iex) {
       System.err.println("User closed connection during packet sending: " + p.getType());
+      System.err.println("Propogating exception up!");
+      iex.printStackTrace();
+      throw iex;
     }
   }
   

@@ -44,7 +44,7 @@ public class TeamDeathmatch extends NoxioGame {
     }
     
     int oid = createOid();
-    Player player = new Fox(this, oid, sp, c.getTeam());
+    Player player = makePlayerObject(q.remove(), sp, c.getTeam());
     addObject(player);
     c.setControl(player);
   }
@@ -81,7 +81,7 @@ public class TeamDeathmatch extends NoxioGame {
 
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
-    if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
+    if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory (BUGGED SEE FUNCTION)
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
       if(killer.getTeam() != victim.getTeam()) {
