@@ -20,7 +20,7 @@ final public class Controller {
   private int respawnPenalty;
   private boolean penalized;
   
-  private final Score score;        // DEPRECATED??
+  private final Score score;        // DEPRECATED?? no????
   
   private final List<String> update; // List of "impulse" updates on this frame. These are things that happen as single events such as whispers.
   
@@ -69,6 +69,7 @@ final public class Controller {
       PLY::CONTROL  - ctl;<int oid>;
       PLY::RSPWNTMR - rst;<int time>;
       SYS::WHISPER  - wsp;<string txt>;
+      SYS::ANNOUNCE - anc;<string code>;
   */
   public void generateUpdateData(final StringBuilder sb) {
     if(object != null) {
@@ -185,6 +186,7 @@ final public class Controller {
   public void penalize() { penalized = true; respawnPenalty++; }
   public boolean respawnReady() { return respawnTimer<=0; }
   public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
+  public void announce(final String code) { update.add("anc;"+code+";"); }
   public String getUser() { return user; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }

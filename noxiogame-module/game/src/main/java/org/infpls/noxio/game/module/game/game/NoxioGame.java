@@ -17,6 +17,7 @@ public abstract class NoxioGame {
   public final int respawnTime;       // Number of frames that a respawn takes
   public final int penaltyTime;       // Number of extra frames you wait if penalized for team kill or w/e
   
+  protected int frame;
   private boolean gameOver;
   private int resetTimer;
    
@@ -41,6 +42,7 @@ public abstract class NoxioGame {
     respawnTime = settings.get("respawn_time", 30);
     penaltyTime = settings.get("penalty_time", 90);
     
+    frame = 0;
     gameOver = false;
   }
     
@@ -84,6 +86,7 @@ public abstract class NoxioGame {
       }
       else { obj.step(); }
     }
+    frame++;
   }
   
   /* Generates the game update packet for all non-localized updates. */
@@ -94,6 +97,7 @@ public abstract class NoxioGame {
       OBJ::DELETE   -  del;<int oid>;<vec2 pos>;
       SYS::SCORE    -  scr;<String gametype>;<String description>;<String[] players>;<String[] scores>;<float[] meter>;<float[] r>;<float[] g>;<float[] b>;
       SYS::MESSAGE  -  msg;<String message>;
+      SYS::ANNOUNCE -  anc;<string code>;
       SYS::GAMEOVER -  end;<String winner>;
       DBG::TICK     -  tck;<long tick>;<long sent>;
   */
@@ -218,6 +222,73 @@ public abstract class NoxioGame {
   
   public abstract void reportKill(final Controller killer, final GameObject killed);
   public abstract void reportObjective(final Controller player, final GameObject objective);
+  
+  /* Called after each score change, announces gametype specific events */
+  public abstract void announceObjective();
+  /* Called after <killer> has scored a kill on <killed>, if there was a multi or a spree it is announced */
+  public final void announceKill(final Controller killer, final Controller killed) {
+    if(killer.getTeam() != -1 && killer.getTeam() == killed.getTeam()) {
+      killer.penalize();
+      killed.getScore().death();
+      killer.announce("btl"); killed.announce("btd");
+      return;
+    }
+    killer.getScore().kill(frame);
+    int kjc = killed.getScore().death();
+    if(kjc >= 5 && kjc < 10) { killer.announce("kj"); }
+    else if(kjc >= 10) { announce("er," + killer.getUser() + "," + killed.getUser()); sendMessage("Killjoy (" + killer.getUser() + ")"); }
+    final int m = killer.getScore().getMulti();
+    if(m > 1) {
+      switch(m) {
+        case 2  : { killer.announce("mk,2"); break; }
+        case 3  : { killer.announce("mk,3"); break; }
+        case 4  : { killer.announce("mk,4"); sendMessage("Multikill X4 (" + killer.getUser() + ")"); break; }
+        case 5  : { killer.announce("mk,5"); sendMessage("Multikill X5 (" + killer.getUser() + ")"); break; }
+        case 6  : { killer.announce("mk,6"); sendMessage("Multikill X6 (" + killer.getUser() + ")"); break; }
+        case 7  : { killer.announce("mk,7"); sendMessage("Multikill X7 (" + killer.getUser() + ")"); break; }
+        case 8  : { killer.announce("mk,8"); sendMessage("Multikill X8 (" + killer.getUser() + ")"); break; }
+        default : { killer.announce("mk,9"); sendMessage("Multikill X" + m + " (" + killer.getUser() + ")"); break; }
+      }
+    }
+    final int s = killer.getScore().getSpree();
+    switch(s) {
+      case 5  : { killer.announce("sp,5"); break; }
+      case 10 : { killer.announce("sp,10"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X10 (" + killer.getUser() + ")"); break; }
+      case 15 : { killer.announce("sp,15"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X15 (" + killer.getUser() + ")"); break; }
+      case 20 : { killer.announce("sp,20"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X20 (" + killer.getUser() + ")"); break; }
+      case 25 : { killer.announce("sp,25"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X25 (" + killer.getUser() + ")"); break; }
+      default : { break; }
+    }
+  }
+  
+  /* Annouce Codes;
+    mk,# :: Multikill <# 0 to 9>
+    sp,# :: Spree     <# 5, 10, 15, 20, 25>
+    oc,@ :: Out of control <@ name of killer> 
+    kj   :: Killjoy
+    er,@,&  :: Ended Reign  <@ name of player> <& name of killed>
+    fb,@ :: First Blood <@ name of player>
+    gl   :: Gained the lead
+    ll   :: Lost the lead
+    btd  :: Betrayed   
+    btl  :: Betrayl
+    dm   :: Deathmatch
+    tdm  :: Team Deathmatch
+    ctf  :: Capture the Flag
+    bs   :: Blue Team Score
+    rs   :: Red Team Score
+    bft  :: Blue Team Flag Taken
+    bfr  :: Blue Team Flag Return
+    rft  :: Red Team Flag Taken
+    rfr  :: Red Team Flag Return
+    1m   :: 1 Minute Remaining
+    pf   :: Perfect
+    go   :: Game Over
+  */
+  public final void announce(final String code) {
+    update.add("anc;"+code+";");
+  }
+  
   public abstract void updateScore();
   
   /* Send a message that will appear in all players chatlog */
@@ -226,6 +297,7 @@ public abstract class NoxioGame {
   }
   
   public void gameOver(String msg) {
+    announce("go");
     update.add("end;"+msg+";");
     gameOver = true; resetTimer = 150;
   }

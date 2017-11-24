@@ -92,8 +92,8 @@ public abstract class Player extends Mobile {
         if(holding==null && flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
           if(flag.pickup(this)) { holding = flag; }
         }
-        if(flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
-          flag.reset(this);
+        if(flag.getPosition().distance(position) < flag.getRadius()+getRadius() && !flag.onBase()) {
+          if(flag.team == team) { flag.kill(); }
         }
       }
     }
@@ -156,9 +156,7 @@ public abstract class Player extends Mobile {
   public void kill() {
     dead = true;
     drop();
-    if(tagged != null) {
-      game.reportKill(tagged, this);
-    }
+    game.reportKill(tagged, this);
   }
   
   public Flag getHolding() { return holding; }

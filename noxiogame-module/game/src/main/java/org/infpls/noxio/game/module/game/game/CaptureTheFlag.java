@@ -95,31 +95,25 @@ public class CaptureTheFlag extends NoxioGame {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
-      if(killer.getTeam() != victim.getTeam()) {
-        killer.getScore().kill();
-        victim.getScore().death();
-        sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
-      }
-      else {
-        victim.getScore().death();
-        killer.penalize();
-        sendMessage(killer.getUser() + " betrayed " + victim.getUser() + ".");
-      }
-      updateScore();
+      announceKill(killer, victim);
     }
+    else if(victim != null) { victim.getScore().death(); }
+    updateScore();
   }
   
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
-    if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory
-    sendMessage(player.getUser() + " scored!");
-    if(player.getTeam()==0) { scores[0]++; }
-    else { scores[1]++; }
+    if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory @TODO: doesnt work, look at actual value instead.
+    if(player.getTeam()==0) { scores[0]++; announce("rs"); }
+    else { scores[1]++; announce("bs"); }
     player.getScore().objective();
     updateScore();
     if( scores[0] >= scoreToWin) { gameOver("Red Team wins!"); }
     else if( scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); }
   }
+  
+  @Override
+  public void announceObjective() { /* @TODO: STUB */ }
   
   @Override
   public void updateScore() {
@@ -142,9 +136,11 @@ public class CaptureTheFlag extends NoxioGame {
       if(controllers.get(i).getTeam()==0) { t++; }
       else { t--; }
     }
-    controllers.add(new Controller(this, player.getUser(), player.getSessionId(), t<0?0:1));
+    final Controller controller = new Controller(this, player.getUser(), player.getSessionId(), t<0?0:1);
+    controllers.add(controller);
     generateJoinPacket(player);
     updateScore();
+    controller.announce("ctf");
   }
   
   @Override

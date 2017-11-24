@@ -5,6 +5,7 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.dao.lobby.GameLobby;
 import org.infpls.noxio.game.module.game.dao.lobby.GameSettings;
 import org.infpls.noxio.game.module.game.game.object.*;
+import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 
 public class Deathmatch extends NoxioGame {
@@ -68,13 +69,18 @@ public class Deathmatch extends NoxioGame {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
-      killer.getScore().kill();
-      victim.getScore().death();
-      sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
-      updateScore();
+      announceKill(killer, victim);
       if(killer.getScore().getKills() >= scoreToWin) { gameOver(killer.getUser() + " wins!"); }
     }
+    else if(victim != null) { victim.getScore().death(); }
+    updateScore();
   }
+
+  @Override
+  public void reportObjective(final Controller player, final GameObject objective) { /* Deathmatch has no objectives. */ }
+  
+  @Override
+  public void announceObjective() { /* @TODO: STUB */ }
   
   @Override
   public void updateScore() {
@@ -89,10 +95,11 @@ public class Deathmatch extends NoxioGame {
     
     update.add(sb.toString());
   }
-
+  
   @Override
-  public void reportObjective(final Controller player, final GameObject objective) {
-    /* Deathmatch has no objective so this is ignored! */
+  public void join(final NoxioSession player) throws IOException {
+    super.join(player);
+    getController(player.getSessionId()).announce("dm");
   }
   
   @Override

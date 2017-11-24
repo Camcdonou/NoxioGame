@@ -84,23 +84,20 @@ public class TeamDeathmatch extends NoxioGame {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory (BUGGED SEE FUNCTION)
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
-      if(killer.getTeam() != victim.getTeam()) {
-        killer.getScore().kill();
-        victim.getScore().death();
-        if(killer.getTeam()==0) { scores[0]++; }
-        else { scores[1]++; }
-        sendMessage(killer.getUser() + " killed " + victim.getUser() + ".");
-      }
-      else {
-        victim.getScore().death();
-        killer.penalize();
-        sendMessage(killer.getUser() + " betrayed " + victim.getUser() + ".");
-      }
-      updateScore();
-      if(scores[0] >= scoreToWin) { gameOver("Red Team wins!"); }
-      else if(scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); }
+      if(killer.getTeam() != victim.getTeam()) { scores[killer.getTeam()==0?0:1]++; }
+      announceKill(killer, victim);
     }
+    else if(victim != null) { victim.getScore().death(); }
+    updateScore();
+    if(scores[0] >= scoreToWin) { gameOver("Red Team wins!"); }
+    else if(scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); }
   }
+
+  @Override
+  public void reportObjective(final Controller player, final GameObject objective) { /* Deathmatch has no objective so this is ignored! */ }
+  
+  @Override
+  public void announceObjective() { /* @TODO: STUB */ }
   
   @Override
   public void updateScore() {
@@ -115,11 +112,6 @@ public class TeamDeathmatch extends NoxioGame {
     
     update.add(sb.toString());
   }
-
-  @Override
-  public void reportObjective(final Controller player, final GameObject objective) {
-    /* Deathmatch has no objective so this is ignored! */
-  }
   
   @Override
   public void join(final NoxioSession player) throws IOException {
@@ -128,12 +120,11 @@ public class TeamDeathmatch extends NoxioGame {
       if(controllers.get(i).getTeam()==0) { t++; }
       else { t--; }
     }
-    controllers.add(new Controller(this, player.getUser(), player.getSessionId(), t<0?0:1));
-    for(int i=0;i<objects.size();i++) {
-      GameObject obj = objects.get(i);
-      generateJoinPacket(player);
-    }
+    final Controller controller = new Controller(this, player.getUser(), player.getSessionId(), t<0?0:1);
+    controllers.add(controller);
+    generateJoinPacket(player);
     updateScore();
+    controller.announce("tdm");
   }
   
   @Override

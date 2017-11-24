@@ -40,7 +40,7 @@ public class Flag extends Mobile {
       for(int i=0;i<game.objects.size();i++) {
         if(game.objects.get(i).getType().equals("obj.mobile.flag")) {
           final Flag f = (Flag)(game.objects.get(i));
-          if(f.team != team && f.onBase() && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) { f.reportObjective(held); kill(); }
+          if(f.team != team && f.onBase() && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) { f.score(held); reset(); }
         }
       }
     }
@@ -86,13 +86,8 @@ public class Flag extends Mobile {
     if(team == p.team) { return false; }
     held = p;
     lastHeld = held.getOid();
+    game.announce(team==0?"rft":"bft");
     return true;
-  }
-  
-  public void reset(final Player p) {
-    if(team == p.team && !isHeld()) {
-      kill();
-    }
   }
   
   public void drop() {
@@ -101,7 +96,7 @@ public class Flag extends Mobile {
     held = null;
   }
   
-  public void reportObjective(final Player p) {
+  public void score(final Player p) {
     game.reportObjective(game.getControllerByObject(p), this);
   }
   
@@ -112,14 +107,19 @@ public class Flag extends Mobile {
     }
   }
   
-  @Override
-  public void kill() {
+  private void reset() {
     drop();
     setPosition(base);
     setVelocity(new Vec2());
     setHeight(0f);
     setVSpeed(0f);
     dropCooldown = 0;
+  }
+  
+  @Override
+  public void kill() {
+    reset();
+    game.announce(team==0?"rfr":"bfr");
   }
   
   public boolean isHeld() { return held!=null; }
