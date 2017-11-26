@@ -223,7 +223,7 @@ public abstract class NoxioGame {
   public abstract void reportKill(final Controller killer, final GameObject killed);
   public abstract void reportObjective(final Controller player, final GameObject objective);
   
-  /* Called after each score change, announces gametype specific events */
+  /* Called after each score change, announces gametype specific events */ // @TODO: not called anywhere in super class, currently has subclass implement call. weird. mabye fix this?
   public abstract void announceObjective();
   /* Called after <killer> has scored a kill on <killed>, if there was a multi or a spree it is announced */
   public final void announceKill(final Controller killer, final Controller killed) {
@@ -283,6 +283,7 @@ public abstract class NoxioGame {
     rfr  :: Red Team Flag Return
     1m   :: 1 Minute Remaining
     pf   :: Perfect
+    hu   :: Humiliation
     go   :: Game Over
   */
   public final void announce(final String code) {

@@ -34,6 +34,7 @@ public class CaptureTheFlag extends NoxioGame {
   
   @Override
   protected void spawnPlayer(final Controller c, final Queue<String> q) {
+    final String charSel = q.remove();
     if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
@@ -55,7 +56,7 @@ public class CaptureTheFlag extends NoxioGame {
     }
     
     int oid = createOid();
-    Player player = makePlayerObject(q.remove(), sp, c.getTeam());
+    Player player = makePlayerObject(charSel, sp, c.getTeam());
     addObject(player);
     c.setControl(player);
   }
@@ -108,12 +109,34 @@ public class CaptureTheFlag extends NoxioGame {
     else { scores[1]++; announce("bs"); }
     player.getScore().objective();
     updateScore();
-    if( scores[0] >= scoreToWin) { gameOver("Red Team wins!"); }
-    else if( scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); }
+    announceObjective();
+    int winr;
+    if( scores[0] >= scoreToWin) { gameOver("Red Team wins!"); winr = 0; }
+    else if( scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); winr = 1; }
+    else { return; }
+    if(scores[winr==0?1:0] == 0) {
+      for(int i=0;i<controllers.size();i++) {
+        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); }
+      }
+    }
   }
   
+  private int lead = 0;
   @Override
-  public void announceObjective() { /* @TODO: STUB */ }
+  public void announceObjective() {
+    if(controllers.size() < 1) { return; } // No players
+    int newLead;
+    if(scores[0] > scores[1]) { newLead = 0; }
+    else { newLead = 1; }
+    
+    if(scores[newLead] > scores[lead] && scores[newLead] < scoreToWin) {
+      for(int i=0;i<controllers.size();i++) {
+        if(controllers.get(i).getTeam() == newLead) { controllers.get(i).announce("gl"); }
+        else { controllers.get(i).announce("ll"); }
+      }
+      lead = newLead;
+    }
+  }
   
   @Override
   public void updateScore() {

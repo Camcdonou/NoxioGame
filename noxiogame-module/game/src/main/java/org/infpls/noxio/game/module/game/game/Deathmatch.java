@@ -20,6 +20,7 @@ public class Deathmatch extends NoxioGame {
   
   @Override
   protected void spawnPlayer(final Controller c, final Queue<String> q) {
+    final String charSel = q.remove();
     if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
     Vec2 sp;
@@ -41,7 +42,7 @@ public class Deathmatch extends NoxioGame {
     }
     
     int oid = createOid();
-    Player player = makePlayerObject(q.remove(), sp);
+    Player player = makePlayerObject(charSel, sp);
     addObject(player);
     c.setControl(player);
   }
@@ -64,23 +65,43 @@ public class Deathmatch extends NoxioGame {
     /* No teams, ignore */
   }
 
+  private boolean firstBlood = false; // Flag to check if first blood has been awarded or not!
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
     if(killer != null && victim != null) {
+      if(!firstBlood) { announce("fb," + killer.getUser()); firstBlood = true; }
       announceKill(killer, victim);
-      if(killer.getScore().getKills() >= scoreToWin) { gameOver(killer.getUser() + " wins!"); }
+      if(killer.getScore().getKills() >= scoreToWin) {
+        gameOver(killer.getUser() + " wins!");
+        if(killer.getScore().getDeaths() < 1) { killer.announce("pf"); }
+      }
     }
     else if(victim != null) { victim.getScore().death(); }
     updateScore();
+    announceObjective();
   }
-
-  @Override
-  public void reportObjective(final Controller player, final GameObject objective) { /* Deathmatch has no objectives. */ }
   
   @Override
-  public void announceObjective() { /* @TODO: STUB */ }
+  public void reportObjective(final Controller player, final GameObject objective) { /* Deathmatch has no objectives. */ }
+
+  private Controller lead = null;     // Points to player who was in the lead last time we announced objective. If this changes we inform players.
+  @Override
+  public void announceObjective() {
+    if(controllers.size() < 1) { return; } // No players
+    Controller newLead = controllers.get(0);
+    for(int i=1;i<controllers.size();i++) {
+      if(controllers.get(i).getScore().getKills() > newLead.getScore().getKills()) {
+        newLead = controllers.get(i);
+      }
+    }
+    if(lead == null || newLead.getScore().getKills() > lead.getScore().getKills() && newLead.getScore().getKills() < scoreToWin) {
+      if(lead != null) { lead.announce("ll"); }
+      newLead.announce("gl");
+      lead = newLead;
+    }
+  }
   
   @Override
   public void updateScore() {
