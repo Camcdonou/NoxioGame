@@ -21,6 +21,7 @@ public final class Vec2 {
   public float distance(final Vec2 b) { return subtract(b).magnitude(); }
   public Vec2 tangent() { return new Vec2(y*-1, x); }
   public float dot(final Vec2 b) { return (x*b.x)+(y*b.y); }
+  public Vec2 rotate(final float angle) { float cos = (float)Math.cos(angle); float sin = (float)Math.sin(angle); return new Vec2((x*cos)+(y*sin), (x*-sin)+(y*cos)); }
   public boolean equals(final Vec2 b) { return x == b.x && y == b.y; }
   public Vec2 copy() { return new Vec2(x, y); }
   

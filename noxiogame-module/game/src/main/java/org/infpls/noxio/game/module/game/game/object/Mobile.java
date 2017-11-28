@@ -8,7 +8,8 @@ import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 public abstract class Mobile extends GameObject {
   protected float radius, weight, friction;
   
-  private float height, vspeed;
+  float height;
+  private float vspeed;
   protected boolean intangible, grounded;
   
   private static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;

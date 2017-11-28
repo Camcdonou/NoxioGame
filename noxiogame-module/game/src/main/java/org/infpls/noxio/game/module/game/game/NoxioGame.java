@@ -197,6 +197,8 @@ public abstract class NoxioGame {
     switch(id) {
       case "inf" : { return new Inferno(this, createOid(), pos, team); }
       case "box" : { return new Fox(this, createOid(), pos, team); }
+      case "flc" : { return new Falco(this, createOid(), pos, team); }
+      case "mar" : { return new Marth(this, createOid(), pos, team); }
       default : { return new Fox(this, createOid(), pos, team); }
     }
   }

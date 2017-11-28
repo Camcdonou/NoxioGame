@@ -5,7 +5,7 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class Player extends Mobile {
-  private static final float AIR_CONTROL = 0.2f;
+  protected static final float AIR_CONTROL = 0.2f;
   
   protected float moveSpeed, jumpHeight;
   
@@ -118,9 +118,7 @@ public abstract class Player extends Mobile {
   */
   public void generateUpdateData(final StringBuilder sb) {
     final Controller c = game.getControllerByObject(this);
-    final String name;
-    if(c != null) { name = c.getUser(); }
-    else { name = ""; }
+    final String name = c!=null?c.getUser():"";
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
