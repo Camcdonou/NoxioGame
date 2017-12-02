@@ -72,7 +72,7 @@ public abstract class Player extends Mobile {
   
   /* Updates various timers */
   public void timers() {
-    if(stunTimer > 0) { stunTimer--; }
+    if(stunTimer > 0) { stunTimer--; } /* ADD CHANNEL FUNCTION HERE */
   }
   
   @Override

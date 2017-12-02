@@ -29,6 +29,8 @@ public class Inferno extends Player {
       switch(action.get(i)) {
         case "tnt" : { taunt(); break; }
         case "jmp" : { jump(); break; }
+        case "atk" : { kill(); break; }
+        case "mov" : { setVelocity(velocity.add(new Vec2((float)(Math.random()*0.5), (float)(Math.random()*0.5)))); stun(30); }
         default : { Oak.log("Invalid action input::"  + action.get(i) + " @Inferno.actions", 1); break; }
       }
     }

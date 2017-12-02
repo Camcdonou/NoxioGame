@@ -199,6 +199,8 @@ public abstract class NoxioGame {
       case "box" : { return new Fox(this, createOid(), pos, team); }
       case "flc" : { return new Falco(this, createOid(), pos, team); }
       case "mar" : { return new Marth(this, createOid(), pos, team); }
+      case "shk" : { return new Shiek(this, createOid(), pos, team); }
+      case "puf" : { return new Puff(this, createOid(), pos, team); }
       default : { return new Fox(this, createOid(), pos, team); }
     }
   }

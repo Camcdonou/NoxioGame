@@ -85,7 +85,7 @@ public class TeamDeathmatch extends NoxioGame {
   public void reportKill(final Controller killer, final GameObject killed) {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory (BUGGED SEE FUNCTION)
     final Controller victim = getControllerByObject(killed);
-    if(killer != null && victim != null) {
+    if(killer != null && victim != null && killer != victim) {
       if(!firstBlood) { announce("fb," + killer.getUser()); firstBlood = true; }
       if(killer.getTeam() != victim.getTeam()) { scores[killer.getTeam()==0?0:1]++; }
       announceKill(killer, victim);

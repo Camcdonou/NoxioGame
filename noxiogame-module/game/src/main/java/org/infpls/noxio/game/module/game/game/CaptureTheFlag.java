@@ -95,7 +95,7 @@ public class CaptureTheFlag extends NoxioGame {
   public void reportKill(final Controller killer, final GameObject killed) {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
-    if(killer != null && victim != null) {
+    if(killer != null && victim != null && killer != victim) {
       announceKill(killer, victim);
     }
     else if(victim != null) { victim.getScore().death(); }

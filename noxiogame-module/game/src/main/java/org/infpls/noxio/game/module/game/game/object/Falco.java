@@ -44,7 +44,7 @@ public class Falco extends Player {
   /* Performs action. */
   @Override
   public void actions() {
-    if(charge) { return; }    // Can't act during charge
+    if(charge) { action.clear(); return; }    // Can't act during charge
     for(int i=0;i<action.size();i++) {
       switch(action.get(i)) {
         case "atk" : { blip(); break; }
@@ -123,8 +123,7 @@ public class Falco extends Player {
   
   @Override
   public void stun(int time) {
-    stunTimer = time;
-    effects.add("stn");
+    super.stun(time);
     charge = false;
     chargeTimer = 0;
     dashCooldown = 0;

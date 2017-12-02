@@ -53,7 +53,7 @@ public class Marth extends Player {
   /* Performs action. */
   @Override
   public void actions() {
-    if(counter) { return; }    // Can't act during counter
+    if(counter) { action.clear(); return; }    // Can't act during counter
     for(int i=0;i<action.size();i++) {
       switch(action.get(i)) {
         case "atk" : { slash(); break; }
@@ -124,8 +124,9 @@ public class Marth extends Player {
         for(int i=0;i<game.objects.size();i++) {
           if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
             Mobile mob = (Mobile)game.objects.get(i);
+            final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
             final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-            if(inst != null) {
+            if(full || inst != null) {
               if(mob.getType().startsWith("obj.mobile.player")) {
                 final Player ply = (Player)mob;
                 ply.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH);
@@ -171,18 +172,19 @@ public class Marth extends Player {
       for(int i=0;i<game.objects.size();i++) {
         if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
           Mobile mob = (Mobile)game.objects.get(i);
-          final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-          if(inst != null) {
-            if(mob.getType().startsWith("obj.mobile.player")) {
-              final Player ply = (Player)mob;
-              if(counterStun > 0) { ply.stun((int)(counterStun * COUNTER_MULTIPLIER)); }
-              combo++; comboTimer = SLASH_COMBO_DEGEN;
-            }
-            final Vec2 normal = mob.getPosition().subtract(position).normalize();
-            if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
-            if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER); }
-            final Controller c = game.getControllerByObject(this);
-            if(c != null) { mob.tag(c); }
+            final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
+            final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
+            if(full || inst != null) {
+              if(mob.getType().startsWith("obj.mobile.player")) {
+                final Player ply = (Player)mob;
+                if(counterStun > 0) { ply.stun((int)(counterStun * COUNTER_MULTIPLIER)); }
+                combo++; comboTimer = SLASH_COMBO_DEGEN;
+              }
+              final Vec2 normal = mob.getPosition().subtract(position).normalize();
+              if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
+              if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER); }
+              final Controller c = game.getControllerByObject(this);
+              if(c != null) { mob.tag(c); }
           }
         }
       }
@@ -209,20 +211,19 @@ public class Marth extends Player {
   @Override
   public void knockback(final Vec2 impulse, final Player player) {
     if(counter && COUNTER_LAG_LENGTH-counterTimer < COUNTER_ACTIVE_LENGTH) { counterHit = true; counterKnock = impulse.magnitude(); counterDirection = player.getPosition().subtract(position).normalize(); return; } // Immune to stun/popup/knockback during counters active frames
-    setVelocity(velocity.add(impulse));
+    super.knockback(impulse, player);
   }
   
   @Override
   public void popup(float power) {
     if(counter && COUNTER_LAG_LENGTH-counterTimer < COUNTER_ACTIVE_LENGTH) { counterHit = true; counterPop = power; return; } // Immune to stun/popup/knockback during counters active frames
-    setVSpeed(getVSpeed() + (power > 0.0f ? power : 0.0f));
+    super.popup(power);
   }
   
   @Override
   public void stun(int time) {
     if(counter && COUNTER_LAG_LENGTH-counterTimer < COUNTER_ACTIVE_LENGTH) { counterHit = true; counterStun = time; return; } // Immune to stun/popup/knockback during counters active frames
-    stunTimer = time;
-    effects.add("stn");
+    super.stun(time);
   }
   
 }
