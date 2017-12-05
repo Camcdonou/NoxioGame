@@ -3,21 +3,20 @@ package org.infpls.noxio.game.module.game.game.object;
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Intersection;
-import org.infpls.noxio.game.module.game.util.Oak;
 
 public class Marth extends Player {
   private static final int SLASH_COOLDOWN_LENGTH = 20, SLASH_COMBO_LENGTH = 3, SLASH_COMBO_DEGEN = 90, SLASH_STUN_LENGTH = 15, SLASH_COMBO_STUN_LENGTH = 25;
-  private static final float SLASH_RANGE = 1.0f, SLASH_ANGLE = 120f, SLASH_SEGMENT_DISTANCE=5f, SLASH_IMPULSE = 0.45f, SLASH_COMBO_IMPULSE = 1.05f;
+  private static final float SLASH_RANGE = 1.0f, SLASH_ANGLE = 120f, SLASH_SEGMENT_DISTANCE=5f, SLASH_IMPULSE = 0.55f, SLASH_COMBO_IMPULSE = 1.05f;
   private static final int COUNTER_COOLDOWN_LENGTH = 45, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 30;
   private static final float COUNTER_MULTIPLIER = 1.33f, COUNTER_ANGLE = 45f, COUNTER_SEGMENT_DISTANCE=5f, COUNTER_RANGE = 1.25f;
   private static final int TAUNT_COOLDOWN_LENGTH = 60;
   
-  private boolean counter, counterHit;
+  private boolean channelCounter, counterHit;
   private float counterKnock, counterPop;
   private int counterStun;
   private Vec2 counterDirection;
   private int combo;
-  private int slashCooldown, counterCooldown, counterTimer, comboTimer, tauntCooldown;
+  private int slashCooldown, counterCooldown, comboTimer;
   public Marth(final NoxioGame game, final int oid, final Vec2 position) {
     this(game, oid, position, -1);
   }
@@ -33,51 +32,26 @@ public class Marth extends Player {
     combo = 0;
     slashCooldown = 0;
     counterCooldown = 0;
-    counterTimer = 0;
     comboTimer = 0;
-    tauntCooldown = 0;
+    
+    channelCounter = false;
+    counterHit = false;
     counterKnock = 0f;
     counterPop = 0f;
     counterStun = 0;
     counterDirection = null;
   }
   
-  /* Applies player inputs to the object. */
-  @Override
-  public void movement() {
-    if(counter) { return; }    // Can't act during counter (overriding defaults here)
-    if(isGrounded()) { setVelocity(velocity.add(look.scale(moveSpeed*speed))); }
-    else { setVelocity(velocity.add(look.scale(moveSpeed*speed).scale(AIR_CONTROL))); } // Reduced control while airborne
-  }
-  
-  /* Performs action. */
-  @Override
-  public void actions() {
-    if(counter) { action.clear(); return; }    // Can't act during counter
-    for(int i=0;i<action.size();i++) {
-      switch(action.get(i)) {
-        case "atk" : { slash(); break; }
-        case "mov" : { counter(); break; }
-        case "tnt" : { taunt(); break; }
-        case "jmp" : { jump(); break; }
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Marth.actions", 1); break; }
-      }
-    }
-    action.clear();
-  }
-  
   /* Updates various timers */
   @Override
-  public void timers() { 
+  public void timers() {
+    super.timers();
+    if(channelCounter && channelTimer <= 0) { channelCounter = false; }
+    if(counterHit) { riposte(); }
     if(slashCooldown > 0) { slashCooldown--; }
     if(counterCooldown > 0) { counterCooldown--; }
     if(comboTimer > 0) { comboTimer--; }
     else if(comboTimer < 1 && combo > 0) { combo--; comboTimer = combo>0?SLASH_COMBO_DEGEN:0; }
-    if(counterHit) { riposte(); }
-    if(counterTimer > 0) { counterTimer--; }
-    else if(counterTimer < 1 && counter) { counter = false; }
-    if(tauntCooldown > 0) { tauntCooldown--; }
-    if(stunTimer > 0) { stunTimer--; }
   }
   
   @Override
@@ -105,7 +79,8 @@ public class Marth extends Player {
   }
   
   /* Generatese a polygon to use as the hitbox for the slash then tests objects against it to see if it hit */
-  public void slash() {
+  @Override   /* Slash */
+  public void actionA() {
     if(slashCooldown <= 0) {
       slashCooldown = SLASH_COOLDOWN_LENGTH;
       final boolean isCombo = combo >= SLASH_COMBO_LENGTH;
@@ -145,12 +120,13 @@ public class Marth extends Player {
     }
   }
   
-  public void counter() {
+  @Override   /* Counter */
+  public void actionB() {
     if(counterCooldown <= 0) {
       counterCooldown = COUNTER_COOLDOWN_LENGTH;
-      counterTimer = COUNTER_LAG_LENGTH;
+      channelCounter = true;
+      channelTimer = COUNTER_LAG_LENGTH;
       counterDirection = null;
-      counter = true;
       counterHit = false;
       effects.add("cnt");
     }
@@ -193,14 +169,15 @@ public class Marth extends Player {
     if(combo == SLASH_COMBO_LENGTH) { effects.add("rdy"); }
     
     counterHit = false;
-    counter = false;
-    counterTimer = 0;
+    channelCounter = false;
+    channelTimer = 0;
     counterCooldown = 5;
     counterKnock = 0f;
     counterPop = 0f;
     counterStun = 0;
   }
   
+  @Override
   public void taunt() {
     if(tauntCooldown <= 0) {
       tauntCooldown = TAUNT_COOLDOWN_LENGTH;
@@ -210,20 +187,32 @@ public class Marth extends Player {
   
   @Override
   public void knockback(final Vec2 impulse, final Player player) {
-    if(counter && COUNTER_LAG_LENGTH-counterTimer < COUNTER_ACTIVE_LENGTH) { counterHit = true; counterKnock = impulse.magnitude(); counterDirection = player.getPosition().subtract(position).normalize(); return; } // Immune to stun/popup/knockback during counters active frames
+    if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
+      counterHit = true; counterKnock = impulse.magnitude(); counterDirection = player.getPosition().subtract(position).normalize();
+      return; // Immune to stun/popup/knockback during counters active frames
+    } 
     super.knockback(impulse, player);
   }
   
   @Override
   public void popup(float power) {
-    if(counter && COUNTER_LAG_LENGTH-counterTimer < COUNTER_ACTIVE_LENGTH) { counterHit = true; counterPop = power; return; } // Immune to stun/popup/knockback during counters active frames
+    if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
+      counterHit = true; counterPop = power;
+      return; // Immune to stun/popup/knockback during counters active frames
+    } 
     super.popup(power);
   }
   
   @Override
   public void stun(int time) {
-    if(counter && COUNTER_LAG_LENGTH-counterTimer < COUNTER_ACTIVE_LENGTH) { counterHit = true; counterStun = time; return; } // Immune to stun/popup/knockback during counters active frames
+    if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
+      counterHit = true; counterStun = time;
+      return; // Immune to stun/popup/knockback during counters active frames
+    } 
     super.stun(time);
+    channelCounter = false;
+    channelTimer = 0;
+    counterCooldown = 0;
   }
   
 }

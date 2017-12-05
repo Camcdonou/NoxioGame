@@ -196,11 +196,12 @@ public abstract class NoxioGame {
   protected final Player makePlayerObject(final String id, final Vec2 pos, final int team) {
     switch(id) {
       case "inf" : { return new Inferno(this, createOid(), pos, team); }
-      case "box" : { return new Fox(this, createOid(), pos, team); }
+      case "fox" : { return new Fox(this, createOid(), pos, team); }
       case "flc" : { return new Falco(this, createOid(), pos, team); }
       case "mar" : { return new Marth(this, createOid(), pos, team); }
       case "shk" : { return new Shiek(this, createOid(), pos, team); }
       case "puf" : { return new Puff(this, createOid(), pos, team); }
+      case "cap" : { return new Captain(this, createOid(), pos, team); }
       default : { return new Fox(this, createOid(), pos, team); }
     }
   }

@@ -3,7 +3,6 @@ package org.infpls.noxio.game.module.game.game.object;
 import java.util.List;
 import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Intersection;
-import org.infpls.noxio.game.module.game.util.Oak;
 
 public class Shiek extends Player {
   private static final int FLASH_COOLDOWN_LENGTH = 30, MARK_COOLDOWN_LENGTH = 10, FLASH_STUN_LENGTH = 45, FLASH_CHARGE_LENGTH = 10;
@@ -13,8 +12,8 @@ public class Shiek extends Player {
   private static final float BANG_THROW_IMPULSE = 0.05f, BANG_THROW_POPUP_IMPULSE = 0.15f;
   
   private Vec2 mark;
-  private boolean charge;
-  private int flashCooldown, flashCharge, bangCooldown, tauntCooldown;
+  private boolean channelFlash;
+  private int flashCooldown, bangCooldown;
   public Shiek(final NoxioGame game, final int oid, final Vec2 position) {
     this(game, oid, position, -1);
   }
@@ -28,49 +27,22 @@ public class Shiek extends Player {
     
     /* Timers */
     mark = null;
-    charge = false;
-    flashCharge = 0;
+    channelFlash = false;
     flashCooldown = 0;
     bangCooldown = 0;
-    tauntCooldown = 0;
-  }
-  
-  /* Applies player inputs to the object. */
-  @Override
-  public void movement() {
-    if(charge) { return; }    // Can't act during charge (overriding defaults here)
-    if(isGrounded()) { setVelocity(velocity.add(look.scale(moveSpeed*speed))); }
-    else { setVelocity(velocity.add(look.scale(moveSpeed*speed).scale(AIR_CONTROL))); } // Reduced control while airborne
-  }
-  
-  /* Performs action. */
-  @Override
-  public void actions() {
-    if(charge) { action.clear(); return; }    // Can't act during charge (overriding defaults here)
-    for(int i=0;i<action.size();i++) {
-      switch(action.get(i)) {
-        case "atk" : { bang(); break; }
-        case "mov" : { flash(); break; }
-        case "tnt" : { taunt(); break; }
-        case "jmp" : { jump(); break; }
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Shiek.actions", 1); break; }
-      }
-    }
-    action.clear();
   }
   
   /* Updates various timers */
   @Override
   public void timers() { 
+    super.timers();
+    if(channelFlash && channelTimer <= 0) { flash(); }
     if(flashCooldown > 0) { flashCooldown--; }
     if(bangCooldown > 0) { bangCooldown--; }
-    if(tauntCooldown > 0) { tauntCooldown--; }
-    if(stunTimer > 0) { stunTimer--; }
-    if(flashCharge > 0) { flashCharge--; }
-    else if(flashCharge <= 0 && charge) { doFlash(); }
   }
   
-  public void bang() {
+  @Override   /* Bang */
+  public void actionA() {
    if(bangCooldown <= 0) {
       bangCooldown = BANG_COOLDOWN_LENGTH;
       effects.add("atk");
@@ -90,7 +62,8 @@ public class Shiek extends Player {
    }
   }
   
-  public void flash() {
+  @Override   /* Flash */
+  public void actionB() {
     if(flashCooldown <= 0) {
       if(mark == null) {
         flashCooldown = MARK_COOLDOWN_LENGTH;
@@ -108,16 +81,16 @@ public class Shiek extends Player {
       }
       else {
         flashCooldown = FLASH_COOLDOWN_LENGTH;
-        flashCharge = FLASH_CHARGE_LENGTH;
-        charge = true;
+        channelFlash = true;
+        channelTimer = FLASH_CHARGE_LENGTH;
         effects.add("chr");
       }
     }
   }
   
-  public void doFlash() {
+  public void flash() {
     effects.add("fsh");
-    charge = false;
+    channelFlash = false;
     if(getHeight() > -0.5) {
       for(int i=0;i<game.objects.size();i++) {
         GameObject obj = game.objects.get(i);
@@ -156,6 +129,7 @@ public class Shiek extends Player {
     return false;
   }
   
+  @Override
   public void taunt() {
     if(tauntCooldown <= 0) {
       tauntCooldown = TAUNT_COOLDOWN_LENGTH;
@@ -166,8 +140,8 @@ public class Shiek extends Player {
   @Override
   public void stun(int time) {
     super.stun(time);
-    charge = false;
-    flashCharge = 0;
+    channelFlash = false;
+    channelTimer = 0;
     flashCooldown = 0;
   }
 }

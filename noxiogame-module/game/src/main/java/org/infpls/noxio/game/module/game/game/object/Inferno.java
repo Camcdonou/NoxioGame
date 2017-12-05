@@ -1,12 +1,11 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import org.infpls.noxio.game.module.game.game.*;
-import org.infpls.noxio.game.module.game.util.Oak;
 
 public class Inferno extends Player {
-  private final static int TAUNT_COOLDOWN_LENGTH = 30;
+  private final static int GEN_COOLDOWN_LENGTH = 10, TAUNT_COOLDOWN_LENGTH = 30;
 
-  private int tauntCooldown;
+  private int genCooldown;
   public Inferno(final NoxioGame game, final int oid, final Vec2 position) {
     this(game, oid, position, -1);
   }
@@ -19,31 +18,34 @@ public class Inferno extends Player {
     moveSpeed = 0.0350f; jumpHeight = 0.250f;
     
     /* Timers */
-    tauntCooldown = 0;
-  }
-  
-  /* Performs action. */
-  @Override
-  public void actions() {
-    for(int i=0;i<action.size();i++) {
-      switch(action.get(i)) {
-        case "tnt" : { taunt(); break; }
-        case "jmp" : { jump(); break; }
-        case "atk" : { kill(); break; }
-        case "mov" : { setVelocity(velocity.add(new Vec2((float)(Math.random()*0.5), (float)(Math.random()*0.5)))); stun(30); }
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Inferno.actions", 1); break; }
-      }
-    }
-    action.clear();
+    genCooldown = 0;
   }
   
   /* Updates various timers */
   @Override
-  public void timers() { 
-    if(tauntCooldown > 0) { tauntCooldown--; }
-    if(stunTimer > 0) { stunTimer--; }
+  public void timers() {
+    super.timers();
+    if(genCooldown > 0) { genCooldown--; }
   }
   
+  @Override   /* Inferno Attack */
+  public void actionA() {
+    if(genCooldown <= 0) {
+      genCooldown = GEN_COOLDOWN_LENGTH;
+      kill();
+    }
+  }
+  
+  @Override   /* Inferno Dash */
+  public void actionB() {
+    if(genCooldown <= 0) {
+      genCooldown = GEN_COOLDOWN_LENGTH;
+      setVelocity(velocity.add(new Vec2((float)(Math.random()-0.5), (float)(Math.random()-0.5)).normalize().scale(0.5f)));
+      stun(30);
+    }
+  }
+  
+  @Override
   public void taunt() {
     if(tauntCooldown <= 0) {
       tauntCooldown = TAUNT_COOLDOWN_LENGTH;

@@ -6,6 +6,8 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
 public abstract class Mobile extends GameObject {
+  protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
+  
   protected float radius, weight, friction;
   
   float height;
@@ -88,29 +90,30 @@ public abstract class Mobile extends GameObject {
     boolean floorBounded = collideFloors(position, floors);
     
     if(floorBounded) {
-      if(height > -0.4f && height <= 0.0f) {
-        if(vspeed < 0.0f) {
-          height = 0.0f; vspeed = 0.0f;       // Grounded not moving up
+      if(height > GROUNDED_BIAS_NEG && height < GROUNDED_BIAS_POS) {
+        if(vspeed <= 0f) {
+          height = 0f; vspeed = 0f;       // Grounded not moving up
           grounded = true;
         }
         else {
-          height += vspeed; vspeed -= 0.03f; // Grounded but above floor
+          height += vspeed; vspeed -= 0.03f; // Grounded and moving up
           grounded = false;
         }
       }
       else {
-        if(height > 0.0f && height + vspeed <= 0.0f) {     // Hit floor while falling
+        if(height >= GROUNDED_BIAS_POS && height + vspeed < GROUNDED_BIAS_POS) {     // Falling above floor and hit it
           fatalImpact = vspeed >= FATAL_IMPACT_SPEED;
-          height = 0.0f;
+          height = 0f; vspeed = 0f;
+          grounded = true;
         }
         else {
-          height += vspeed; vspeed -= 0.03f;   // Falling while below floor
+          height += vspeed; vspeed -= 0.03f;   // Falling while above or below the floor 
           grounded = false;
         }
       }
     }
     else {
-      height += vspeed; vspeed -= 0.03f;     // Falling
+      height += vspeed; vspeed -= 0.03f;     // Above void
       grounded = false;
     }
 

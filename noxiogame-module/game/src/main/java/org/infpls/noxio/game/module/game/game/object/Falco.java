@@ -1,17 +1,15 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import org.infpls.noxio.game.module.game.game.*;
-import org.infpls.noxio.game.module.game.util.Oak;
 
 public class Falco extends Player {
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 35;
   private static final int DASH_COOLDOWN_LENGTH = 45, CHARGE_TIME_LENGTH = 20;
   private static final int TAUNT_COOLDOWN_LENGTH = 10;
-  private static final float BLIP_IMPULSE = 0.45f, BLIP_POPUP_IMPULSE = 0.25f, DASH_IMPULSE = 0.45f, DASH_POPOUP_IMPULSE = 0.25f, BLIP_OUTER_RADIUS = 0.1f;
+  private static final float BLIP_IMPULSE = 0.45f, BLIP_POPUP_IMPULSE = 0.25f, DASH_IMPULSE = 0.45f, DASH_POPOUP_IMPULSE = 0.25f, BLIP_OUTER_RADIUS = 0.1f, DASH_FALL_DAMPEN_MULT = 0.15f;
   
-  private boolean charge;
-  private int chargeTimer;
-  private int blipCooldown, dashCooldown, tauntCooldown, blipPower, dashPower;
+  private boolean channelDash;
+  private int blipCooldown, dashCooldown, blipPower, dashPower;
   public Falco(final NoxioGame game, final int oid, final Vec2 position) {
     this(game, oid, position, -1);
   }
@@ -24,53 +22,25 @@ public class Falco extends Player {
     moveSpeed = 0.0375f; jumpHeight = 0.175f;
     
     /* Timers */
-    charge = false;
-    chargeTimer = 0;
+    channelDash = false;
     blipCooldown = 0;
     dashCooldown = 0;
-    tauntCooldown = 0;
     blipPower = BLIP_POWER_MAX;
-    dashPower = 0;
-  }
-  
-  /* Applies player inputs to the object. */
-  @Override
-  public void movement() {
-    if(charge) { return; }    // Can't act during charge (overriding defaults here)
-    if(isGrounded()) { setVelocity(velocity.add(look.scale(moveSpeed*speed))); }
-    else { setVelocity(velocity.add(look.scale(moveSpeed*speed).scale(AIR_CONTROL))); } // Reduced control while airborne
-  }
-  
-  /* Performs action. */
-  @Override
-  public void actions() {
-    if(charge) { action.clear(); return; }    // Can't act during charge
-    for(int i=0;i<action.size();i++) {
-      switch(action.get(i)) {
-        case "atk" : { blip(); break; }
-        case "mov" : { charge(); break; }
-        case "tnt" : { taunt(); break; }
-        case "jmp" : { jump(); break; }
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Falco.actions", 1); break; }
-      }
-    }
-    action.clear();
   }
   
   /* Updates various timers */
   @Override
-  public void timers() { 
-    if(chargeTimer > 0 ) { setVSpeed(getVSpeed()*0.05f); chargeTimer--; }
-    if(charge && chargeTimer < 1) { dash(); }
+  public void timers() {
+    super.timers();
+    if(channelDash && channelTimer <= 0) { dash(); }
+    else if(channelDash) { setVSpeed(getVSpeed()*DASH_FALL_DAMPEN_MULT); }
     if(blipCooldown > 0) { blipCooldown--; }
     if(dashCooldown > 0) { dashCooldown--; }
-    if(tauntCooldown > 0) { tauntCooldown--; }
     if(blipPower < BLIP_POWER_MAX) { blipPower++; }
-    if(dashPower > 0) { dashPower--; }
-    if(stunTimer > 0) { stunTimer--; }
   }
 
-  public void blip() {
+  @Override /* Pop Shine */
+  public void actionA() {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
       if(getHeight() > -0.5) {
@@ -97,23 +67,25 @@ public class Falco extends Player {
     }
   }
   
-  public void charge() {
+  @Override /* Firebird */
+  public void actionB() {
     if(dashCooldown <= 0) {
       dashCooldown = DASH_COOLDOWN_LENGTH;
-      chargeTimer = CHARGE_TIME_LENGTH;
-      charge = true;
+      channelDash = true;
+      channelTimer = CHARGE_TIME_LENGTH;
       effects.add("chr");
     }
   }
   
   public void dash() {
-    charge = false;
+    channelDash = false;
     drop();
     setVelocity(velocity.add(look.scale(DASH_IMPULSE)));
     setVSpeed(DASH_POPOUP_IMPULSE);
     effects.add("mov");
   }
   
+  @Override
   public void taunt() {
     if(tauntCooldown <= 0) {
       tauntCooldown = TAUNT_COOLDOWN_LENGTH;
@@ -124,8 +96,8 @@ public class Falco extends Player {
   @Override
   public void stun(int time) {
     super.stun(time);
-    charge = false;
-    chargeTimer = 0;
+    channelDash = false;
+    channelTimer = 0;
     dashCooldown = 0;
   }
 }

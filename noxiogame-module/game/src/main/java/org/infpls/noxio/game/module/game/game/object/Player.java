@@ -5,8 +5,9 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class Player extends Mobile {
-  protected static final float AIR_CONTROL = 0.2f;
+  protected static final float AIR_CONTROL = 0.2f, MULTI_JUMP_DAMPEN = 0.2f;
   
+  protected boolean jumped;                  // Flags a jump so players can only jump once, either off the ground or mid air
   protected float moveSpeed, jumpHeight;
   
   protected Vec2 look;                       // Normalized direction player is facing
@@ -17,7 +18,7 @@ public abstract class Player extends Mobile {
   protected Controller tagged;
   protected Flag holding;
   
-  protected int stunTimer;
+  protected int channelTimer, tauntCooldown, stunTimer;
   public Player(final NoxioGame game, final int oid, final String type, final Vec2 position, final int team) {
     super(game, oid, type, position);
     
@@ -39,6 +40,8 @@ public abstract class Player extends Mobile {
     
     /* Timers */
     stunTimer = 0;
+    channelTimer = 0;
+    tauntCooldown =  0;
   }
   
   /* Sets player inputs. These will be processed on the next step() */
@@ -56,23 +59,33 @@ public abstract class Player extends Mobile {
   
   /* Applies player inputs to the object. */
   public void movement() {
+    if(channelTimer > 0) { return; }
     if(isGrounded()) { setVelocity(velocity.add(look.scale(moveSpeed*speed))); }
     else { setVelocity(velocity.add(look.scale(moveSpeed*speed).scale(AIR_CONTROL))); } // Reduced control while airborne
   }
   
   /* Performs action. */
-  public void actions() {
-    for(int i=0;i<action.size();i++) {
+  public final void actions() {
+    if(isGrounded() && jumped) { jumped = false; }
+    for(int i=0;i<action.size()&&channelTimer<=0;i++) {
       switch(action.get(i)) {
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Player.actions", 1); break; }
+        case "atk" : { actionA(); break; }
+        case "mov" : { actionB(); break; }
+        case "tnt" : { taunt(); break; }
+        case "jmp" : { jump(); break; }
+        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Player.actions:::" + getType(), 1); break; }
       }
     }
     action.clear();
   }
   
+  
+  
   /* Updates various timers */
   public void timers() {
-    if(stunTimer > 0) { stunTimer--; } /* ADD CHANNEL FUNCTION HERE */
+    if(stunTimer > 0) { stunTimer--; }
+    if(channelTimer > 0) { channelTimer--; }
+    if(tauntCooldown > 0) { tauntCooldown--; }
   }
   
   @Override
@@ -81,7 +94,7 @@ public abstract class Player extends Mobile {
     physics();    // Object physics and collision
     actions();    // Perform action
     pickup();     // Picking up objects like flags
-    timers();     // Updates timers for various things
+    timers();     // Updates timers and flags for various things
   }
   
   /* Pickup flag or whatever if you move over it */
@@ -133,10 +146,22 @@ public abstract class Player extends Mobile {
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }
-
+  
+  public abstract void actionA();
+  public abstract void actionB();
+  public abstract void taunt();
+  
   public void jump() {
-    if(!isGrounded() || getVSpeed() != 0f) { return; }
-    popup(jumpHeight);
+    if(jumped) { return; }
+    if(isGrounded()) {
+      popup(jumpHeight);
+    }
+    else {
+      setVSpeed(getVSpeed()*MULTI_JUMP_DAMPEN);
+      popup(jumpHeight);
+      effects.add("air");
+    }
+    jumped = true;
     effects.add("jmp");
   }
   

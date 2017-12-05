@@ -1,7 +1,6 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import org.infpls.noxio.game.module.game.game.*;
-import org.infpls.noxio.game.module.game.util.Oak;
 
 public class Fox extends Player {
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30;
@@ -9,7 +8,7 @@ public class Fox extends Player {
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float BLIP_IMPULSE = 0.85f, DASH_IMPULSE = 0.25f, BLIP_OUTER_RADIUS = 0.1f;
   
-  private int blipCooldown, dashCooldown, tauntCooldown, blipPower, dashPower;
+  private int blipCooldown, dashCooldown, blipPower, dashPower;
   public Fox(final NoxioGame game, final int oid, final Vec2 position) {
     this(game, oid, position, -1);
   }
@@ -24,38 +23,22 @@ public class Fox extends Player {
     /* Timers */
     blipCooldown = 0;
     dashCooldown = 0;
-    tauntCooldown = 0;
     blipPower = BLIP_POWER_MAX;
     dashPower = 0;
   }
   
-  /* Performs action. */
-  @Override
-  public void actions() {
-    for(int i=0;i<action.size();i++) {
-      switch(action.get(i)) {
-        case "atk" : { blip(); break; }
-        case "mov" : { dash(); break; }
-        case "tnt" : { taunt(); break; }
-        case "jmp" : { jump(); break; }
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Fox.actions", 1); break; }
-      }
-    }
-    action.clear();
-  }
-  
   /* Updates various timers */
   @Override
-  public void timers() { 
+  public void timers() {
+    super.timers();
     if(blipCooldown > 0) { blipCooldown--; }
     if(dashCooldown > 0) { dashCooldown--; }
-    if(tauntCooldown > 0) { tauntCooldown--; }
     if(blipPower < BLIP_POWER_MAX) { blipPower++; }
     if(dashPower > 0) { dashPower--; }
-    if(stunTimer > 0) { stunTimer--; }
   }
 
-  public void blip() {
+  @Override   /* Shine */
+  public void actionA() {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
       if(getHeight() > -0.5) {
@@ -81,7 +64,8 @@ public class Fox extends Player {
     }
   }
   
-  public void dash() {
+  @Override   /* Wavedash */
+  public void actionB() {
     if(dashCooldown <= 0 && dashPower < DASH_POWER_MAX) {
       drop();
       dashCooldown = DASH_COOLDOWN_LENGTH;
@@ -91,7 +75,8 @@ public class Fox extends Player {
       if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME); }
     }
   }
-  
+
+  @Override
   public void taunt() {
     if(tauntCooldown <= 0) {
       tauntCooldown = TAUNT_COOLDOWN_LENGTH;
