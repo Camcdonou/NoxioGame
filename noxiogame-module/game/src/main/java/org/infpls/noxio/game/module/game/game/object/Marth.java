@@ -106,6 +106,7 @@ public class Marth extends Player {
                 final Player ply = (Player)mob;
                 ply.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH);
                 combo++; comboTimer = SLASH_COMBO_DEGEN;
+                effects.add(isCombo?"cht":"sht");
               }
               final Vec2 normal = mob.getPosition().subtract(position).normalize();
               mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
@@ -155,6 +156,7 @@ public class Marth extends Player {
                 final Player ply = (Player)mob;
                 if(counterStun > 0) { ply.stun((int)(counterStun * COUNTER_MULTIPLIER)); }
                 combo++; comboTimer = SLASH_COMBO_DEGEN;
+                effects.add("cht");
               }
               final Vec2 normal = mob.getPosition().subtract(position).normalize();
               if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }

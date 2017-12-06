@@ -97,9 +97,8 @@ public class Deathmatch extends NoxioGame {
       }
     }
     if(lead == null || newLead.getScore().getKills() > lead.getScore().getKills() && newLead.getScore().getKills() < scoreToWin) {
-      if(lead != null) { lead.announce("ll"); }
-      newLead.announce("gl");
-      lead = newLead;
+      if(lead != null) { lead.announce("ll"); newLead.announce("gl"); }
+      if(newLead.getScore().getKills() > 0) { lead = newLead; }
     }
   }
   

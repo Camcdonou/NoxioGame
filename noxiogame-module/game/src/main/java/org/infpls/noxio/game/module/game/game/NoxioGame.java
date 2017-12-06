@@ -305,7 +305,7 @@ public abstract class NoxioGame {
   public void gameOver(String msg) {
     announce("go");
     update.add("end;"+msg+";");
-    gameOver = true; resetTimer = 150;
+    gameOver = true; resetTimer = 210;
   }
   
   public void close() {

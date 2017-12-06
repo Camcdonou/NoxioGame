@@ -108,6 +108,7 @@ public class TeamDeathmatch extends NoxioGame {
   @Override
   public void reportObjective(final Controller player, final GameObject objective) { /* Deathmatch has no objective so this is ignored! */ }
   
+  private boolean firsties = true;
   private int lead = 0;
   @Override
   public void announceObjective() {
@@ -117,10 +118,13 @@ public class TeamDeathmatch extends NoxioGame {
     else { newLead = 1; }
     
     if(scores[newLead] > scores[lead] && scores[newLead] < scoreToWin) {
-      for(int i=0;i<controllers.size();i++) {
-        if(controllers.get(i).getTeam() == newLead) { controllers.get(i).announce("gl"); }
-        else { controllers.get(i).announce("ll"); }
+      if(!firsties) {
+        for(int i=0;i<controllers.size();i++) {
+          if(controllers.get(i).getTeam() == newLead) { controllers.get(i).announce("gl"); }
+          else { controllers.get(i).announce("ll"); }
+        }
       }
+      firsties = false;
       lead = newLead;
     }
   }

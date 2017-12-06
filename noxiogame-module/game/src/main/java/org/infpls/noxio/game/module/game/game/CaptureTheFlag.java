@@ -121,6 +121,7 @@ public class CaptureTheFlag extends NoxioGame {
     }
   }
   
+  private boolean firsties = true;
   private int lead = 0;
   @Override
   public void announceObjective() {
@@ -130,10 +131,13 @@ public class CaptureTheFlag extends NoxioGame {
     else { newLead = 1; }
     
     if(scores[newLead] > scores[lead] && scores[newLead] < scoreToWin) {
-      for(int i=0;i<controllers.size();i++) {
-        if(controllers.get(i).getTeam() == newLead) { controllers.get(i).announce("gl"); }
-        else { controllers.get(i).announce("ll"); }
+      if(!firsties) {
+        for(int i=0;i<controllers.size();i++) {
+          if(controllers.get(i).getTeam() == newLead) { controllers.get(i).announce("gl"); }
+          else { controllers.get(i).announce("ll"); }
+        }
       }
+      firsties = false;
       lead = newLead;
     }
   }

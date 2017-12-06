@@ -40,6 +40,7 @@ public class Inferno extends Player {
   public void actionB() {
     if(genCooldown <= 0) {
       genCooldown = GEN_COOLDOWN_LENGTH;
+      effects.add("mov");
       setVelocity(velocity.add(new Vec2((float)(Math.random()-0.5), (float)(Math.random()-0.5)).normalize().scale(0.5f)));
       stun(30);
     }
