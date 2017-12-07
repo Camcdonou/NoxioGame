@@ -15,6 +15,8 @@ public abstract class Player extends Mobile {
   protected final List<String> action;       // Action to be performed on the next frame
   protected final List<String> effects;      // List of actions performed that will be sent to the client on the next update
   
+  protected boolean ultimate;
+  
   protected Controller tagged;
   protected Flag holding;
   
@@ -36,6 +38,7 @@ public abstract class Player extends Mobile {
     moveSpeed = 0.0375f; jumpHeight = 0.175f;
     
     /* State */
+    this.ultimate = false;
     this.team = team;
     
     /* Timers */
@@ -164,6 +167,15 @@ public abstract class Player extends Mobile {
     jumped = true;
     effects.add("jmp");
   }
+  
+  /* Used for 'ultimate lifeform' gamemode. Simply sends an effect id to the client to flag this player as the ultimate lifeform. */
+  public final void ultimate() {
+    effects.add("ult");
+    ultimate = true;
+  }
+  
+  @Override
+  public boolean isGlobal() { return ultimate; }
   
   public void stun(int time) {
     stunTimer = time;

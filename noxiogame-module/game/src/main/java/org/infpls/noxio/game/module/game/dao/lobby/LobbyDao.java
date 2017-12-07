@@ -34,32 +34,34 @@ public class LobbyDao {
       c.set("gametype", "CaptureTheFlag");
       c.set("teams", "2");
       c.set("max_players", "8");
-      c.set("score_to_win", "3");
+      c.set("score_to_win", "25");
       c.set("respawn_time", "90");
       
-      f.set("game_name", "TDM Test #2");
-      f.set("map_name", "battle");
-      f.set("gametype", "TeamDeathmatch");
-      f.set("teams", "2");
+      f.set("game_name", "K Test #1");
+      f.set("map_name", "war");
+      f.set("gametype", "King");
+      f.set("teams", "0");
       f.set("max_players", "12");
-      f.set("score_to_win", "50");
+      f.set("score_to_win", "25");
+      f.set("static_hill", "0");
+      f.set("score_to_move", "5");
       f.set("respawn_time", "90");
       
-      g.set("game_name", "CTF Test #2");
+      g.set("game_name", "UL Test #1");
       g.set("map_name", "war");
-      g.set("gametype", "CaptureTheFlag");
-      g.set("teams", "2");
+      g.set("gametype", "Ultimate");
+      g.set("teams", "0");
       g.set("max_players", "12");
-      g.set("score_to_win", "3");
+      g.set("score_to_win", "25");
       g.set("respawn_time", "90");
       
-      e.set("game_name", "CTF Test #3");
+      e.set("game_name", "TK Test #1");
       e.set("map_name", "war");
-      e.set("gametype", "CaptureTheFlag");
+      e.set("gametype", "TeamKing");
       e.set("teams", "2");
-      e.set("max_players", "32");
-      e.set("score_to_win", "5");
-      e.set("respawn_time", "150");
+      e.set("max_players", "12");
+      e.set("score_to_win", "25");
+      e.set("respawn_time", "90");
       
       
       lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c));

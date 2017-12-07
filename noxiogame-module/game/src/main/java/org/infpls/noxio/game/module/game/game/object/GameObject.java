@@ -14,12 +14,7 @@ public abstract class GameObject {
   protected boolean dead;
   protected Vec2 position, velocity;
   public GameObject(final NoxioGame game, final int oid, final String type, final Vec2 position) {
-    this.game = game;
-    this.oid = oid; this.type = type;
-    this.dead = false;
-    this.position = position;
-    this.velocity = new Vec2();
-    this.team = -1;
+    this(game, oid, type, position, new Vec2());
   }
   public GameObject(final NoxioGame game, final int oid, final String type, final Vec2 position, final Vec2 velocity) {
     this.game = game;

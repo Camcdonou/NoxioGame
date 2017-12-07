@@ -69,8 +69,11 @@ public abstract class GameLobby {
     final String gametype = settings.get("gametype", "Deathmatch");
     switch(gametype) {
       case "Deathmatch" : { game = new Deathmatch(this, map, settings); break; }
+      case "King" : { game = new King(this, map, settings); break; }
+      case "Ultimate" : { game = new Ultimate(this, map, settings); break; }
       case "TeamDeathmatch" : { game = new TeamDeathmatch(this, map, settings); break; }
       case "CaptureTheFlag" : { game = new CaptureTheFlag(this, map, settings); break; }
+      case "TeamKing" : { game = new TeamKing(this, map, settings); break; }
       default : { game = new Deathmatch(this, map, settings); break; }
     }
   }

@@ -189,8 +189,7 @@ public abstract class NoxioGame {
     }
     return null;
   }
-
-  public static float SPAWN_SAFE_RADIUS = 5.0f;
+  
   protected abstract void spawnPlayer(final Controller c, final Queue<String> q);
   protected final Player makePlayerObject(final String id, final Vec2 pos) { return makePlayerObject(id, pos, -1); }
   protected final Player makePlayerObject(final String id, final Vec2 pos, final int team) {
@@ -204,6 +203,27 @@ public abstract class NoxioGame {
       case "cap" : { return new Captain(this, createOid(), pos, team); }
       default : { return new Fox(this, createOid(), pos, team); }
     }
+  }
+  
+  protected final Vec2 findSafeSpawn(final List<NoxioMap.Spawn> spawns) {
+    if(spawns.isEmpty()) { return new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f); } // Fallback
+    
+    NoxioMap.Spawn safest = spawns.get(0);
+    float d = 0f;
+    
+    for(int i=0;i<spawns.size();i++) {
+      float e = Float.MAX_VALUE;
+      for(int j=0;j<controllers.size();j++) {
+        final GameObject obj = controllers.get(j).getControlled();
+        if(obj != null) {
+          float k = obj.getPosition().distance(spawns.get(i).getPos());
+          if(k < e) { e = k; }
+        }
+      }
+      if(e >= d) { safest = spawns.get(i); d = e; }
+    }
+    
+    return safest.getPos();
   }
   
   public void join(final NoxioSession player) throws IOException {
@@ -278,8 +298,13 @@ public abstract class NoxioGame {
     btd  :: Betrayed   
     btl  :: Betrayl
     dm   :: Deathmatch
+    kh   :: King
+    tkh  :: Team King
+    ulf  :: Ultimate Lifeform
     tdm  :: Team Deathmatch
     ctf  :: Capture the Flag
+    khm  :: Hill Moved
+    hc   :: New Ultimate Lifeform
     bs   :: Blue Team Score
     rs   :: Red Team Score
     bft  :: Blue Team Flag Taken

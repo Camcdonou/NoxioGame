@@ -27,20 +27,7 @@ final public class Controller {
   private static final float VIEW_DISTANCE = 12.0f; /* Anything farther than this is out of view and not updated */
   
   public Controller(final NoxioGame game, final String user, final String sid) {
-    this.game = game;
-    this.user = user;
-    this.sid = sid;
-    
-    this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
-    this.action = new ArrayList();
-
-    this.respawnTimer = 0;
-    this.respawnPenalty = 0;
-    this.penalized = false;
-    
-    this.score = new Score();
-    this.update = new ArrayList();
-    this.team = -1;
+    this(game, user, sid, -1);
   }
   
   public Controller(final NoxioGame game, final String user, final String sid, final int team) {
