@@ -81,7 +81,7 @@ public abstract class GameLobby {
   public void step(final long tick) {
     try {
       handleEvents();
-      if(game.isGameOver()) {
+      if(game.isResetReady()) {
         newGame();
         packets.pop();
         GameLobbyInfo info = getInfo();

@@ -337,7 +337,8 @@ public abstract class NoxioGame {
     /* Do things! */
   }
   
-  public boolean isGameOver() { return resetTimer < 1 && gameOver; }            // @TODO: Kind of weird that this isnt actually game over but when to load new game
+  public boolean isGameOver() { return gameOver; }                              // Game over, resetTimer counting down to new game
+  public boolean isResetReady() { return resetTimer < 1 && gameOver; }          // Ready to start a new game
   public final int createOid() { return idGen++; }
   public abstract String gametypeName();
   public abstract int objectiveBaseId();                                        // ID for gametype objective, 0 = none, 1 = ctf flags, etc...
