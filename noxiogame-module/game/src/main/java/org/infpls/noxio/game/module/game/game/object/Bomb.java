@@ -80,7 +80,7 @@ public class Bomb extends Mobile {
         GameObject obj = game.objects.get(i);
         if(obj != this && obj.getType().startsWith("obj.mobile") && !obj.getType().equals("obj.mobile.bomb")) {
           final Mobile mob = (Mobile)obj;
-          if(mob.getPosition().distance(position) < mob.getRadius() + getRadius() + DETONATION_OUTER_RADIUS && mob.getHeight() > -0.5) {
+          if(!mob.isIntangible() && mob.getPosition().distance(position) < mob.getRadius() + getRadius() + DETONATION_OUTER_RADIUS && mob.getHeight() > -0.5) {
             if(obj.getType().startsWith("obj.mobile.player")) {
               final Player ply = (Player)obj;
               ply.stun(DETONATION_STUN_LENGTH);

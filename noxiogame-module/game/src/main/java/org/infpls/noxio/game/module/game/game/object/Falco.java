@@ -48,7 +48,7 @@ public class Falco extends Player {
           GameObject obj = game.objects.get(i);
           if(obj != this && obj.getType().startsWith("obj.mobile")) {
             final Mobile mob = (Mobile)obj;
-            if(mob.getPosition().distance(position) < mob.getRadius() + getRadius() + BLIP_OUTER_RADIUS && mob.getHeight() > -0.5) {
+            if(!mob.isIntangible() && mob.getPosition().distance(position) < mob.getRadius() + getRadius() + BLIP_OUTER_RADIUS && mob.getHeight() > -0.5) {
               if(obj.getType().startsWith("obj.mobile.player")) {
                 final Player ply = (Player)obj;
                 ply.stun(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX));

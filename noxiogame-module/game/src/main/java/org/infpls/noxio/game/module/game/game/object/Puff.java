@@ -54,7 +54,7 @@ public class Puff extends Player {
           GameObject obj = game.objects.get(i);
           if(obj != this && obj.getType().startsWith("obj.mobile")) {
             final Mobile mob = (Mobile)obj;
-            if(mob.getPosition().distance(position) < mob.getRadius() + getRadius() && mob.getHeight() > -0.5f) {
+            if(!mob.isIntangible() && mob.getPosition().distance(position) < mob.getRadius() + getRadius() && mob.getHeight() > -0.5f) {
               if(obj.getType().startsWith("obj.mobile.player")) {
                 final Player ply = (Player)obj;
                 ply.stun(REST_STUN_LENGTH);
@@ -112,7 +112,7 @@ public class Puff extends Player {
         GameObject obj = game.objects.get(i);
         if(obj != this && obj.getType().startsWith("obj.mobile")) {
           final Mobile mob = (Mobile)obj;
-          if(mob.getPosition().distance(poundPos) < mob.getRadius() + POUND_RADIUS && mob.getHeight() > -0.5f) {
+          if(!mob.isIntangible() && mob.getPosition().distance(poundPos) < mob.getRadius() + POUND_RADIUS && mob.getHeight() > -0.5f) {
             if(obj.getType().startsWith("obj.mobile.player")) {
               final Player ply = (Player)obj;
               ply.stun(POUND_STUN_LENGTH);

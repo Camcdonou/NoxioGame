@@ -99,19 +99,21 @@ public class Marth extends Player {
         for(int i=0;i<game.objects.size();i++) {
           if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
             Mobile mob = (Mobile)game.objects.get(i);
-            final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
-            final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-            if(full || inst != null) {
-              if(mob.getType().startsWith("obj.mobile.player")) {
-                final Player ply = (Player)mob;
-                ply.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH);
-                combo++; comboTimer = SLASH_COMBO_DEGEN;
-                effects.add(isCombo?"cht":"sht");
+            if(!mob.isIntangible() && mob.getHeight() > -0.5f) {
+              final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
+              final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
+              if(full || inst != null) {
+                if(mob.getType().startsWith("obj.mobile.player")) {
+                  final Player ply = (Player)mob;
+                  ply.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH);
+                  combo++; comboTimer = SLASH_COMBO_DEGEN;
+                  effects.add(isCombo?"cht":"sht");
+                }
+                final Vec2 normal = mob.getPosition().subtract(position).normalize();
+                mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
+                final Controller c = game.getControllerByObject(this);
+                if(c != null) { mob.tag(c); }
               }
-              final Vec2 normal = mob.getPosition().subtract(position).normalize();
-              mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
-              final Controller c = game.getControllerByObject(this);
-              if(c != null) { mob.tag(c); }
             }
           }
         }
@@ -149,6 +151,7 @@ public class Marth extends Player {
       for(int i=0;i<game.objects.size();i++) {
         if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
           Mobile mob = (Mobile)game.objects.get(i);
+          if(!mob.isIntangible() && mob.getHeight() > -0.5f) {
             final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
             final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
             if(full || inst != null) {
@@ -163,6 +166,7 @@ public class Marth extends Player {
               if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER); }
               final Controller c = game.getControllerByObject(this);
               if(c != null) { mob.tag(c); }
+            }
           }
         }
       }

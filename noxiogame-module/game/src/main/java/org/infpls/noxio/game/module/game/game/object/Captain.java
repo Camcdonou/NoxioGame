@@ -78,18 +78,20 @@ public class Captain extends Player {
       for(int i=0;i<game.objects.size();i++) {
         if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
           Mobile mob = (Mobile)game.objects.get(i);
-          final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
-          final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-          if(full || inst != null) {
-            if(mob.getType().startsWith("obj.mobile.player")) {
-              final Player ply = (Player)mob;
-              ply.stun(PUNCH_STUN_LENGTH);
+          if(!mob.isIntangible() && mob.getHeight() > -0.5f) {
+            final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
+            final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
+            if(full || inst != null) {
+              if(mob.getType().startsWith("obj.mobile.player")) {
+                final Player ply = (Player)mob;
+                ply.stun(PUNCH_STUN_LENGTH);
+              }
+              //final Vec2 normal = mob.getPosition().subtract(position).normalize();
+              final Vec2 normal = punchDirection;
+              mob.knockback(normal.scale(PUNCH_IMPULSE), this);
+              final Controller c = game.getControllerByObject(this);
+              if(c != null) { mob.tag(c); }
             }
-            //final Vec2 normal = mob.getPosition().subtract(position).normalize();
-            final Vec2 normal = punchDirection;
-            mob.knockback(normal.scale(PUNCH_IMPULSE), this);
-            final Controller c = game.getControllerByObject(this);
-            if(c != null) { mob.tag(c); }
           }
         }
       }
@@ -103,6 +105,7 @@ public class Captain extends Player {
       effects.add("mov");
       kickTimer = KICK_LENGTH;
       kickDirection = look;
+      drop();
     }
   }
   
