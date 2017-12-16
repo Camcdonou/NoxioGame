@@ -66,7 +66,7 @@ public class NoxioMap {
     final String[] dp = fields[4].split(";");
     doodadSet = new ArrayList();
     for(int i=0;i<dp.length;i++) {
-      final String[] d = ts[i].split(",");
+      final String[] d = dp[i].split(",");
       if(d.length < 2) { Oak.log("Error parsing map file: " + mapName + " FIELD_4 @NoxioMap.new", 2); continue; }
       doodadSet.add(new Tile(d[0], d[1]));
     }
@@ -77,7 +77,7 @@ public class NoxioMap {
     for(int i=0;i<dds.length;i++) {
       final String[] d = dds[i].split(",");
       if(d.length < 4) { Oak.log("Error parsing map file: " + mapName + " FIELD_5 @NoxioMap.new", 2); continue; }
-      doodads.add(new Doodad(Integer.parseInt(d[0]), new Vec2(Float.parseFloat(d[1]), Float.parseFloat(d[2])), Float.parseFloat(d[3])));
+      doodads.add(new Doodad(Integer.parseInt(d[0]), new Vec3(Float.parseFloat(d[1]), Float.parseFloat(d[2]), Float.parseFloat(d[3])), Float.parseFloat(d[4]), Float.parseFloat(d[5])));
     }
     
     /* Field#6 - Collision Floor */
@@ -193,14 +193,16 @@ public class NoxioMap {
   
   public class Doodad {
     private final int index;
-    private final Vec2 pos;
+    private final Vec3 pos;
     private final float rot;
-    public Doodad(final int index, final Vec2 pos, final float rot) {
+    private final float scale;
+    public Doodad(final int index, final Vec3 pos, final float rot, final float scale) {
       this.index = index;
-      this.pos = pos; this.rot = rot;
+      this.pos = pos;
+      this.rot = rot; this.scale = scale;
     }
     public int getIndex() { return index; }
-    public Vec2 getPos() { return pos; }
+    public Vec3 getPos() { return pos; }
     public float getRot() { return rot; }
   }
   

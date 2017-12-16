@@ -2,11 +2,14 @@ package org.infpls.noxio.game.module.game.game.object;
 
 public final class Vec2 {
   public final float x, y;
-  public Vec2(float x, float y) {
+  public Vec2(final float x, final float y) {
     this.x = x; this.y = y;
   }
+  public Vec2(final float a) {
+    this(a, a);
+  }
   public Vec2() {
-    this.x = 0; this.y = 0;
+    this(0f, 0f);
   }
   
   public boolean isZero() { return magnitude() == 0.0f; }
@@ -23,7 +26,7 @@ public final class Vec2 {
   public float dot(final Vec2 b) { return (x*b.x)+(y*b.y); }
   public Vec2 rotate(final float angle) { float cos = (float)Math.cos(angle); float sin = (float)Math.sin(angle); return new Vec2((x*cos)+(y*sin), (x*-sin)+(y*cos)); }
   public boolean equals(final Vec2 b) { return x == b.x && y == b.y; }
-  public Vec2 copy() { return new Vec2(x, y); }
+  public Vec2 copy() { return new Vec2(x, y); } /* @TODO: Does not need to exist since Vec2 is final */
   
   @Override
   public String toString() { return x + "," + y; }
