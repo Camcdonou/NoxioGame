@@ -205,25 +205,27 @@ public abstract class NoxioGame {
     }
   }
   
+  private final static float SAFE_SPAWN_RADIUS = 2.5f;
   protected final Vec2 findSafeSpawn(final List<NoxioMap.Spawn> spawns) {
     if(spawns.isEmpty()) { return new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f); } // Fallback
     
-    NoxioMap.Spawn safest = spawns.get(0);
-    float d = 0f;
+    final List<NoxioMap.Spawn> sss = new ArrayList();
     
     for(int i=0;i<spawns.size();i++) {
-      float e = Float.MAX_VALUE;
+      final NoxioMap.Spawn sp = spawns.get(i);
+      boolean safe = true;
       for(int j=0;j<controllers.size();j++) {
         final GameObject obj = controllers.get(j).getControlled();
         if(obj != null) {
-          float k = obj.getPosition().distance(spawns.get(i).getPos());
-          if(k < e) { e = k; }
+          float k = obj.getPosition().distance(sp.getPos());
+          if(k < SAFE_SPAWN_RADIUS) { safe = false; break; }
         }
       }
-      if(e >= d) { safest = spawns.get(i); d = e; }
+      if(safe) { sss.add(sp); }
     }
     
-    return safest.getPos();
+    if(sss.isEmpty()) { return spawns.get((int)(Math.random()*spawns.size())).getPos(); }
+    else              { return sss.get((int)(Math.random()*sss.size())).getPos(); }
   }
   
   public void join(final NoxioSession player) throws IOException {

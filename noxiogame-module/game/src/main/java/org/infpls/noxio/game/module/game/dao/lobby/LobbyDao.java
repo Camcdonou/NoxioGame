@@ -22,19 +22,19 @@ public class LobbyDao {
       a.set("respawn_time", "30");
       
       b.set("game_name", "TDM Test #1");
-      b.set("map_name", "final");
+      b.set("map_name", "war");
       b.set("gametype", "TeamDeathmatch");
       b.set("teams", "2");
-      b.set("max_players", "6");
-      b.set("score_to_win", "25");
+      b.set("max_players", "12");
+      b.set("score_to_win", "30");
       b.set("respawn_time", "90");
       
       c.set("game_name", "CTF Test #1");
       c.set("map_name", "battle");
       c.set("gametype", "CaptureTheFlag");
       c.set("teams", "2");
-      c.set("max_players", "8");
-      c.set("score_to_win", "25");
+      c.set("max_players", "12");
+      c.set("score_to_win", "3");
       c.set("respawn_time", "90");
       
       f.set("game_name", "K Test #1");
@@ -48,19 +48,19 @@ public class LobbyDao {
       f.set("respawn_time", "90");
       
       g.set("game_name", "UL Test #1");
-      g.set("map_name", "war");
+      g.set("map_name", "final");
       g.set("gametype", "Ultimate");
       g.set("teams", "0");
-      g.set("max_players", "12");
+      g.set("max_players", "4");
       g.set("score_to_win", "25");
       g.set("respawn_time", "90");
       
       e.set("game_name", "TK Test #1");
-      e.set("map_name", "war");
+      e.set("map_name", "battle");
       e.set("gametype", "TeamKing");
       e.set("teams", "2");
-      e.set("max_players", "12");
-      e.set("score_to_win", "25");
+      e.set("max_players", "16");
+      e.set("score_to_win", "50");
       e.set("respawn_time", "90");
       
       

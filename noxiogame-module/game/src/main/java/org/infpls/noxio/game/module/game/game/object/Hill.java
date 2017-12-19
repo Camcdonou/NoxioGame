@@ -45,8 +45,9 @@ public class Hill extends GameObject {
     }
   }
   
-  public void moveTo(final Vec2 pos) {
+  public void moveTo(final Vec2 pos, final Vec2 size) {
     setPosition(pos);
+    this.size = size;
     scoreTimers.clear();
   }
   

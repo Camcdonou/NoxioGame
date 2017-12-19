@@ -17,7 +17,7 @@ public class NoxioMap {
   private final List<Spawn> spawns;
   
   private final int[] bounds;         // Map boundary in tiles
-  private final int[][] map;          // 2D Array of tile indexes
+  private final TilInst[][] map;      // 2D Array of tile instances
   private final List<Polygon> floor;  // Floor collision data
   private final List<Polygon> wall;   // Wall collision data
   
@@ -55,10 +55,17 @@ public class NoxioMap {
     
     /* Field#3 - Map Data */
     final String[] m = fields[3].split(",");
-    map = new int[bounds[1]][bounds[0]];
-    for(int i=0, k=0;i<bounds[1];i++) {
+    int kk = 0;
+    map = new TilInst[bounds[1]][bounds[0]];
+    final int[][] mapind = new int[bounds[1]][bounds[0]];
+    for(int i=0;i<bounds[1];i++) {
       for(int j=0;j<bounds[0];j++) {
-       map[bounds[1]-i-1][j] = Integer.parseInt(m[k++]); // Read map y backwards because GL renders from bottom not top
+       mapind[bounds[1]-i-1][j] = Integer.parseInt(m[kk++]);                                     // Read map y backwards because GL renders from bottom not top
+      }
+    }
+    for(int i=0;i<bounds[1];i++) {
+      for(int j=0;j<bounds[0];j++) {
+       map[bounds[1]-i-1][j] = new TilInst(mapind[bounds[1]-i-1][j], Integer.parseInt(m[kk++])); // Read map y backwards because GL renders from bottom not top
       }
     }
     
@@ -159,18 +166,34 @@ public class NoxioMap {
     return sb.toString();
   }
   
-  public List<Spawn> getSpawns(final String type) {
+  public List<Spawn> getSpawns(final String type, final String gt) {
     final List<Spawn> sps = new ArrayList();
     for(int i=0;i<spawns.size();i++) {
-      if(spawns.get(i).getType().equals(type)) { sps.add(spawns.get(i)); }
+      final Spawn sp = spawns.get(i);
+      if(sp.getType().equals(type)) {
+        final String[] gts = sp.getGametype();
+        boolean gtmatch = false;
+        for(int j=0;j<gts.length;j++) {
+          if(gts[j].equalsIgnoreCase(gt)) { gtmatch = true; break; }
+        }
+        if(gtmatch) { sps.add(spawns.get(i)); }
+      }
     }
     return sps;
   }
   
-  public List<Spawn> getSpawns(final String type, final int team) {
+  public List<Spawn> getSpawns(final String type, final String gt, final int team) {
     final List<Spawn> sps = new ArrayList();
     for(int i=0;i<spawns.size();i++) {
-      if(spawns.get(i).getType().equals(type) && spawns.get(i).getTeam() == team) { sps.add(spawns.get(i)); }
+      final Spawn sp = spawns.get(i);
+      if(sp.getType().equals(type) && sp.getTeam() == team) {
+        final String[] gts = sp.getGametype();
+        boolean gtmatch = false;
+        for(int j=0;j<gts.length;j++) {
+          if(gts[j].equalsIgnoreCase(gt)) { gtmatch = true; break; }
+        }
+        if(gtmatch) { sps.add(spawns.get(i)); }
+      }
     }
     return sps;
   }
@@ -180,7 +203,7 @@ public class NoxioMap {
   public List<String> getGametypes() { return gametypes; }
   public List<Tile> getTileSet() { return tileSet; }
   public int[] getBounds() { return bounds; }
-  public int[][] getMap() { return map; }
+  public TilInst[][] getMap() { return map; }
   
   public class Tile {
     private final String model, material;
@@ -189,6 +212,15 @@ public class NoxioMap {
     }
     public String getModel() { return model; }
     public String getMaterial() { return material; }
+  }
+  
+  public class TilInst {
+    private final int ind, rot;
+    public TilInst(final int ind, final int rot) {
+      this.ind = ind; this.rot = rot;
+    }
+    public int getInd() { return ind; }
+    public int getRot() { return rot; }
   }
   
   public class Doodad {

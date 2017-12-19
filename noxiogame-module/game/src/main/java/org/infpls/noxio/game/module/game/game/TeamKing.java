@@ -25,16 +25,20 @@ public class TeamKing extends TeamGame {
   }
   
   private Hill createHill() {
-    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill");
+    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeName());
     final Vec2 hs;
+    final float size;
     if(hillSpawns.isEmpty()) {
       hs = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f);
+      size = 2f;
     }
     else {
-      hs = hillSpawns.get(hillSpawnRotation++%hillSpawns.size()).getPos();
+      int doot = hillSpawnRotation++%hillSpawns.size();
+      hs = hillSpawns.get(doot).getPos();
+      size = hillSpawns.get(doot).getTeam();
     }
     
-    final Hill h = new Hill(this, createOid(), hs, new Vec2(5f, 5f));
+    final Hill h = new Hill(this, createOid(), hs, new Vec2(size));
     addObject(h);
     return h;
   }
@@ -42,16 +46,20 @@ public class TeamKing extends TeamGame {
   private void moveHill() {
     moveTimer = 0;
     if(staticHill) { return; }
-    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill");
+    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeName());
     final Vec2 hs;
+    final float size;
     if(hillSpawns.isEmpty()) {
       hs = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f);
+      size = 2f;
     }
     else {
-      hs = hillSpawns.get(hillSpawnRotation++%hillSpawns.size()).getPos();
+      int doot = hillSpawnRotation++%hillSpawns.size();
+      hs = hillSpawns.get(doot).getPos();
+      size = hillSpawns.get(doot).getTeam();
     }
     
-    hill.moveTo(hs);
+    hill.moveTo(hs, new Vec2(size));
     announce("khm");
   }
 

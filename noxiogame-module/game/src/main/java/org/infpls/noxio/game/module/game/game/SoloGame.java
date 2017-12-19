@@ -25,7 +25,7 @@ public abstract class SoloGame extends NoxioGame {
     final String charSel = q.remove();
     if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
     
-    final List<NoxioMap.Spawn> spawns = map.getSpawns("player");
+    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeName());
     final Vec2 sp = findSafeSpawn(spawns);
     
     int oid = createOid();

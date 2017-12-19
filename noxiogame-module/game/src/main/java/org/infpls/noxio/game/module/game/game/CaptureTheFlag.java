@@ -15,8 +15,8 @@ public class CaptureTheFlag extends TeamGame {
   }
   
   private void spawnFlags() {
-    List<NoxioMap.Spawn> rs = map.getSpawns("flag", 0);
-    List<NoxioMap.Spawn> bs = map.getSpawns("flag", 1);
+    List<NoxioMap.Spawn> rs = map.getSpawns("flag", gametypeName(), 0);
+    List<NoxioMap.Spawn> bs = map.getSpawns("flag", gametypeName(), 1);
     final Vec2 rsl, bsl;
     rsl = rs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)+1f, map.getBounds()[1]*0.5f):rs.get(0).getPos();
     bsl = bs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)-1f, map.getBounds()[1]*0.5f):bs.get(0).getPos();

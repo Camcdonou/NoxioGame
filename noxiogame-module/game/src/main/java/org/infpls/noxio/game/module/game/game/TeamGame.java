@@ -25,7 +25,7 @@ public abstract class TeamGame extends NoxioGame {
     final String charSel = q.remove();
     if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
 
-    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", c.getTeam());
+    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeName(), c.getTeam());
     final Vec2 sp = findSafeSpawn(spawns);
     
     int oid = createOid();
