@@ -2,9 +2,12 @@ package org.infpls.noxio.game.module.game.game.object;
 
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.*;
+import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class Player extends Mobile {
+  private static final int TAG_CREDIT_GRACE_PERIOD = 300;
+  protected static final float VERTICAL_HIT_TEST_LENIENCY = 1.25f;
   protected static final float AIR_CONTROL = 0.2f, MULTI_JUMP_DAMPEN = 0.2f;
   
   protected boolean jumped;                  // Flags a jump so players can only jump once, either off the ground or mid air
@@ -17,20 +20,21 @@ public abstract class Player extends Mobile {
   
   protected boolean ultimate;
   
-  protected Controller tagged;
   protected Flag holding;
   
   protected int channelTimer, tauntCooldown, stunTimer;
-  public Player(final NoxioGame game, final int oid, final String type, final Vec2 position, final int team) {
-    super(game, oid, type, position);
+  public Player(final NoxioGame game, final int oid, final Vec2 position, final int team) {
+    super(game, oid, position);
+    /* Bitmask Type */
+    bitIs = bitIs | Types.PLAYER;
     
+    /* Vars */
     look =  new Vec2(0.0f, 1.0f);
     speed = 0.0f;
     
     action = new ArrayList();
     effects = new ArrayList();
-    
-    tagged = null;
+
     holding = null;
     
     /* Settings */
@@ -63,20 +67,20 @@ public abstract class Player extends Mobile {
   /* Applies player inputs to the object. */
   public void movement() {
     if(channelTimer > 0) { return; }
-    if(isGrounded()) { setVelocity(velocity.add(look.scale(moveSpeed*speed))); }
+    if(grounded) { setVelocity(velocity.add(look.scale(moveSpeed*speed))); }
     else { setVelocity(velocity.add(look.scale(moveSpeed*speed).scale(AIR_CONTROL))); } // Reduced control while airborne
   }
   
   /* Performs action. */
   public final void actions() {
-    if(isGrounded() && jumped) { jumped = false; }
+    if(grounded && jumped) { jumped = false; }
     for(int i=0;i<action.size()&&channelTimer<=0;i++) {
       switch(action.get(i)) {
         case "atk" : { actionA(); break; }
         case "mov" : { actionB(); break; }
         case "tnt" : { taunt(); break; }
         case "jmp" : { jump(); break; }
-        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Player.actions:::" + getType(), 1); break; }
+        default : { Oak.log("Invalid action input::"  + action.get(i) + " @Player.actions:::" + type(), 1); break; }
       }
     }
     action.clear();
@@ -103,8 +107,9 @@ public abstract class Player extends Mobile {
   /* Pickup flag or whatever if you move over it */
   public void pickup() {
     for(int i=0;i<game.objects.size();i++) {
-      if(game.objects.get(i).getType().equals("obj.mobile.flag")) {
-        final Flag flag = (Flag)(game.objects.get(i));
+      final GameObject obj = game.objects.get(i);
+      if(obj.is(Types.FLAG)) {
+        final Flag flag = (Flag)(obj);
         if(holding==null && flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
           if(flag.pickup(this)) { holding = flag; }
         }
@@ -156,7 +161,7 @@ public abstract class Player extends Mobile {
   
   public void jump() {
     if(jumped) { return; }
-    if(isGrounded()) {
+    if(grounded) {
       popup(jumpHeight);
     }
     else {
@@ -174,24 +179,56 @@ public abstract class Player extends Mobile {
     ultimate = true;
   }
   
+  /* Test given circle at <vec2 p> w/ radius <float r> against other players and return hits */ 
+  public List<Mobile> hitTest(final Vec2 p, final float r) {
+    final List<Mobile> hits = new ArrayList();
+    for(int i=0;i<game.objects.size();i++) {
+      final GameObject obj = game.objects.get(i);
+      if(obj != this && obj.is(Types.MOBILE)) {
+        final Mobile mob = (Mobile)obj;
+        final float cr = mob.getRadius() + r;
+        if(p.distance(mob.getPosition()) <= cr && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
+          hits.add(mob);
+        }
+      }
+    }
+    return hits;
+  }
+  
+  /* Test given hitbox <Polygon poly> against other players and return hits */ 
+  public List<Mobile> hitTest(final Polygon p) {
+    final List<Mobile> hits = new ArrayList();
+    for(int i=0;i<game.objects.size();i++) {
+      final GameObject obj = game.objects.get(i);
+      if(obj != this && obj.is(Types.MOBILE)) {
+        final Mobile mob = (Mobile)obj;
+        final float cr = mob.getRadius() + getRadius();
+        if(!immune && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
+          final boolean full = Intersection.pointInPolygon(mob.getPosition(), p);
+          final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), p, mob.getRadius());
+          if(full || inst != null) {
+            hits.add(mob);
+          }
+        }
+      }
+    }
+    return hits;
+  }
+  
   @Override
   public boolean isGlobal() { return ultimate; }
   
+  @Override
   public void stun(int time) {
     stunTimer = time;
     effects.add("stn");
   }
   
   @Override
-  public void tag(final Controller player) {
-    tagged = player;
-  }
-  
-  @Override
   public void kill() {
     dead = true;
     drop();
-    game.reportKill(tagged, this);
+    game.reportKill(tagTime-game.getFrame()<=TAG_CREDIT_GRACE_PERIOD?tagged:null, this);
   }
   
   public Flag getHolding() { return holding; }

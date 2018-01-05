@@ -50,7 +50,7 @@ public class Ultimate extends SoloGame {
         final Controller controller = getControllerByObject(ultimate);
         if(controller != null) { reportObjective(controller, ultimate); }
       }
-      if(ultimate.getType().startsWith("obj.mobile.player")) {
+      if(ultimate.is(GameObject.Types.PLAYER)) {
         ((Player)ultimate).ultimate();
       }
     }

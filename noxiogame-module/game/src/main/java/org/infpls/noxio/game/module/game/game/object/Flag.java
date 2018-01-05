@@ -13,8 +13,11 @@ public class Flag extends Mobile {
   private int dropCooldown, resetCooldown;
   private final static int DROP_COOLDOWN_TIME = 45, RESET_COOLDOWN_TIME = 900;
   public Flag(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.flag", position);
+    super(game, oid, position);
+    /* Bitmask Type */
+    bitIs = bitIs | Types.FLAG;
     
+    /* Vars */
     effects = new ArrayList();
     
     base = position;
@@ -26,6 +29,7 @@ public class Flag extends Mobile {
     /* State */
     this.team = team;
     intangible = true;
+    immune = true;
     
     /* Timers */
     dropCooldown = 0; lastHeld = -1;
@@ -38,8 +42,9 @@ public class Flag extends Mobile {
     
     if(isHeld()) {
       for(int i=0;i<game.objects.size();i++) {
-        if(game.objects.get(i).getType().equals("obj.mobile.flag")) {
-          final Flag f = (Flag)(game.objects.get(i));
+        final GameObject obj = game.objects.get(i);
+        if(obj.is(Types.FLAG)) {
+          final Flag f = (Flag)(obj);
           if(f.team != team && f.onBase() && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) { f.score(held); reset(); }
         }
       }
@@ -100,13 +105,6 @@ public class Flag extends Mobile {
     game.reportObjective(game.getControllerByObject(p), this);
   }
   
-  @Override
-  public void knockback(final Vec2 impulse, final Player player) {
-    if(team != player.team) {
-      setVelocity(velocity.add(impulse));
-    }
-  }
-  
   private void reset() {
     drop();
     setPosition(base);
@@ -127,4 +125,7 @@ public class Flag extends Mobile {
   
   @Override
   public boolean isGlobal() { return true; }
+  
+  @Override
+  public String type() { return "flg"; }
 }

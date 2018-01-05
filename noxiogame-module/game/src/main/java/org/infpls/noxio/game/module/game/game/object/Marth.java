@@ -2,13 +2,12 @@ package org.infpls.noxio.game.module.game.game.object;
 
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.*;
-import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Marth extends Player {
   private static final int SLASH_COOLDOWN_LENGTH = 20, SLASH_COMBO_LENGTH = 3, SLASH_COMBO_DEGEN = 90, SLASH_STUN_LENGTH = 15, SLASH_COMBO_STUN_LENGTH = 25;
   private static final float SLASH_RANGE = 1.0f, SLASH_ANGLE = 120f, SLASH_SEGMENT_DISTANCE=5f, SLASH_IMPULSE = 0.55f, SLASH_COMBO_IMPULSE = 1.05f;
   private static final int COUNTER_COOLDOWN_LENGTH = 45, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 30;
-  private static final float COUNTER_MULTIPLIER = 1.33f, COUNTER_ANGLE = 45f, COUNTER_SEGMENT_DISTANCE=5f, COUNTER_RANGE = 1.25f;
+  private static final float COUNTER_MULTIPLIER = 1.5f, COUNTER_ANGLE = 45f, COUNTER_SEGMENT_DISTANCE=5f, COUNTER_RANGE = 1.25f;
   private static final int TAUNT_COOLDOWN_LENGTH = 60;
   
   private boolean channelCounter, counterHit;
@@ -22,7 +21,7 @@ public class Marth extends Player {
   }
   
   public Marth(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.player.marth", position, team);
+    super(game, oid, position, team);
     
     /* Settings */
     radius = 0.5f; weight = 0.9f; friction = 0.705f;
@@ -78,7 +77,6 @@ public class Marth extends Player {
     sb.append(";");
   }
   
-  /* Generatese a polygon to use as the hitbox for the slash then tests objects against it to see if it hit */
   @Override   /* Slash */
   public void actionA() {
     if(slashCooldown <= 0) {
@@ -86,38 +84,27 @@ public class Marth extends Player {
       final boolean isCombo = combo >= SLASH_COMBO_LENGTH;
       effects.add("atk");
       if(isCombo) { combo = 0; comboTimer = 0; effects.add("cmb"); }
-      if(getHeight() > -0.5) {
-        final float rad = (float)(Math.PI/180);
-        final Polygon hitbox;
-        final List<Vec2> verts = new ArrayList();
-        final Vec2 start = look.scale(SLASH_RANGE).rotate(SLASH_ANGLE*rad*-0.5f);
-        verts.add(position);
-        for(float d=0f;d<SLASH_ANGLE*rad;d+=SLASH_SEGMENT_DISTANCE*rad) {
-          verts.add(start.rotate(d).add(position));
-        }
-        hitbox = new Polygon(verts.toArray(new Vec2[0]));
-        for(int i=0;i<game.objects.size();i++) {
-          if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
-            Mobile mob = (Mobile)game.objects.get(i);
-            if(!mob.isIntangible() && mob.getHeight() > -0.5f) {
-              final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
-              final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-              if(full || inst != null) {
-                if(mob.getType().startsWith("obj.mobile.player")) {
-                  final Player ply = (Player)mob;
-                  ply.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH);
-                  combo++; comboTimer = SLASH_COMBO_DEGEN;
-                  effects.add(isCombo?"cht":"sht");
-                }
-                final Vec2 normal = mob.getPosition().subtract(position).normalize();
-                mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
-                final Controller c = game.getControllerByObject(this);
-                if(c != null) { mob.tag(c); }
-              }
-            }
-          }
-        }
+      
+      final float rad = (float)(Math.PI/180);
+      final Polygon hitbox;
+      final List<Vec2> verts = new ArrayList();
+      final Vec2 start = look.scale(SLASH_RANGE).rotate(SLASH_ANGLE*rad*-0.5f);
+      verts.add(position);
+      for(float d=0f;d<SLASH_ANGLE*rad;d+=SLASH_SEGMENT_DISTANCE*rad) {
+        verts.add(start.rotate(d).add(position));
       }
+      hitbox = new Polygon(verts.toArray(new Vec2[0]));
+      
+      final List<Mobile> hits = hitTest(hitbox);
+      for(int i=0;i<hits.size();i++) {
+        final Mobile mob = hits.get(i);
+        final Vec2 normal = mob.getPosition().subtract(position).normalize();
+        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, this);
+        mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
+        combo++; comboTimer = SLASH_COMBO_DEGEN;
+        effects.add(isCombo?"cht":"sht");
+      }
+      
       if(combo > SLASH_COMBO_LENGTH) { combo = SLASH_COMBO_LENGTH; }
       if(combo == SLASH_COMBO_LENGTH) { effects.add("rdy"); }
     }
@@ -137,40 +124,29 @@ public class Marth extends Player {
   
   public void riposte() {
     effects.add("rip");
-    if(getHeight() > -0.5) {
-      final float rad = (float)(Math.PI/180);
-      final Vec2 dir = counterDirection!=null?counterDirection:look;
-      final Polygon hitbox;
-      final List<Vec2> verts = new ArrayList();
-      final Vec2 start = dir.normalize().scale(COUNTER_RANGE).rotate(COUNTER_ANGLE*rad*-0.5f);
-      verts.add(position);
-      for(float d=0f;d<COUNTER_ANGLE*rad;d+=COUNTER_SEGMENT_DISTANCE*rad) {
-        verts.add(start.rotate(d).add(position));
-      }
-      hitbox = new Polygon(verts.toArray(new Vec2[0]));
-      for(int i=0;i<game.objects.size();i++) {
-        if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
-          Mobile mob = (Mobile)game.objects.get(i);
-          if(!mob.isIntangible() && mob.getHeight() > -0.5f) {
-            final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
-            final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-            if(full || inst != null) {
-              if(mob.getType().startsWith("obj.mobile.player")) {
-                final Player ply = (Player)mob;
-                if(counterStun > 0) { ply.stun((int)(counterStun * COUNTER_MULTIPLIER)); }
-                combo++; comboTimer = SLASH_COMBO_DEGEN;
-                effects.add("cht");
-              }
-              final Vec2 normal = mob.getPosition().subtract(position).normalize();
-              if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
-              if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER); }
-              final Controller c = game.getControllerByObject(this);
-              if(c != null) { mob.tag(c); }
-            }
-          }
-        }
-      }
+
+    final float rad = (float)(Math.PI/180);
+    final Vec2 dir = counterDirection!=null?counterDirection:look;
+    final Polygon hitbox;
+    final List<Vec2> verts = new ArrayList();
+    final Vec2 start = dir.normalize().scale(COUNTER_RANGE).rotate(COUNTER_ANGLE*rad*-0.5f);
+    verts.add(position);
+    for(float d=0f;d<COUNTER_ANGLE*rad;d+=COUNTER_SEGMENT_DISTANCE*rad) {
+      verts.add(start.rotate(d).add(position));
     }
+    hitbox = new Polygon(verts.toArray(new Vec2[0]));
+    
+    final List<Mobile> hits = hitTest(hitbox);
+    for(int i=0;i<hits.size();i++) {
+      final Mobile mob = hits.get(i);
+      final Vec2 normal = mob.getPosition().subtract(position).normalize();
+      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), this); }
+      if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
+      if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER, this); }
+      combo++; comboTimer = SLASH_COMBO_DEGEN;
+      effects.add("cht");
+    }
+
     if(combo > SLASH_COMBO_LENGTH) { combo = SLASH_COMBO_LENGTH; }
     if(combo == SLASH_COMBO_LENGTH) { effects.add("rdy"); }
     
@@ -201,24 +177,31 @@ public class Marth extends Player {
   }
   
   @Override
-  public void popup(float power) {
+  public void popup(float power, final Player player) {
     if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
-      counterHit = true; counterPop = power;
+      counterHit = true; counterPop = power; counterDirection = player.getPosition().subtract(position).normalize();
       return; // Immune to stun/popup/knockback during counters active frames
     } 
-    super.popup(power);
+    super.popup(power, player);
+  }
+  
+  @Override
+  public void stun(int time, final Player player) {
+    if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
+      counterHit = true; counterStun = time; counterDirection = player.getPosition().subtract(position).normalize();
+      return; // Immune to stun/popup/knockback during counters active frames
+    } 
+    super.stun(time, player);
   }
   
   @Override
   public void stun(int time) {
-    if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
-      counterHit = true; counterStun = time;
-      return; // Immune to stun/popup/knockback during counters active frames
-    } 
     super.stun(time);
     channelCounter = false;
     channelTimer = 0;
     counterCooldown = 0;
   }
   
+  @Override
+  public String type() { return "mar"; }
 }

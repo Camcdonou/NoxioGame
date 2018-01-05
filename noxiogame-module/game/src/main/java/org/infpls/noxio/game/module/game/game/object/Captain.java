@@ -1,7 +1,7 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
+import java.util.List;
 import org.infpls.noxio.game.module.game.game.*;
-import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Captain extends Player {
   private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30;
@@ -17,7 +17,7 @@ public class Captain extends Player {
   }
   
   public Captain(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.player.captain", position, team);
+    super(game, oid, position, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -74,26 +74,13 @@ public class Captain extends Player {
         position.add(punchDirection.scale(PUNCH_HITBOX_OFFSET)).add(punchDirection.rotate((float)(120*rad)).scale(PUNCH_HITBOX_SIZE)),
         position.add(punchDirection.scale(PUNCH_HITBOX_OFFSET)).add(punchDirection.rotate((float)(240*rad)).scale(PUNCH_HITBOX_SIZE))
       });
-
-      for(int i=0;i<game.objects.size();i++) {
-        if(game.objects.get(i).getType().startsWith("obj.mobile")&&game.objects.get(i)!=this) {
-          Mobile mob = (Mobile)game.objects.get(i);
-          if(!mob.isIntangible() && mob.getHeight() > -0.5f) {
-            final boolean full = Intersection.pointInPolygon(mob.getPosition(), hitbox);
-            final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
-            if(full || inst != null) {
-              if(mob.getType().startsWith("obj.mobile.player")) {
-                final Player ply = (Player)mob;
-                ply.stun(PUNCH_STUN_LENGTH);
-              }
-              //final Vec2 normal = mob.getPosition().subtract(position).normalize();
-              final Vec2 normal = punchDirection;
-              mob.knockback(normal.scale(PUNCH_IMPULSE), this);
-              final Controller c = game.getControllerByObject(this);
-              if(c != null) { mob.tag(c); }
-            }
-          }
-        }
+      
+      final List<Mobile> hits = hitTest(hitbox);
+      for(int i=0;i<hits.size();i++) {
+        final Mobile mob = hits.get(i);
+        final Vec2 normal = punchDirection;
+        mob.stun(PUNCH_STUN_LENGTH, this);
+        mob.knockback(normal.scale(PUNCH_IMPULSE), this);
       }
     }
   }
@@ -138,4 +125,7 @@ public class Captain extends Player {
     kickTimer = 0;
     kickCooldown = 0;
   }
+  
+  @Override
+  public String type() { return "cap"; }
 }

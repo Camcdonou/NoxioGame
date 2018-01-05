@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
+import java.util.List;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Puff extends Player {
@@ -16,7 +17,7 @@ public class Puff extends Player {
   }
   
   public Puff(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.player.puff", position, team);
+    super(game, oid, position, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -49,25 +50,16 @@ public class Puff extends Player {
     if(restCooldown <= 0) {
       restCooldown = REST_COOLDOWN_LENGTH;
       effects.add("atk");
-      if(getHeight() > -0.5f) {
-        for(int i=0;i<game.objects.size();i++) {
-          GameObject obj = game.objects.get(i);
-          if(obj != this && obj.getType().startsWith("obj.mobile")) {
-            final Mobile mob = (Mobile)obj;
-            if(!mob.isIntangible() && mob.getPosition().distance(position) < mob.getRadius() + getRadius() && mob.getHeight() > -0.5f) {
-              if(obj.getType().startsWith("obj.mobile.player")) {
-                final Player ply = (Player)obj;
-                ply.stun(REST_STUN_LENGTH);
-              }
-              final Vec2 normal = mob.getPosition().subtract(position).normalize();
-              mob.knockback(normal.scale(REST_IMPULSE), this);
-              effects.add("hta");
-              final Controller c = game.getControllerByObject(this);
-              if(c != null) { mob.tag(c); }
-            }
-          }
-        }
+      
+      final List<Mobile> hits = hitTest(position, getRadius());
+      for(int i=0;i<hits.size();i++) {
+        final Mobile mob = hits.get(i);
+        final Vec2 normal = mob.getPosition().subtract(position).normalize();
+        mob.stun(REST_STUN_LENGTH, this);
+        mob.knockback(normal.scale(REST_IMPULSE), this);
+        effects.add("hta");
       }
+      
       sleep();
     }
   }
@@ -80,14 +72,6 @@ public class Puff extends Player {
       channelPound = true;
       channelTimer = POUND_CHANNEL_TIME;
     }
-//    if(dashCooldown <= 0 && dashPower < DASH_POWER_MAX) {
-//      drop();
-//      dashCooldown = DASH_COOLDOWN_LENGTH;
-//      dashPower += DASH_POWER_ADD;
-//      setVelocity(velocity.add(look.scale(DASH_IMPULSE)));
-//      
-//      if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME); }
-//    }
   }
   
   /* The dash of pound */
@@ -105,27 +89,16 @@ public class Puff extends Player {
   public void pound() {
     effects.add("pnh");
     delayPound = false;
-    if(getHeight() > -0.5f) {
-      final Vec2 poundPos = position.add(poundDirection.scale(POUND_OFFSET));
-      
-      for(int i=0;i<game.objects.size();i++) {
-        GameObject obj = game.objects.get(i);
-        if(obj != this && obj.getType().startsWith("obj.mobile")) {
-          final Mobile mob = (Mobile)obj;
-          if(!mob.isIntangible() && mob.getPosition().distance(poundPos) < mob.getRadius() + POUND_RADIUS && mob.getHeight() > -0.5f) {
-            if(obj.getType().startsWith("obj.mobile.player")) {
-              final Player ply = (Player)obj;
-              ply.stun(POUND_STUN_LENGTH);
-            }
-            final Vec2 normal = mob.getPosition().subtract(poundPos).normalize();
-            mob.knockback(normal.scale(POUND_IMPULSE), this);
-            mob.popup(POUND_POPUP);
-            effects.add("htb");
-            final Controller c = game.getControllerByObject(this);
-            if(c != null) { mob.tag(c); }
-          }
-        }
-      }
+    final Vec2 poundPos = position.add(poundDirection.scale(POUND_OFFSET));
+
+    final List<Mobile> hits = hitTest(poundPos, getRadius());
+    for(int i=0;i<hits.size();i++) {
+      final Mobile mob = hits.get(i);
+      final Vec2 normal = mob.getPosition().subtract(position).normalize();
+      mob.stun(POUND_STUN_LENGTH, this);
+      mob.knockback(normal.scale(POUND_IMPULSE), this);
+      mob.popup(POUND_POPUP, this);
+      effects.add("htb");
     }
   }
   
@@ -157,4 +130,7 @@ public class Puff extends Player {
     delayTimer = 0;
     poundCooldown = 0;
   }
+  
+  @Override
+  public String type() { return "puf"; }
 }

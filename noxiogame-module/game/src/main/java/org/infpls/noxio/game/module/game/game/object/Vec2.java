@@ -19,7 +19,7 @@ public final class Vec2 {
   public Vec2 scale(final float s) { return new Vec2(x*s, y*s); }
   public Vec2 inverse() { return new Vec2(x*-1, y*-1); }
   public float magnitude() { return (float)(Math.sqrt((x*x)+(y*y))); }
-  public Vec2 normalize() { float m = magnitude(); return new Vec2(x/m,y/m); }
+  public Vec2 normalize() { final float m = magnitude(); return Math.abs(m) != 0f ? new Vec2(x/m,y/m) : new Vec2(0f, 1f); }  /* Safe on potential NaN */
   public Vec2 lerp(final Vec2 b, final float s) { return new Vec2((x*s)+(b.x*(1-s)),(y*s)+(b.y*(1-s))); }
   public float distance(final Vec2 b) { return subtract(b).magnitude(); }
   public Vec2 tangent() { return new Vec2(y*-1, x); }

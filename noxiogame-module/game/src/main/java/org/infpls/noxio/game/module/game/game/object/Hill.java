@@ -11,7 +11,11 @@ public class Hill extends GameObject {
   private final Map<Integer, Integer> scoreTimers;
   
   public Hill(final NoxioGame game, final int oid, final Vec2 position, final Vec2 size) {
-    super(game, oid, "obj.hill", position);
+    super(game, oid, position);
+    /* Bitmask Type */
+    bitIs = bitIs | Types.HILL;
+    
+    /* Vars */
     this.size = size;
     scoreTimers = new HashMap();
   }
@@ -29,7 +33,7 @@ public class Hill extends GameObject {
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
       final Controller con = game.getControllerByObject(obj);
-      if(con != null && obj.getType().startsWith("obj.mobile")) {
+      if(con != null && obj.is(Types.MOBILE)) {
         final Mobile mob = (Mobile)obj;
         final boolean inside = Intersection.pointInPolygon(mob.getPosition(), hitbox);
         final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
@@ -73,4 +77,7 @@ public class Hill extends GameObject {
   public void kill() {
     /* You can't kill a game objective! */
   }
+  
+  @Override
+  public String type() { return "hil"; }
 }

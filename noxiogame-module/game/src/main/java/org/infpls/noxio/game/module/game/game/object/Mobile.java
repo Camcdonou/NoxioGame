@@ -1,45 +1,53 @@
 package org.infpls.noxio.game.module.game.game.object;
 
 import java.util.*;
+import org.infpls.noxio.game.module.game.game.Controller;
 import org.infpls.noxio.game.module.game.game.NoxioGame;
 import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
 public abstract class Mobile extends GameObject {
   protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
+  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;
+  
+  protected Controller tagged;
+  protected int tagTime;
   
   protected float radius, weight, friction;
   
-  float height;
+  public float height;
   private float vspeed;
-  protected boolean intangible, grounded;
-  
-  private static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;
-  public Mobile(final NoxioGame game, final int oid, final String type, final Vec2 position) {
-    super(game, oid, type, position);
+  protected boolean intangible, immune, grounded;
+    
+  public Mobile(final NoxioGame game, final int oid, final Vec2 position) {
+    super(game, oid, position);
+    /* Bitmask Type */
+    bitIs = bitIs | Types.MOBILE;
+    
+    /* Vars */
+    tagged = null;
+    tagTime = -1;
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
     
     /* States */
-    height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false;
+    height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false; immune = false;
   }
   
-  public void physics() {
+  protected void physics() {
     /* -- Objects -- */
-    if(height > -0.5 && !intangible) {                                          // If this object is to low we ignore object collision.
+    if(!intangible) {                                                            // Ignore if intangible
       for(int i=0;i<game.objects.size();i++) {
         final GameObject obj = game.objects.get(i);
-        if(obj != this && obj.getType().startsWith("obj.mobile")) {             // Object must be something physical (IE a barrel or a pillar or a player)
+        if(obj != this && obj.is(Types.MOBILE)) {                                // Object must be something physical (IE a barrel or a pillar or a player)
           final Mobile mob = (Mobile)obj;
           final float combinedRadius = radius+mob.getRadius();
-          if(position.distance(mob.getPosition()) < combinedRadius && mob.getHeight() > -0.5 && !mob.isIntangible()) {
+          if(!mob.intangible && position.distance(mob.getPosition()) < combinedRadius && Math.abs(getHeight()-mob.getHeight()) < combinedRadius) {
             final float dist = position.distance(obj.getPosition());
             final Vec2 norm = position.subtract(obj.getPosition()).normalize();
             final float weightOffset = weight/(mob.getWeight()+weight);
-            //final float aoi = 1.0f-Math.abs((velocity.normalize().isNaN() ? new Vec2(0.0f, 1.0f) : velocity.normalize()).dot(norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm));
-            //setVelocity(velocity.scale((aoi*0.25f)+0.75f)); // Pushing another object head on slows this object down BUGGED!
-            final Vec2 push = (norm.isNaN() ? new Vec2(0.0f, 1.0f) : norm).scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
+            final Vec2 push = norm.scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
             setVelocity(velocity.add(push));
           }
         }
@@ -123,7 +131,7 @@ public abstract class Mobile extends GameObject {
       kill();
     }
     
-    if(isGrounded()) { setVelocity(velocity.scale(friction)); } // No ice skating on the lawn!
+    if(grounded) { setVelocity(velocity.scale(friction)); } // No ice skating on the lawn!
     else { setVelocity(velocity.scale(AIR_DRAG)); }             // No friction while moving airborne, but air drag is accounted.
   }
   
@@ -170,10 +178,18 @@ public abstract class Mobile extends GameObject {
     return false;
   }
   
-  public void knockback(final Vec2 impulse, final Player player) { setVelocity(velocity.add(impulse)); }
+  public void stun(final int time, final Player p) { stun(time); tag(p); }
+  public void stun(int time) { /* No Effect, Override */ }
+  public void knockback(final Vec2 impulse, final Player p) { knockback(impulse); tag(p); }
+  public void knockback(final Vec2 impulse) { setVelocity(velocity.add(impulse)); }
+  public void popup(float power, final Player p) { popup(power); tag(p); }
   public void popup(float power) { vspeed += (power > 0.0f ? power : 0.0f); }
-  public boolean isGrounded() { return grounded; }
-  public boolean isIntangible() { return intangible; }
+  
+  @Override
+  public void tag(final Player player) {
+    final Controller c = game.getControllerByObject(player);
+    if(c != null) { tagged = c; tagTime = game.getFrame(); }
+  }
   
   public float getRadius() { return radius; }
   public float getWeight() { return weight; }

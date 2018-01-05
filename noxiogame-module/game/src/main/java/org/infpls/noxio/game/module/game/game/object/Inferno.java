@@ -11,7 +11,7 @@ public class Inferno extends Player {
   }
   
   public Inferno(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.player.inferno", position, team);
+    super(game, oid, position, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -53,4 +53,7 @@ public class Inferno extends Player {
       effects.add("tnt");
     }
   }
+  
+  @Override
+  public String type() { return "inf"; }
 }

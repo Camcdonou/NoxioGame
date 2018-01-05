@@ -1,12 +1,13 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
+import java.util.List;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Falco extends Player {
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 35;
   private static final int DASH_COOLDOWN_LENGTH = 45, CHARGE_TIME_LENGTH = 20;
   private static final int TAUNT_COOLDOWN_LENGTH = 10;
-  private static final float BLIP_IMPULSE = 0.45f, BLIP_POPUP_IMPULSE = 0.25f, DASH_IMPULSE = 0.45f, DASH_POPOUP_IMPULSE = 0.25f, BLIP_OUTER_RADIUS = 0.1f, DASH_FALL_DAMPEN_MULT = 0.15f;
+  private static final float BLIP_IMPULSE = 0.45f, BLIP_POPUP_IMPULSE = 0.25f, DASH_IMPULSE = 0.45f, DASH_POPOUP_IMPULSE = 0.25f, BLIP_RADIUS = 0.6f, DASH_FALL_DAMPEN_MULT = 0.15f;
   
   private boolean channelDash;
   private int blipCooldown, dashCooldown, blipPower, dashPower;
@@ -15,7 +16,7 @@ public class Falco extends Player {
   }
   
   public Falco(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, "obj.mobile.player.falco", position, team);
+    super(game, oid, position, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.1f; friction = 0.725f;
@@ -38,30 +39,21 @@ public class Falco extends Player {
     if(dashCooldown > 0) { dashCooldown--; }
     if(blipPower < BLIP_POWER_MAX) { blipPower++; }
   }
-
+  
   @Override /* Pop Shine */
   public void actionA() {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
-      if(getHeight() > -0.5) {
-        for(int i=0;i<game.objects.size();i++) {
-          GameObject obj = game.objects.get(i);
-          if(obj != this && obj.getType().startsWith("obj.mobile")) {
-            final Mobile mob = (Mobile)obj;
-            if(!mob.isIntangible() && mob.getPosition().distance(position) < mob.getRadius() + getRadius() + BLIP_OUTER_RADIUS && mob.getHeight() > -0.5) {
-              if(obj.getType().startsWith("obj.mobile.player")) {
-                final Player ply = (Player)obj;
-                ply.stun(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX));
-              }
-              final Vec2 normal = mob.getPosition().subtract(position).normalize();
-              mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
-              mob.popup(BLIP_POPUP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f));
-              final Controller c = game.getControllerByObject(this);
-              if(c != null) { mob.tag(c); }
-            }
-          }
-        }
+      
+      final List<Mobile> hits = hitTest(position, BLIP_RADIUS);
+      for(int i=0;i<hits.size();i++) {
+        final Mobile mob = hits.get(i);
+        final Vec2 normal = mob.getPosition().subtract(position).normalize();
+        mob.stun(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX), this);
+        mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
+        mob.popup(BLIP_POPUP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f), this);
       }
+      
       blipPower = 0;
       effects.add("atk");
     }
@@ -100,4 +92,7 @@ public class Falco extends Player {
     channelTimer = 0;
     dashCooldown = 0;
   }
+  
+  @Override
+  public String type() { return "flc"; }
 }

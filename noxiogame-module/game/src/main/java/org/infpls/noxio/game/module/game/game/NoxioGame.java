@@ -112,7 +112,7 @@ public abstract class NoxioGame {
       final GameObject obj = created.get(i);
       sba.append("crt"); sba.append(";");
       sba.append(obj.getOid()); sba.append(";");
-      sba.append(obj.getType()); sba.append(";");
+      sba.append(obj.type()); sba.append(";");
       obj.getPosition().toString(sba); sba.append(";");
       obj.getVelocity().toString(sba); sba.append(";");
     }
@@ -153,7 +153,7 @@ public abstract class NoxioGame {
       final GameObject obj = objects.get(i);
       sb.append("crt"); sb.append(";");
       sb.append(obj.getOid()); sb.append(";");
-      sb.append(obj.getType()); sb.append(";");
+      sb.append(obj.type()); sb.append(";");
       obj.getPosition().toString(sb); sb.append(";");
       obj.getVelocity().toString(sb); sb.append(";");
     }
@@ -339,6 +339,7 @@ public abstract class NoxioGame {
     /* Do things! */
   }
   
+  public int getFrame() { return frame; }
   public boolean isGameOver() { return gameOver; }                              // Game over, resetTimer counting down to new game
   public boolean isResetReady() { return resetTimer < 1 && gameOver; }          // Ready to start a new game
   public final int createOid() { return idGen++; }
