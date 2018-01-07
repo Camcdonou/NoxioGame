@@ -5,9 +5,10 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Captain extends Player {
   private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30;
-  private static final int KICK_COOLDOWN_LENGTH = 45, KICK_LENGTH = 12;
+  private static final int KICK_COOLDOWN_LENGTH = 60, KICK_LENGTH = 8;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
-  private static final float PUNCH_IMPULSE = 1.65f, PUNCH_HITBOX_SIZE = 0.75f, PUNCH_HITBOX_OFFSET = 0.5f, KICK_IMPULSE = 0.4f, KICK_VELOCITY_DAMPEN = 0.25f, KICK_ACCEL = 0.15f;
+  private static final float PUNCH_IMPULSE = 1.65f, PUNCH_HITBOX_SIZE = 0.75f, PUNCH_HITBOX_OFFSET = 0.5f;
+  private static final float KICK_MIN_IMPULSE = 0.15f, KICK_MAX_IMPULSE = 0.45f, KICK_FALL_DAMPEN = 0.25f, KICK_RADIUS = 0.65f, KICK_OFFSET = 0.1f;
   
   private Vec2 punchDirection, kickDirection;
   private boolean chargePunch;
@@ -50,6 +51,7 @@ public class Captain extends Player {
     if(punchCooldown > 0) { punchCooldown--; }
     if(kickCooldown > 0) { kickCooldown--; }
     if(kickTimer > 0) { kicking(); }
+    else { intangible = false; }
   }
 
   @Override   /* Charge Punch */
@@ -92,14 +94,28 @@ public class Captain extends Player {
       effects.add("mov");
       kickTimer = KICK_LENGTH;
       kickDirection = look;
+      intangible = true;
+      setVelocity(kickDirection.scale(Math.min(KICK_MIN_IMPULSE, velocity.magnitude())));
+      baseImp = velocity.magnitude();
+      
       drop();
     }
   }
   
-  public void kicking() {
+  private float baseImp;
+  public void kicking() { /* @TODO: POW USAGE HERE IS FUBAR */
     kickTimer--;
-    setVelocity(kickDirection.scale(Math.min(kickTimer*KICK_ACCEL, KICK_IMPULSE)).add(velocity.scale(KICK_VELOCITY_DAMPEN)));
-    setVSpeed(getVSpeed()*KICK_VELOCITY_DAMPEN);
+    setVelocity(kickDirection.scale(baseImp + (((1f-(kickTimer/KICK_LENGTH))*0.75f)+0.25f)*KICK_MAX_IMPULSE));
+    setVSpeed(getVSpeed()*(KICK_FALL_DAMPEN*1f-((float)(Math.pow((1f-(kickTimer/KICK_LENGTH)),2f)))));
+    
+    final Vec2 kickBox = position.add(kickDirection.scale(KICK_OFFSET));
+    
+    final List<Mobile> hits = hitTest(kickBox, KICK_RADIUS);
+    for(int i=0;i<hits.size();i++) {
+      final Mobile mob = hits.get(i);
+      final float pow = 1f-(float)(Math.pow(mob.getPosition().distance(kickBox)/(KICK_RADIUS+mob.getRadius()), 1.5f));
+      mob.knockback(kickDirection.scale(pow), this);
+    }
   }
   
   @Override

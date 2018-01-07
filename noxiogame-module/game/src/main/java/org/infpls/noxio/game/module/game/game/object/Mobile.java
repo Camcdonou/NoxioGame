@@ -132,7 +132,7 @@ public abstract class Mobile extends GameObject {
     }
     
     if(grounded) { setVelocity(velocity.scale(friction)); } // No ice skating on the lawn!
-    else { setVelocity(velocity.scale(AIR_DRAG)); }             // No friction while moving airborne, but air drag is accounted.
+    else { setVelocity(velocity.scale(AIR_DRAG)); }         // No friction while moving airborne, but air drag is accounted.
   }
   
   /* Takes current position & velociyt as well as a list of wall polygons and returns the result of movement. */
