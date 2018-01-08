@@ -9,9 +9,9 @@ public class LobbyDao {
   public LobbyDao() {
     lobbies = new ArrayList();
     try {
-      final GameSettings a, b, c, e, f, g;
-      a = new GameSettings(); b = new GameSettings(); c = new GameSettings();
-      e = new GameSettings(); f = new GameSettings(); g = new GameSettings();
+      final GameSettings a, b, c, e, f, g, a2, c2, g2;
+      a = new GameSettings(); a2 = new GameSettings(); b = new GameSettings(); c = new GameSettings(); c2 = new GameSettings();
+      e = new GameSettings(); f = new GameSettings(); g = new GameSettings(); g2 = new GameSettings();
       
       a.set("game_name", "DM Test #1");
       a.set("map_name", "final");
@@ -20,6 +20,14 @@ public class LobbyDao {
       a.set("max_players", "3");
       a.set("score_to_win", "15");
       a.set("respawn_time", "30");
+      
+      a2.set("game_name", "DM Test #2");
+      a2.set("map_name", "war");
+      a2.set("gametype", "Deathmatch");
+      a2.set("teams", "0");
+      a2.set("max_players", "8");
+      a2.set("score_to_win", "15");
+      a2.set("respawn_time", "30");
       
       b.set("game_name", "TDM Test #1");
       b.set("map_name", "war");
@@ -33,15 +41,23 @@ public class LobbyDao {
       c.set("map_name", "battle");
       c.set("gametype", "CaptureTheFlag");
       c.set("teams", "2");
-      c.set("max_players", "12");
+      c.set("max_players", "16");
       c.set("score_to_win", "3");
       c.set("respawn_time", "90");
+      
+      c2.set("game_name", "CTF Test #2");
+      c2.set("map_name", "war");
+      c2.set("gametype", "CaptureTheFlag");
+      c2.set("teams", "2");
+      c2.set("max_players", "12");
+      c2.set("score_to_win", "3");
+      c2.set("respawn_time", "90");
       
       f.set("game_name", "K Test #1");
       f.set("map_name", "war");
       f.set("gametype", "King");
       f.set("teams", "0");
-      f.set("max_players", "12");
+      f.set("max_players", "8");
       f.set("score_to_win", "25");
       f.set("static_hill", "0");
       f.set("score_to_move", "5");
@@ -55,17 +71,25 @@ public class LobbyDao {
       g.set("score_to_win", "25");
       g.set("respawn_time", "90");
       
+      g2.set("game_name", "UL Test #2");
+      g2.set("map_name", "war");
+      g2.set("gametype", "Ultimate");
+      g2.set("teams", "0");
+      g2.set("max_players", "8");
+      g2.set("score_to_win", "25");
+      g2.set("respawn_time", "90");
+      
       e.set("game_name", "TK Test #1");
       e.set("map_name", "battle");
       e.set("gametype", "TeamKing");
       e.set("teams", "2");
-      e.set("max_players", "16");
+      e.set("max_players", "12");
       e.set("score_to_win", "50");
       e.set("respawn_time", "90");
       
       
-      lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c));
-      lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(g)); lobbies.add(new OfficialLobby(e));
+      lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(a2)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c)); lobbies.add(new OfficialLobby(c2));
+      lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(e)); lobbies.add(new OfficialLobby(g));
       
       for(int i=0;i<lobbies.size();i++) { lobbies.get(i).start(); }
     }
