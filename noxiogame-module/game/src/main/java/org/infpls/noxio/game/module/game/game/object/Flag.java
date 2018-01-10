@@ -120,6 +120,13 @@ public class Flag extends Mobile {
     game.announce(team==0?"rfr":"bfr");
   }
   
+  @Override
+  public void knockback(final Vec2 impulse, final Player p) { if(p.team != team) { super.knockback(impulse, p); } }
+  @Override
+  public void stun(final int time, final Player p) { if(p.team != team) { super.stun(time, p); } }
+  @Override
+  public void popup(final float power, final Player p) { if(p.team != team) { super.popup(power, p); } }
+  
   public boolean isHeld() { return held!=null; }
   public boolean onBase() { return position.equals(base); }
   

@@ -33,7 +33,7 @@ public class LobbyDao {
       b.set("map_name", "war");
       b.set("gametype", "TeamDeathmatch");
       b.set("teams", "2");
-      b.set("max_players", "12");
+      b.set("max_players", "10");
       b.set("score_to_win", "30");
       b.set("respawn_time", "90");
       
@@ -41,7 +41,7 @@ public class LobbyDao {
       c.set("map_name", "battle");
       c.set("gametype", "CaptureTheFlag");
       c.set("teams", "2");
-      c.set("max_players", "16");
+      c.set("max_players", "12");
       c.set("score_to_win", "3");
       c.set("respawn_time", "90");
       
@@ -49,7 +49,7 @@ public class LobbyDao {
       c2.set("map_name", "war");
       c2.set("gametype", "CaptureTheFlag");
       c2.set("teams", "2");
-      c2.set("max_players", "12");
+      c2.set("max_players", "10");
       c2.set("score_to_win", "3");
       c2.set("respawn_time", "90");
       

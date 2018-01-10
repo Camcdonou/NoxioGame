@@ -6,14 +6,14 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Shiek extends Player {
   private static final int FLASH_COOLDOWN_LENGTH = 30, MARK_COOLDOWN_LENGTH = 10, FLASH_STUN_LENGTH = 45, FLASH_CHARGE_LENGTH = 10;
-  private static final int BANG_COOLDOWN_LENGTH = 30;
+  private static final int BANG_COOLDOWN_LENGTH = 22, BANG_POWER_USE = 15, BANG_POWER_MAX = 80;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float FLASH_IMPULSE = 1.0f, FLASH_RADIUS = 0.65f;
   private static final float BANG_THROW_IMPULSE = 0.15f, BANG_THROW_V_IMPULSE = -0.07f;
   
   private Vec2 mark;
   private boolean channelFlash;
-  private int flashCooldown, bangCooldown;
+  private int flashCooldown, bangCooldown, bangPower;
   public Shiek(final NoxioGame game, final int oid, final Vec2 position) {
     this(game, oid, position, -1);
   }
@@ -30,6 +30,7 @@ public class Shiek extends Player {
     channelFlash = false;
     flashCooldown = 0;
     bangCooldown = 0;
+    bangPower = BANG_POWER_MAX;
   }
   
   /* Updates various timers */
@@ -39,6 +40,7 @@ public class Shiek extends Player {
     if(channelFlash && channelTimer <= 0) { flash(); }
     if(flashCooldown > 0) { flashCooldown--; }
     if(bangCooldown > 0) { bangCooldown--; }
+    if(bangPower < BANG_POWER_MAX) { bangPower++; }
   }
   
   @Override   /* Bang */
@@ -46,22 +48,50 @@ public class Shiek extends Player {
    if(bangCooldown <= 0) {
       bangCooldown = BANG_COOLDOWN_LENGTH;
       effects.add("atk");
-      final Bomb ba, bb, bc;
-      ba = new Bomb(game, game.createOid(), position, team, 15, this);
-      bb = new Bomb(game, game.createOid(), position, team, 11, this);
-      bc = new Bomb(game, game.createOid(), position, team, 19, this);
-      ba.setVelocity(velocity.add(look.scale(BANG_THROW_IMPULSE)));
-      bb.setVelocity(velocity.add(look.lerp(look.tangent(), 0.25f).normalize().scale(BANG_THROW_IMPULSE)));
-      bc.setVelocity(velocity.add(look.lerp(look.tangent().inverse(), 0.25f).normalize().scale(BANG_THROW_IMPULSE)));
-      ba.setHeight(radius*2f);
-      bb.setHeight(radius*2f);
-      bc.setHeight(radius*2f);
-      ba.setVSpeed(BANG_THROW_V_IMPULSE);
-      bb.setVSpeed(BANG_THROW_V_IMPULSE);
-      bc.setVSpeed(BANG_THROW_V_IMPULSE);
-      game.addObject(ba);
-      game.addObject(bb);
-      game.addObject(bc);
+      final int count = Math.max(1, Math.min(3, bangPower / BANG_POWER_USE));
+      bangPower -= Math.max(count*BANG_POWER_USE, BANG_POWER_USE);
+      if(bangPower < 0) { bangPower = 0; }
+     
+      if(count > 2) {
+        final Bomb ba, bb, bc;
+        ba = new Bomb(game, game.createOid(), position, team, 15, this);
+        bb = new Bomb(game, game.createOid(), position, team, 11, this);
+        bc = new Bomb(game, game.createOid(), position, team, 19, this);
+        ba.setVelocity(velocity.add(look.scale(BANG_THROW_IMPULSE)));
+        bb.setVelocity(velocity.add(look.lerp(look.tangent(), 0.375f).normalize().scale(BANG_THROW_IMPULSE)));
+        bc.setVelocity(velocity.add(look.lerp(look.tangent().inverse(), 0.375f).normalize().scale(BANG_THROW_IMPULSE)));
+        ba.setHeight(radius*2f);
+        bb.setHeight(radius*2f);
+        bc.setHeight(radius*2f);
+        ba.setVSpeed(BANG_THROW_V_IMPULSE);
+        bb.setVSpeed(BANG_THROW_V_IMPULSE);
+        bc.setVSpeed(BANG_THROW_V_IMPULSE);
+        game.addObject(ba);
+        game.addObject(bb);
+        game.addObject(bc);
+      }
+      if(count == 2) {
+        final Bomb ba, bb;
+        ba = new Bomb(game, game.createOid(), position, team, 15, this);
+        bb = new Bomb(game, game.createOid(), position, team, 11, this);
+        ba.setVelocity(velocity.add(look.lerp(look.tangent(), 0.65f).normalize().scale(BANG_THROW_IMPULSE)));
+        bb.setVelocity(velocity.add(look.lerp(look.tangent().inverse(), 0.65f).normalize().scale(BANG_THROW_IMPULSE)));
+        ba.setHeight(radius*2f);
+        bb.setHeight(radius*2f);
+        ba.setVSpeed(BANG_THROW_V_IMPULSE);
+        bb.setVSpeed(BANG_THROW_V_IMPULSE);
+        game.addObject(ba);
+        game.addObject(bb);
+      }
+      else {
+        final Bomb ba;
+        ba = new Bomb(game, game.createOid(), position, team, 15, this);
+        ba.setVelocity(velocity.add(look.scale(BANG_THROW_IMPULSE)));
+        ba.setHeight(radius*2f);
+        ba.setVSpeed(BANG_THROW_V_IMPULSE);
+        game.addObject(ba);
+      }
+      
    }
   }
   

@@ -5,7 +5,7 @@ package org.infpls.noxio.game.module.game.game;
 public class Score {
   private int kills, deaths, objectives, spree;
   private int multi, timer;
-  private static final int MULTI_TIMER_LENGTH = 90;
+  private static final int MULTI_TIMER_LENGTH = 135;
   public Score() {
     kills = 0;
     deaths = 0;
