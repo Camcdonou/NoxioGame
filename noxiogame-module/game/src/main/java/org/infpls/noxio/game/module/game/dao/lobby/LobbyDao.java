@@ -9,9 +9,9 @@ public class LobbyDao {
   public LobbyDao() {
     lobbies = new ArrayList();
     try {
-      final GameSettings a, b, c, e, f, g, a2, c2, g2;
-      a = new GameSettings(); a2 = new GameSettings(); b = new GameSettings(); c = new GameSettings(); c2 = new GameSettings();
-      e = new GameSettings(); f = new GameSettings(); g = new GameSettings(); g2 = new GameSettings();
+      final GameSettings a, b, c, e, f, g, a2, a3, c2, f2, g2;
+      a = new GameSettings(); a2 = new GameSettings(); a3 = new GameSettings(); b = new GameSettings(); c = new GameSettings(); c2 = new GameSettings();
+      e = new GameSettings(); f = new GameSettings(); f2 = new GameSettings(); g = new GameSettings(); g2 = new GameSettings();
       
       a.set("game_name", "DM Test #1");
       a.set("map_name", "final");
@@ -28,6 +28,14 @@ public class LobbyDao {
       a2.set("max_players", "8");
       a2.set("score_to_win", "15");
       a2.set("respawn_time", "30");
+      
+      a3.set("game_name", "DM Test #3");
+      a3.set("map_name", "combat");
+      a3.set("gametype", "Deathmatch");
+      a3.set("teams", "0");
+      a3.set("max_players", "5");
+      a3.set("score_to_win", "15");
+      a3.set("respawn_time", "30");
       
       b.set("game_name", "TDM Test #1");
       b.set("map_name", "war");
@@ -63,6 +71,15 @@ public class LobbyDao {
       f.set("score_to_move", "5");
       f.set("respawn_time", "90");
       
+      f2.set("game_name", "K Test #2");
+      f2.set("map_name", "combat");
+      f2.set("gametype", "King");
+      f2.set("teams", "0");
+      f2.set("max_players", "5");
+      f2.set("score_to_win", "25");
+      f2.set("static_hill", "1");
+      f2.set("respawn_time", "90");
+      
       g.set("game_name", "UL Test #1");
       g.set("map_name", "final");
       g.set("gametype", "Ultimate");
@@ -88,8 +105,8 @@ public class LobbyDao {
       e.set("respawn_time", "90");
       
       
-      lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(a2)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c)); lobbies.add(new OfficialLobby(c2));
-      lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(e)); lobbies.add(new OfficialLobby(g));
+      lobbies.add(new OfficialLobby(a)); lobbies.add(new OfficialLobby(a2)); lobbies.add(new OfficialLobby(a3)); lobbies.add(new OfficialLobby(b)); lobbies.add(new OfficialLobby(c)); lobbies.add(new OfficialLobby(c2));
+      lobbies.add(new OfficialLobby(f)); lobbies.add(new OfficialLobby(f2)); lobbies.add(new OfficialLobby(e)); lobbies.add(new OfficialLobby(g));
       
       for(int i=0;i<lobbies.size();i++) { lobbies.get(i).start(); }
     }
