@@ -1,6 +1,7 @@
 package org.infpls.noxio.game.module.game.dao.lobby;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 import org.infpls.noxio.game.module.game.session.*;
@@ -86,9 +87,12 @@ public abstract class GameLobby {
         packets.pop();
         GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
-          players.get(i).sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, settings.get("score_to_win", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
-          loading.add(players.get(i)); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
-          /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
+          final NoxioSession player = players.get(i);
+          try {
+            player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, settings.get("score_to_win", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
+            loading.add(player); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
+            /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
+          } catch(IOException | IllegalStateException ex) { remove(player); }
         }
         return; /* Screw you guys I'm going home. */
       }
@@ -101,14 +105,14 @@ public abstract class GameLobby {
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
         if(!loading.contains(player) && !outAll.isEmpty()) {
-          player.sendPacket(new PacketS01(outAll));
+          try { player.sendPacket(new PacketS01(outAll)); } catch(IOException | IllegalStateException ex) { System.err.println("## CRITICAL ## Ejecting player: " + player.getUser() + " :: Exception thrown on packet send..."); ex.printStackTrace(); remove(player); }
         }
       }
       outAll.clear();
       for(int i=0;i<players.size();i++) {
         final NoxioSession player = players.get(i);
         if(!loading.contains(player) && !outDirect.get(player).isEmpty()) {
-          player.sendPacket(new PacketS01(outDirect.get(player)));
+          try { player.sendPacket(new PacketS01(outDirect.get(player))); } catch(IOException | IllegalStateException ex) { System.err.println("## CRITICAL ## Ejecting player: " + player.getUser() + " :: Exception thrown on packet send..."); ex.printStackTrace(); remove(player); }
         }
         outDirect.get(player).clear();
       }
@@ -117,9 +121,17 @@ public abstract class GameLobby {
       System.err.println("## CRITICAL ## Game step exception!");
       System.err.println("## STATE    ## lobbyName=" + name + "gameOver=" + game.isGameOver());
       ex.printStackTrace();
-      for(int i=0;i<players.size();i++) {
-        try { players.get(i).close(ex); }
-        catch(Exception ioex) { System.err.println("Bad stuff be happening here!"); ioex.printStackTrace(); }
+      System.err.println("## CRITICAL ## Attempting to close lobby!");
+      try { close(); System.err.println("## INFO     ## Closed Lobby Successfully!"); }
+      catch(IOException ioex) {
+        System.err.println("## CRITICAL ## Failed to close lobby correctly!");
+        System.err.println("## CRITICAL ## Ejecting players manually!");
+        closed = true;
+        ioex.printStackTrace();
+        for(int i=0;i<players.size();i++) {
+          try { players.get(i).close(ex); }
+          catch(Exception pioex) { System.err.println("## CRITICAL ## Very bad! Better start praying!"); pioex.printStackTrace(); }
+        }
       }
     }
   }

@@ -9,6 +9,7 @@ public abstract class Player extends Mobile {
   private static final int TAG_CREDIT_GRACE_PERIOD = 300;
   protected static final float VERTICAL_HIT_TEST_LENIENCY = 1.25f;
   protected static final float AIR_CONTROL = 0.2f, MULTI_JUMP_DAMPEN = 0.2f;
+  protected static final float TOSS_IMPULSE = 0.3f, TOSS_POPUP = 0.15f;
   
   protected boolean jumped;                  // Flags a jump so players can only jump once, either off the ground or mid air
   protected float moveSpeed, jumpHeight;
@@ -79,6 +80,7 @@ public abstract class Player extends Mobile {
         case "atk" : { actionA(); break; }
         case "mov" : { actionB(); break; }
         case "tnt" : { taunt(); break; }
+        case "tos" : { toss(); break; }
         case "jmp" : { jump(); break; }
         default : { Oak.log("Invalid action input::"  + action.get(i) + " @Player.actions:::" + type(), 1); break; }
       }
@@ -114,18 +116,26 @@ public abstract class Player extends Mobile {
           if(flag.pickup(this)) { holding = flag; }
         }
         if(flag.getPosition().distance(position) < flag.getRadius()+getRadius() && !flag.onBase()) {
-          if(flag.team == team) { flag.kill(); }
+          if(flag.team == team && !flag.isHeld()) { flag.kill(); }
         }
       }
     }
   }
   
-  /* Do not call this?!?!?!? */
+  public void toss() {
+    if(holding==null) { return; }
+    final Flag f = holding;
+    drop();
+    f.setVelocity(velocity.scale(0.5f).add(look.scale(TOSS_IMPULSE)));
+    f.popup(TOSS_POPUP);
+  }
+  
   public void drop() {
     if(holding==null) { return; }
     final Flag f = holding;
     holding = null;
     f.drop();
+    f.setVelocity(velocity.scale(0.5f));
   }
 
   @Override

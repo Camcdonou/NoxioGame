@@ -8,7 +8,7 @@ import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
 public abstract class Mobile extends GameObject {
   protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
-  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.175f;
+  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f;
   
   protected Controller tagged;
   protected int tagTime;
@@ -55,16 +55,17 @@ public abstract class Mobile extends GameObject {
     }
     /* -- Movement  -- */
     final Vec2 to = position.add(velocity);
-    final List<Polygon> walls = game.map.getNearWalls(to, radius);
-    final List<Polygon> floors = game.map.getNearFloors(to, radius);
+    final List<Polygon> walls = game.map.getNearWalls(position, radius + velocity.magnitude());
     boolean fatalImpact = false;
+    
     if(velocity.magnitude() > 0.00001f) {
       
-      final Vec2[] mov = new Vec2[] {to, velocity};
-      float aoi = Float.NaN;
+      final Vec2[] mov = new Vec2[] {position, velocity};
+      float aoi = rayWalls(mov, walls);
+        fatalImpact = Math.min(Math.pow(aoi, 0.65f), 0.75)*velocity.magnitude()>FATAL_IMPACT_SPEED;
       for(int i=0;i<5&&aoi!=0f&&!fatalImpact;i++) {                             // Bound max collision tests to 5 incase of an object being stuck in an area to small for it to fit!
         aoi = Math.max(collideWalls(mov, walls), 0f);
-        fatalImpact = Math.min(Math.pow(aoi,2), 0.9)*velocity.magnitude()>FATAL_IMPACT_SPEED;
+        fatalImpact = Math.min(Math.pow(aoi, 0.65f), 0.75)*velocity.magnitude()>FATAL_IMPACT_SPEED;
         for(int j=0;j<walls.size()&!fatalImpact;j++) {
           final Polygon w = walls.get(j);
           if(Intersection.pointInPolygon(mov[0], w)) {
@@ -73,28 +74,12 @@ public abstract class Mobile extends GameObject {
         }
       }
       
-      if(!fatalImpact) {
-        setPosition(mov[0]);
-        setVelocity(mov[1]);
-      }
-      else {
-        final List<Instance> hits = new ArrayList();
-        for(int i=0;i<walls.size();i++) {
-          Instance test = Intersection.polygonLine(new Line2(position, to), walls.get(i));
-          if(test != null) { hits.add(test); }
-        }
-        if(hits.size() < 1) { setPosition(to); setVelocity(new Vec2()); }
-        else {
-          Instance nearest = hits.get(0);
-          for(int i=1;i<hits.size();i++) {
-            if(hits.get(i).distance < nearest.distance) { nearest = hits.get(i); }
-          }
-          setPosition(nearest.intersection.add(nearest.normal.scale(radius*0.5f))); setVelocity(new Vec2());
-        }
-      }
+      setPosition(mov[0]);
+      setVelocity(mov[1]);
     }
     
     /* Height */
+    final List<Polygon> floors = game.map.getNearFloors(position, radius);
     boolean floorBounded = collideFloors(position, floors);
     
     if(floorBounded) {
@@ -135,6 +120,38 @@ public abstract class Mobile extends GameObject {
     else { setVelocity(velocity.scale(AIR_DRAG)); }         // No friction while moving airborne, but air drag is accounted.
   }
   
+  private float rayWalls(final Vec2[] mov, final List<Polygon> walls) {
+    final List<Instance> hits = new ArrayList();
+    final Vec2 to = mov[0].add(mov[1]);
+    for(int i=0;i<walls.size();i++) {
+      final Polygon w = walls.get(i);
+      Instance inst = Intersection.polygonLine(new Line2(mov[0], to), w);
+      if(inst != null) { hits.add(inst); }
+    }
+    if(hits.size() > 0) {
+      Instance nearest = hits.get(0);
+      for(int i=1;i<hits.size();i++) {
+        if(hits.get(i).distance < nearest.distance) {
+          nearest = hits.get(i);
+        }
+      }
+      /* Move to point of impact */
+      final Vec2 corrected = nearest.intersection.add(nearest.normal.scale(radius));
+      /* Reflect Off Wall */
+      final Vec2 ihd = to.subtract(mov[0]).normalize().inverse();      // Inverse Hit Directino
+      final float dp = nearest.normal.dot(ihd);
+      final Vec2 ref = nearest.normal.scale(2*dp).subtract(ihd).normalize(); // Reflection normal
+      /* Slide off nearest collision */
+      float aoi = (float)Math.pow(1f-Math.max(0f, mov[1].normalize().inverse().dot(nearest.normal)), 0.5f); // 0.0 is straight into the wall 1.0 is parallel to it
+      mov[1]=ref.scale(mov[1].magnitude()*((aoi*0.5f)+0.5f));
+      mov[0]=corrected;
+      return 1f-aoi;
+    }
+    
+    mov[0]=to;
+    return Float.NaN;
+  }
+  
   /* Takes current position & velociyt as well as a list of wall polygons and returns the result of movement. */
   /* 0.0   - no hits, mov unchanged
      !0.0  - hit,     updated mov, returned value is impact angle
@@ -156,7 +173,7 @@ public abstract class Mobile extends GameObject {
       /* Move to point of impact */
       final Vec2 corrected = nearest.intersection.add(nearest.normal.scale(radius));
       /* Slide off nearest collision */
-      float aoi = 1f-Math.abs(mov[1].dot(nearest.normal)); // 0.0 is straight into the wall 1.0 is parallel to it
+      float aoi = (float)Math.pow(1f-Math.max(0f, mov[1].normalize().inverse().dot(nearest.normal)), 0.5f); // 0.0 is straight into the wall 1.0 is parallel to it
       mov[1]=mov[1].scale((aoi*0.5f)+0.5f);
       mov[0]=corrected;
       return 1f-aoi;
