@@ -197,7 +197,7 @@ public abstract class Player extends Mobile {
       if(obj != this && obj.is(Types.MOBILE)) {
         final Mobile mob = (Mobile)obj;
         final float cr = mob.getRadius() + r;
-        if(p.distance(mob.getPosition()) <= cr && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
+        if(!mob.immune && p.distance(mob.getPosition()) <= cr && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
           hits.add(mob);
         }
       }
@@ -213,7 +213,7 @@ public abstract class Player extends Mobile {
       if(obj != this && obj.is(Types.MOBILE)) {
         final Mobile mob = (Mobile)obj;
         final float cr = mob.getRadius() + getRadius();
-        if(!immune && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
+        if(!mob.immune && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
           final boolean full = Intersection.pointInPolygon(mob.getPosition(), p);
           final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), p, mob.getRadius());
           if(full || inst != null) {

@@ -30,7 +30,7 @@ public class Flag extends Mobile {
     /* State */
     this.team = team;
     intangible = true;
-    immune = true;
+    immune = false;
     
     /* Timers */
     dropCooldown = 0; lastHeld = -1;
@@ -38,8 +38,8 @@ public class Flag extends Mobile {
   
   @Override
   public void step() {
-    if(held==null) { physics(); }                                                                     // Object physics and collision
-    else { setPosition(held.getPosition()); setVelocity(new Vec2()); setHeight(held.getHeight()); }   // Or not!
+    if(held==null) { immune = false; physics(); }                                                                     // Object physics and collision
+    else { immune = true; setPosition(held.getPosition()); setVelocity(new Vec2()); setHeight(held.getHeight()); }   // Or not!
     
     if(isHeld()) {
       for(int i=0;i<game.objects.size();i++) {
