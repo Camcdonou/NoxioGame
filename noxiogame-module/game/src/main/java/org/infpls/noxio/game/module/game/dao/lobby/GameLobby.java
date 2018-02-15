@@ -34,7 +34,7 @@ public abstract class GameLobby {
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
   protected NoxioGame game; /* The actual game object */
   
-  private final PacketSync packets; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
+  private final InputSync inputs; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
   private final EventSync events; /* Second verse same as the first. */
   
   private final GameSettings settings;
@@ -53,11 +53,8 @@ public abstract class GameLobby {
     loading = new ArrayList();
     closed = false;
     
-    packets = new PacketSync();
+    inputs = new InputSync();
     events = new EventSync();
-    
-    outAll = new ArrayList();
-    outDirect = new HashMap();
     
     newGame();
     loop = new GameLoop(this);
@@ -84,45 +81,29 @@ public abstract class GameLobby {
       handleEvents();
       if(game.isResetReady()) {
         newGame();
-        packets.pop();
+        inputs.pop();
         GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
           final NoxioSession player = players.get(i);
-          try {
-            player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, settings.get("score_to_win", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
-            loading.add(player); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
-            /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
-          } catch(IOException | IllegalStateException ex) { remove(player); }
+          player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, settings.get("score_to_win", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
+          loading.add(player); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
+          /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
         }
         return; /* Screw you guys I'm going home. */
       }
       
-      game.handlePackets(packets.pop()); // Player Input
+      game.handlePackets(inputs.pop());  // Player Input
       game.step();                       // Game tick
       game.generateUpdatePackets(tick);  // Send updates to players
       game.post();                       // Clean up
       
-      for(int i=0;i<players.size();i++) {
-        final NoxioSession player = players.get(i);
-        if(!loading.contains(player) && !outAll.isEmpty()) {
-          try { player.sendPacket(new PacketS01(outAll)); } catch(IOException | IllegalStateException ex) { System.err.println("## CRITICAL ## Ejecting player: " + player.getUser() + " :: Exception thrown on packet send..."); ex.printStackTrace(); remove(player); }
-        }
-      }
-      outAll.clear();
-      for(int i=0;i<players.size();i++) {
-        final NoxioSession player = players.get(i);
-        if(!loading.contains(player) && !outDirect.get(player).isEmpty()) {
-          try { player.sendPacket(new PacketS01(outDirect.get(player))); } catch(IOException | IllegalStateException ex) { System.err.println("## CRITICAL ## Ejecting player: " + player.getUser() + " :: Exception thrown on packet send..."); ex.printStackTrace(); remove(player); }
-        }
-        outDirect.get(player).clear();
-      }
     }
     catch(Exception ex) {
       System.err.println("## CRITICAL ## Game step exception!");
       System.err.println("## STATE    ## lobbyName=" + name + "gameOver=" + game.isGameOver());
       ex.printStackTrace();
       System.err.println("## CRITICAL ## Attempting to close lobby!");
-      try { close(); System.err.println("## INFO     ## Closed Lobby Successfully!"); }
+      try { close("The Game Lobby encoutered an error and had to close. Sorry!"); System.err.println("## INFO     ## Closed Lobby Successfully!"); }
       catch(IOException ioex) {
         System.err.println("## CRITICAL ## Failed to close lobby correctly!");
         System.err.println("## CRITICAL ## Ejecting players manually!");
@@ -180,7 +161,6 @@ public abstract class GameLobby {
     if(players.contains(player)) { player.close("Lobby Doppleganger Error."); return false; }
     players.add(player);
     loading.add(player);
-    outDirect.put(player, new ArrayList());
     game.sendMessage(player.getUser() + " connected.");
     return true;
   }
@@ -195,8 +175,26 @@ public abstract class GameLobby {
     return true;
   }
   
-  protected abstract void leave(NoxioSession player) throws IOException;
-  public abstract void remove(NoxioSession player) throws IOException;
+  protected void leave(NoxioSession player) throws IOException {
+    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
+    while(loading.remove(player));
+    game.leave(player);
+    if(players.size() >= 1) { game.sendMessage(player.getUser() + " left the game."); }
+  }
+  
+  public void remove(NoxioSession player) throws IOException {
+    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
+    while(loading.remove(player));
+    game.leave(player);
+    if(players.size() >= 1) { game.sendMessage(player.getUser() + " disconnected."); }
+  }
+  
+  public void remove(NoxioSession player, final String message) throws IOException { player.sendPacket(new PacketG06(message)); remove(player); }
+  
+  protected void close(final String message) throws IOException {
+    sendPacket(new PacketG06(message));
+    close();
+  }
   
   protected void close() throws IOException {
     closed = true;
@@ -206,38 +204,31 @@ public abstract class GameLobby {
     game.close();
   }
   
-  protected List<Packet> outAll;
-  protected Map<NoxioSession, List<Packet>> outDirect;
   /* Send a packet to everyone in the lobby */
   public void sendPacket(final Packet p) {
-    outAll.add(p);
+    for(int i=0;i<players.size();i++) {
+      players.get(i).sendPacket(p);
+    }
   }
   
   /* Send a packet to a specific player with the given SID */
   public void sendPacket(final Packet p, final String sid) {
-    try {
     for(int i=0;i<players.size();i++) {
       final NoxioSession player = players.get(i);
-      if(!loading.contains(player) && player.getSessionId().equals(sid)) {
-        outDirect.get(player).add(p);
+      if(player.getSessionId().equals(sid)) {
+        player.sendPacket(p);
         return;
       }
     }
-    } catch(NullPointerException ex) {
-      System.err.println("Invalid user mapping: " + p.getType());
-    }
+    System.err.println("GameLobby::sendPacket() - Invalid User SID '" + sid + "'");
   }
   
   /* Send a packet to a specific player */
   public void sendPacket(final Packet p, final NoxioSession player) {
-    try {
-      outDirect.get(player).add(p);
-    } catch(NullPointerException ex) {
-      System.err.println("Invalid user mapping: " + p.getType());
-    }
+    player.sendPacket(p);
   }
   
-  public void pushPacket(final Packet p) { packets.push(p); }
+  public void pushInput(final String sid, final String data) { inputs.push(new InputData(sid, data)); }
   public void pushEvent(final SessionEvent evt) { events.push(evt); }
   
   public abstract NoxioSession getHost();
@@ -283,26 +274,26 @@ public abstract class GameLobby {
     }
   }
   
-  private class PacketSync {
-    private List<Packet> packets;
-    public PacketSync() { packets = new ArrayList(); }
+  private class InputSync {
+    private List<InputData> inputs;
+    public InputSync() { inputs = new ArrayList(); }
 
-    public void push(final Packet p) { syncPacketAccess(false, p); }
-    public List<Packet> pop() { return syncPacketAccess(true, null); }
+    public void push(final InputData in) { syncInputAccess(false, in); }
+    public List<InputData> pop() { return syncInputAccess(true, null); }
 
     /* Game Packet handling methods 
        - syncAccess.s == true / pop
        - syncAccess.s == false / push
     */
-    private synchronized List<Packet> syncPacketAccess(final boolean s, final Packet p) {
+    private synchronized List<InputData> syncInputAccess(final boolean s, final InputData in) {
       if(s) {
-        List<Packet> pkts = packets;
-        packets = new ArrayList();
-        return pkts;
+        List<InputData> inps = inputs;
+        inputs = new ArrayList();
+        return inps;
       }
       else {
-        if(p == null) { return null; }
-        packets.add(p);
+        if(in == null) { return null; }
+        inputs.add(in);
         return null;
       }
     }
@@ -330,6 +321,14 @@ public abstract class GameLobby {
         sessionEvents.add(evt);
         return null;
       }
+    }
+  }
+  
+  public class InputData {
+    public final String sid, data;
+    public InputData(final String sid, final String data) {
+      this.sid = sid;
+      this.data = data;
     }
   }
 }

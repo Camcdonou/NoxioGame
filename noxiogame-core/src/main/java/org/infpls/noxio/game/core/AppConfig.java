@@ -19,5 +19,10 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 	public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
 		return new PropertySourcesPlaceholderConfigurer();
 	}
+    
+    @Bean(name="servletServerContainerFactoryBean")
+    public int maxSessionIdleTimeout() {
+      return 3000;
+    }
 }
 

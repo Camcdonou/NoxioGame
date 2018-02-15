@@ -46,12 +46,12 @@ public abstract class NoxioGame {
     gameOver = false;
   }
     
-  public void handlePackets(final List<Packet> packets) {
-    for(int i=0;i<packets.size();i++) {
-      Controller c = getController(packets.get(i).getSrcSid());
-      if(packets.get(i).getType().equals("i00") && c != null) {
-        final PacketI00 p = (PacketI00)(packets.get(i));
-        final String[] spl = p.getData().split(";");
+  public void handlePackets(final List<GameLobby.InputData> inputs) {
+    for(int i=0;i<inputs.size();i++) {
+      final GameLobby.InputData in = inputs.get(i);
+      Controller c = getController(in.sid);
+      if(c != null) {
+        final String[] spl = in.data.split(";");
         final Queue<String> queue = new LinkedList(Arrays.asList(spl));
         for(int j=0;j<queue.size();j++) {
           final String id = queue.remove();
@@ -63,7 +63,7 @@ public abstract class NoxioGame {
         }
       }
       else {
-        Oak.log("Invalid User Input '" + packets.get(i).getType() + "' " + (c!=null?c.getUser():"<NULL_CONTROLLER>") + "@NoxioGame.handlePackets", 1);
+        Oak.log("Invalid User Input :: " + (c!=null?c.getUser():"<NULL_CONTROLLER>") + "@NoxioGame.handlePackets", 1);
       }
     }
   }

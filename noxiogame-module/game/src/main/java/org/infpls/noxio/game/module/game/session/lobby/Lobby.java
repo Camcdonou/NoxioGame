@@ -41,7 +41,7 @@ public class Lobby extends SessionState {
         case "b02" : { close(); break; }
         case "b03" : { createLobby(gson.fromJson(data, PacketB03.class)); break; }
         case "b04" : { joinLobby(gson.fromJson(data, PacketB04.class)); break; }
-        default : { close("Invalid data: " + p.getType()); break; }
+        default : { /*close("Invalid data: " + p.getType()); */ break; }   /* @TODO: commented out to prevent game kick -> i00 packet error */
       }
     } catch(IOException | NullPointerException | JsonParseException ex) {
       close(ex);

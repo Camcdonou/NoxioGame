@@ -24,7 +24,7 @@ public class InGame extends SessionState {
     < g01 game info && map file
     > g02 close
     > g03 leave game
-    < g06 transversal error
+    < g06 transversal error/info (generic message)
     > g07 load done
     < g08 left game lobby
     > g09 client game closed (ready to change state)
@@ -61,7 +61,7 @@ public class InGame extends SessionState {
         /* Ingame Type Packets gxx */
         
         /* Input Type Packets ixx */
-        case "i00" : { lobby.pushPacket(gson.fromJson(data, PacketI00.class).setSrcSid(session.getSessionId())); break; }
+        case "i00" : { lobby.pushInput(session.getSessionId(), gson.fromJson(data, PacketI00.class).getData()); break; }
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(Exception ex) { /* IOException | NullPointerException | JsonParseException */

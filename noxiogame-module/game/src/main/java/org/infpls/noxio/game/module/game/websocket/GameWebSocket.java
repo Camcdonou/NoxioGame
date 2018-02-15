@@ -20,6 +20,7 @@ public class GameWebSocket extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession webSocket) {
       try {
         NoxioSession session = dao.getUserDao().createSession(webSocket, dao);
+        session.start();
         webSocket.getAttributes().put("session", session);
       }
       catch(Exception e) {

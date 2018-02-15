@@ -9,24 +9,6 @@ public class OfficialLobby extends GameLobby {
   }
   
   @Override
-  protected void leave(NoxioSession player) throws IOException {
-    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
-    while(loading.remove(player));
-    game.leave(player);
-    outDirect.remove(player);
-    if(players.size() >= 1) { game.sendMessage(player.getUser() + " left the game."); }
-  }
-  
-  @Override
-  public void remove(NoxioSession player) throws IOException { /* Similar to leave but called from the destroy() of a session. */
-    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
-    while(loading.remove(player));
-    game.leave(player);
-    outDirect.remove(player);
-    if(players.size() >= 1) { game.sendMessage(player.getUser() + " disconnected."); }
-  }
-  
-  @Override
   public NoxioSession getHost() { return null; }
   
   @Override

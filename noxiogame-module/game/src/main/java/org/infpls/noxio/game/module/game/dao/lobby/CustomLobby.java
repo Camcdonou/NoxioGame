@@ -1,6 +1,5 @@
 package org.infpls.noxio.game.module.game.dao.lobby;
 
-import java.util.*;
 import java.io.IOException;
 
 import org.infpls.noxio.game.module.game.session.NoxioSession;
@@ -14,36 +13,22 @@ public class CustomLobby extends GameLobby {
   
   @Override
   protected boolean connect(NoxioSession player) throws IOException {
-    if(closed) { return false; }
-    if(players.size() >= maxPlayers) { return false; }
-    if(players.contains(player)) { player.close("Lobby Doppleganger Error."); return false; }
-    players.add(player);
-    loading.add(player);
-    outDirect.put(player, new ArrayList());
-    if(hostPlayer == null) { hostPlayer = player; } /* The very first person to connect to a custom match is always the host. */
-    game.sendMessage(player.getUser() + " connected.");
-    return true;
+    boolean res = super.connect(player);
+    if(res) { if(hostPlayer == null) { hostPlayer = player; } } /* The very first person to connect to a custom match is always the host. */
+    return res;
   }
   
   @Override
   protected void leave(NoxioSession player) throws IOException {
-    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
-    while(loading.remove(player));
-    game.leave(player);
-    outDirect.remove(player);
+    super.leave(player);
     if(players.size() < 1) { close(); return; }
-    if(players.size() >= 1) { game.sendMessage(player.getUser() + " left the game."); }
     if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getUser() + " is now the lobby host."); }
   }
   
   @Override
-  public void remove(NoxioSession player) throws IOException { /* Similar to leave but called from the destroy() of a session. */
-    if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
-    while(loading.remove(player));
-    game.leave(player);
-    outDirect.remove(player);
+  public void remove(NoxioSession player) throws IOException {
+    super.remove(player);
     if(players.size() < 1) { close(); return; }
-    if(players.size() >= 1) { game.sendMessage(player.getUser() + " disconnected."); }
     if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getUser() + " is now the lobby host."); }
   }
     

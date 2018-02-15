@@ -16,33 +16,35 @@ public final class NoxioSession {
   private final DaoContainer dao;
   
   private String user, sid;
+  private final SessionThread sessionThread;
   private SessionState sessionState;
  
   public NoxioSession(final WebSocketSession webSocket, final DaoContainer dao) throws IOException {
     this.webSocket = webSocket;
     this.dao = dao;
-        
+
+    sessionThread = new SessionThread(this);
+    
     changeState("l");
+  }
+  
+  public void start() {
+    sessionThread.start();
   }
   
   public void handlePacket(final String data) throws IOException {
     sessionState.handlePacket(data);
   }
   
-  public void sendPacket(final Packet p) throws IOException {
-    /* Due to the multi threaded nature of this application, it's possible a packet can attempt to be sent right as teh connection closes.
-       This isOpen() is just a small prevention measure to stop lots of pointless exceptions. */
-    try {
-      if(isOpen()) {
-        final Gson gson = new GsonBuilder().create();
-        webSocket.sendMessage(new TextMessage(gson.toJson(p)));
-      }
-    }
-    catch(IllegalStateException | IOException iex) {
-      System.err.println("User closed connection during packet sending: " + p.getType());
-      System.err.println("Propogating exception up!");
-      iex.printStackTrace();
-      throw iex;
+  public void sendPacket(final Packet p) {
+    sessionThread.push(p);
+  }
+  
+  /* Sends data over websocket on immiediate thread. Should only be called by this.sessionThread.run() */
+  public void sendImmiediate(final Packet p) throws IOException, IllegalStateException {
+    if(isOpen()) {
+      final Gson gson = new GsonBuilder().create();
+      webSocket.sendMessage(new TextMessage(gson.toJson(p)));
     }
   }
   
@@ -94,26 +96,30 @@ public final class NoxioSession {
   }
   
   public void destroy() throws IOException {
+    sessionThread.close();
     sessionState.destroy();
   }
   
   /* Normal connection close */
   public void close() throws IOException {
+    sessionThread.close();
     webSocket.close();
   }
   
   /* Error connection close */
   public void close(final String message) throws IOException {
-    sendPacket(new PacketX00(message));
+    sessionThread.close();
+    if(sessionThread.blockingWaitForClose()) { sendImmiediate(new PacketX00(message)); }
     webSocket.close(CloseStatus.NOT_ACCEPTABLE);
   }
   
   /* Exception connection close */
   public void close(final Exception ex) throws IOException {
+    sessionThread.close();
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
     ex.printStackTrace(pw);
-    sendPacket(new PacketX01(ex.getMessage(), sw.toString()));
+    if(sessionThread.blockingWaitForClose()) { sendImmiediate(new PacketX01(ex.getMessage(), sw.toString())); }
     webSocket.close(CloseStatus.NOT_ACCEPTABLE);
   }
 }
