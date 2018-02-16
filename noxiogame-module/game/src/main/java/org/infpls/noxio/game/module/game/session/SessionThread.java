@@ -41,21 +41,16 @@ public class SessionThread extends Thread {
       }
       catch(IOException | IllegalStateException ex) {
         System.err.println("SessionThread::run() Exception during SessionThread send for user: " + session.getUser());
-        System.err.println("SessionThread::run() Force closing connection...");
+        System.err.println("SessionThread::run() Closing connection...");
         ex.printStackTrace();
         forceClose();
       }
     }
     if(forceClose) {
       System.err.println("SessionThread::run() Unsafe SessionThread close for user: " + session.getUser());
-      System.err.println("SessionThread::run() Force closing connection...");
-      if(session.isOpen()) {
-        try  { session.close("Connection force closed by server."); }
-        catch(IOException ex) { 
-          System.err.println("SessionThread::run() IOException during SessionThread forceClose for user: " + session.getUser());
-          ex.printStackTrace();
-        }
-      }
+      try { if(session.isOpen()) { session.close(); } }
+      catch(IOException ex) { System.err.println("SessionThread::forceClose() ## CRITICAL ## Failed to force close SessionThread."); ex.printStackTrace(); }
+      System.err.println("SessionThread::run() resolved for user: " + session.getUser());
     }
     closed = true;
   }
@@ -71,7 +66,7 @@ public class SessionThread extends Thread {
     }
   }
   
-  public void push(final Packet p) { syncPacketAccess(false, p); checkTimeout(); doNotify(); }
+  public void push(final Packet p) { if(forceClose || safeClose || closed) { return; } syncPacketAccess(false, p); checkTimeout(); doNotify(); }
   private List<Packet> pop() { return syncPacketAccess(true, null); }
   private synchronized List<Packet> syncPacketAccess(final boolean s, final Packet p) {
     if(s) {
@@ -99,9 +94,11 @@ public class SessionThread extends Thread {
     return closed;
   }
   
-  public void forceClose() {
-    System.err.println("SessionThread::forceClose() call for user: " + session.getUser());
+  private void forceClose() {
+    if(forceClose) { return; }
     forceClose = true;
+    System.err.println("SessionThread::forceClose() call for user: " + session.getUser());
+    try { System.err.println("SessionThread::forceClose() kicking user from game: " + session.getUser()); session.leaveGame(); } catch(IOException ex) { ex.printStackTrace(); }
     doNotify();
   }
 }

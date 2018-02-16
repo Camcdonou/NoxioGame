@@ -60,7 +60,7 @@ public final class NoxioSession {
   }
   
   public void leaveGame() throws IOException {
-    changeState("b");
+    if(sessionState instanceof InGame) { changeState("b"); }
   }
   
   public void joinGame(final GameLobby gl) throws IOException {
