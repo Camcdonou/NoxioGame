@@ -45,4 +45,13 @@ public class UserDao {
     }
     return null;
   }
+
+  public List<String> getOnlineUserList() {
+    final List<String> users = new ArrayList();
+    for(int i=0;i<sessions.size();i++) {
+      final NoxioSession session = sessions.get(i);
+      users.add(session.loggedIn() ? session.getUser() : "Session##"+session.getSessionId());
+    }
+    return users;
+  }
 }

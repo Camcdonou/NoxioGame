@@ -169,4 +169,21 @@ public class LobbyDao {
       }
     }
   }
+
+  public List<String> getOnlineLobbyList() {
+    final List<String> loblist = new ArrayList();
+    for(int i=0;i<lobbies.size();i++) {
+      final GameLobby lob = lobbies.get(i);
+      final StringBuilder sb = new StringBuilder();
+      sb.append(lob.name); sb.append(" :: ");
+      sb.append(lob.lid); sb.append(" :: ");
+      sb.append(lob.players.size());  sb.append("/"); sb.append(lob.maxPlayers);
+      sb.append("</br>");
+      for(int j=0;j<lob.players.size();j++) {
+        sb.append(lob.players.get(j).getUser()); sb.append(" ");
+      }
+      loblist.add(sb.toString());
+    }
+    return loblist;
+  }
 }
