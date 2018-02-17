@@ -1,7 +1,6 @@
 package org.infpls.noxio.game.module.game.dao.lobby;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.*;
 
 import org.infpls.noxio.game.module.game.session.*;
@@ -37,26 +36,28 @@ public abstract class GameLobby {
   private final InputSync inputs; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
   private final EventSync events; /* Second verse same as the first. */
   
-  private final GameSettings settings;
-  private final NoxioMap map;
+  private final LobbySettings settings;
   
-  protected boolean closed; //Clean this shit up!
-  public GameLobby(final GameSettings settings) throws IOException {
+  private int gameCount;    // Number of times the game has ended and restarted
+  protected boolean closed; // Clean this shit up!
+  public GameLobby(final LobbySettings settings) throws IOException {
     lid = Salt.generate();
     this.settings = settings;
     
     name = settings.get("game_name", "Default Name");
-    map = new NoxioMap(settings.get("map_name", "final"));
     maxPlayers = settings.get("max_players", 6);
     
     players = new ArrayList();
     loading = new ArrayList();
-    closed = false;
     
     inputs = new InputSync();
     events = new EventSync();
     
+    gameCount = 0;
+    closed = false;
+    
     newGame();
+
     loop = new GameLoop(this);
   }
   
@@ -64,15 +65,18 @@ public abstract class GameLobby {
   public void start() { loop.start(); }
   
   private void newGame() throws IOException {
-    final String gametype = settings.get("gametype", "Deathmatch");
-    switch(gametype) {
-      case "Deathmatch" : { game = new Deathmatch(this, map, settings); break; }
-      case "King" : { game = new King(this, map, settings); break; }
-      case "Ultimate" : { game = new Ultimate(this, map, settings); break; }
-      case "TeamDeathmatch" : { game = new TeamDeathmatch(this, map, settings); break; }
-      case "CaptureTheFlag" : { game = new CaptureTheFlag(this, map, settings); break; }
-      case "TeamKing" : { game = new TeamKing(this, map, settings); break; }
-      default : { game = new Deathmatch(this, map, settings); break; }
+    gameCount++;
+    final GameSettings gs = settings.getRotation(gameCount);
+    final String gametype = gs.get("gametype", "deathmatch");
+    final NoxioMap map = new NoxioMap(gs.get("map_name", "final"));
+    switch(gametype.toLowerCase()) {
+      case "deathmatch" : { game = new Deathmatch(this, map, gs); break; }
+      case "king" : { game = new King(this, map, gs); break; }
+      case "ultimate" : { game = new Ultimate(this, map, gs); break; }
+      case "teamdeathmatch" : { game = new TeamDeathmatch(this, map, gs); break; }
+      case "capturetheflag" : { game = new CaptureTheFlag(this, map, gs); break; }
+      case "teamking" : { game = new TeamKing(this, map, gs); break; }
+      default : { game = new Deathmatch(this, map, gs); break; }
     }
   }
 
@@ -85,7 +89,7 @@ public abstract class GameLobby {
         GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
           final NoxioSession player = players.get(i);
-          player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, settings.get("score_to_win", 0), settings.get("teams", 0), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
+          player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, game.getScoreToWin(), game.isTeamGame(), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
           loading.add(player); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
           /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
         }
@@ -127,7 +131,7 @@ public abstract class GameLobby {
             if(!evt.getSession().isOpen()) { break; }                                     /* Check to make sure connection is still active. */
             if(!connect(evt.getSession())) { evt.getSession().sendPacket(new PacketG06("Connection failed.")); evt.getSession().leaveGame(); }
             else { GameLobbyInfo info = getInfo(); evt.getSession().sendPacket(
-              new PacketG01(name, game.gametypeName(), maxPlayers, settings.get("score_to_win", 5), settings.get("teams", 0), game.objectiveBaseId(), game.map));
+              new PacketG01(name, game.gametypeName(), maxPlayers, game.getScoreToWin(), game.isTeamGame(), game.objectiveBaseId(), game.map));
             }
             break;
           }

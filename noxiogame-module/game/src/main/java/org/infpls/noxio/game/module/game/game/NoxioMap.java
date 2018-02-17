@@ -3,8 +3,7 @@ package org.infpls.noxio.game.module.game.game;
 import java.io.*;
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
-import org.infpls.noxio.game.module.game.util.Oak;
-import org.springframework.core.io.*;
+import org.infpls.noxio.game.module.game.util.*;
 
 public class NoxioMap {
   private final String name, description;
@@ -24,7 +23,7 @@ public class NoxioMap {
   private final String cache;         // Asset cache for client
   
   public NoxioMap(final String mapName) throws IOException {
-    final String data = readFile("map/" + mapName + ".map");
+    final String data = Scung.readFile("map/" + mapName + ".map");
     final String[] fields = data.split("\\|");
     
     /* Field#0 - Info */
@@ -150,20 +149,6 @@ public class NoxioMap {
       }
     }
     return w;
-  }
-  
-  private String readFile(final String path) throws IOException {
-    final Resource resource = new ClassPathResource(path);
-    final InputStream in = resource.getInputStream();
-    final BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-    final StringBuilder sb = new StringBuilder();
-    String line;
-    while((line=br.readLine()) != null) {
-       sb.append(line);
-    }
-    br.close();
-    in.close();
-    return sb.toString();
   }
   
   public List<Spawn> getSpawns(final String type, final String gt) {

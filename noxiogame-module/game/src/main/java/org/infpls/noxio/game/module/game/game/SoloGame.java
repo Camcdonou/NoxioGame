@@ -47,4 +47,7 @@ public abstract class SoloGame extends NoxioGame {
     
     update.add(sb.toString());
   }
+  
+  @Override
+  public int isTeamGame() { return 0; }
 }

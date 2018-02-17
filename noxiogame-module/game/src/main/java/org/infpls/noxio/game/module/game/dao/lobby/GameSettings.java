@@ -4,7 +4,7 @@ import java.util.*;
 
 public class GameSettings {
   private final Map<String, String> settings;
-  public GameSettings() { 
+  public GameSettings() {
     settings = new HashMap();
   }
   

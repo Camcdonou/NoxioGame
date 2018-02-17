@@ -114,4 +114,7 @@ public class King extends SoloGame {
   
   @Override
   public int objectiveBaseId() { return 2; }
+  
+  @Override
+  public int getScoreToWin() { return scoreToWin; }
 }

@@ -107,4 +107,7 @@ public class TeamKing extends TeamGame {
   
   @Override
   public int objectiveBaseId() { return 2; }
+  
+  @Override
+  public int getScoreToWin() { return scoreToWin; }
 }

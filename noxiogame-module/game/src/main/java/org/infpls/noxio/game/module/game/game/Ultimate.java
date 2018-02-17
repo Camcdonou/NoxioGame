@@ -125,4 +125,7 @@ public class Ultimate extends SoloGame {
   
   @Override
   public int objectiveBaseId() { return 3; }
+  
+  @Override
+  public int getScoreToWin() { return scoreToWin; }
 }

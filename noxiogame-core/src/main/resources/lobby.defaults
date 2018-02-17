@@ -1,0 +1,165 @@
+# Defines all default lobbies and their gametype rotations #
+# It's like JSON sort of. It's more brooble tho #
+
+lobbies: [
+  {
+    game_name: "DM Test #1",
+    max_players: "4",
+    rotation: [
+      {
+        gametype: "deathmatch",
+        map_name: "final",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+    ]
+  },
+  {
+    game_name: "TDM Test #1",
+    max_players: "10",
+    rotation: [
+      {
+        gametype: "teamdeathmatch",
+        map_name: "war",
+        score_to_win: "25",
+        respawn_time: "30"
+      },
+      {
+        gametype: "teamdeathmatch",
+        map_name: "battle",
+        score_to_win: "25",
+        respawn_time: "30"
+      },
+      {
+        gametype: "teamdeathmatch",
+        map_name: "penultimate",
+        score_to_win: "25",
+        respawn_time: "30"
+      }
+    ]
+  },
+  {
+    game_name: "TDM Test #2",
+    max_players: "4",
+    rotation: [
+      {
+        gametype: "teamdeathmatch",
+        map_name: "final",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "teamdeathmatch",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+    ]
+  },
+  {
+    game_name: "CTF Test #1",
+    max_players: "12",
+    rotation: [
+      {
+        gametype: "capturetheflag",
+        map_name: "war",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "capturetheflag",
+        map_name: "battle",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "capturetheflag",
+        map_name: "penultimate",
+        score_to_win: "3",
+        respawn_time: "90"
+      }
+    ]
+  },
+  {
+    game_name: "CTF Test #2",
+    max_players: "24",
+    rotation: [
+      {
+        gametype: "capturetheflag",
+        map_name: "battle",
+        score_to_win: "5",
+        respawn_time: "150"
+      },
+      {
+        gametype: "capturetheflag",
+        map_name: "penultimate",
+        score_to_win: "5",
+        respawn_time: "150"
+      }
+    ]
+  },
+  {
+    game_name: "K Test #1",
+    max_players: "4",
+    rotation: [
+      {
+        gametype: "king",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "30",
+        static_hill: "1",
+        score_to_move: "5"
+      },
+      {
+        gametype: "king",
+        map_name: "final",
+        score_to_win: "15",
+        respawn_time: "30",
+        static_hill: "0",
+        score_to_move: "5"
+      }
+    ]
+  },
+  {
+    game_name: "K Test #2",
+    max_players: "6",
+    rotation: [
+      {
+        gametype: "king",
+        map_name: "war",
+        score_to_win: "15",
+        respawn_time: "30",
+        static_hill: "0",
+        score_to_move: "5"
+      }
+    ]
+  },
+  {
+    game_name: "TK Test #1",
+    max_players: "10",
+    rotation: [
+      {
+        gametype: "teamking",
+        map_name: "battle",
+        score_to_win: "20",
+        respawn_time: "90",
+        static_hill: "0",
+        score_to_move: "7"
+      },
+      {
+        gametype: "teamking",
+        map_name: "penultimate",
+        score_to_win: "20",
+        respawn_time: "90",
+        static_hill: "1",
+        score_to_move: "7"
+      }
+    ]
+  }
+]

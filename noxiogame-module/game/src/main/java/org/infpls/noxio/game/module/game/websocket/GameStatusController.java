@@ -24,6 +24,7 @@ public class GameStatusController {
     @RequestMapping(value = "/info", method = RequestMethod.GET, produces = "application/json")
     public @ResponseBody ResponseEntity getInfo() {
         Gson gson = new GsonBuilder().create();
+
         return new ResponseEntity(gson.toJson(infoDao.getServerInfo()), HttpStatus.OK);
     }
   

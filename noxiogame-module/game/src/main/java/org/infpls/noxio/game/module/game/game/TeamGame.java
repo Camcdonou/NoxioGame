@@ -98,4 +98,7 @@ public abstract class TeamGame extends NoxioGame {
     generateJoinPacket(player);
     updateScore();
   }
+  
+  @Override
+  public int isTeamGame() { return 2; }
 }

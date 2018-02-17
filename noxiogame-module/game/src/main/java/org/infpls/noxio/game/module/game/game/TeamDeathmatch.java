@@ -51,4 +51,7 @@ public class TeamDeathmatch extends TeamGame {
   
   @Override
   public int objectiveBaseId() { return 0; }
+  
+  @Override
+  public int getScoreToWin() { return scoreToWin; }
 }

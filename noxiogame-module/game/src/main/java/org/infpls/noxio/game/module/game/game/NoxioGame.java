@@ -339,6 +339,8 @@ public abstract class NoxioGame {
     /* Do things! */
   }
   
+  public abstract int getScoreToWin();                                          // Returns number of points needed to win the game
+  public abstract int isTeamGame();                                             // Returns number of teams in ths game (generally 0 or 2 unless i add support for more)
   public int getFrame() { return frame; }
   public boolean isGameOver() { return gameOver; }                              // Game over, resetTimer counting down to new game
   public boolean isResetReady() { return resetTimer < 1 && gameOver; }          // Ready to start a new game

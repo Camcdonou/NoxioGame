@@ -69,4 +69,7 @@ public class CaptureTheFlag extends TeamGame {
   
   @Override
   public int objectiveBaseId() { return 1; }
+  
+  @Override
+  public int getScoreToWin() { return scoreToWin; }
 }
