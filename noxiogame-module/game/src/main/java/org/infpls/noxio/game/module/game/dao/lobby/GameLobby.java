@@ -8,7 +8,7 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Salt;
 
-/* On next work day.
+/* OLD TODO :: innacurate and out of date
    ! - INPUT IS SO FUCKING WEIRD LOL to many references to handle to many things in weird ways. pls fix.
    # - RequestAnimFrame + Delta Time Interpolation (remember camera & particles & lights needs it)
    & - Gametype/map dependency needs to be worked out. Also MapDao or whatever
@@ -20,6 +20,45 @@ import org.infpls.noxio.game.module.game.util.Salt;
    11 - shadow map size needs to be added as a uniform to allow proper sampling (ACTUALLY JUST REFACTOR AND RENAME AND UPDATE THAT )
    12 - maybe adjust center point based on camera angle. (maaaaaaaaaaaaaaybe)
    14 - SKY
+*/
+
+/* Finalizing list ::
+  ==== Core Functions ====
+  - HTTPS + WSS Support
+  - Database setup
+  - Storage of usersettings and userdata
+  - Create filestore for user uploaded content
+  - Setup secure paypal payment, credit/debit payment, and patreon support page
+  - Email authentication
+  - Password change
+  - Display name
+  - Warn users if HW accel is off (Also look into report of bad performance ? (NVM it was actually just someone with HW accel off. no worries here)) (also delete fallback mode (and ban emily))
+  ==== Creation of UserData ====
+  - Implement statistics and credits
+  - Implement unlocks (free unlocks & payed user unlocks)
+  - Implement global ranking meter (lifetime credits)
+  ==== Expansion of UserSettings ====
+  - Volume slider expansion ... ( Master, Music, Announcer, Voice, SFX )
+  - Custom colors, win sounds, patterns, sprays ( Server side usersettings )
+  - Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
+  ==== Required Features. Will add ====
+  - Create custom game menus
+  - Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF )
+  - Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps )
+  - Improve existing sky
+  - Create a handful of alt skins for unlocks
+  - Optimize decals, very very bad performance with them
+  ==== Extra Features. Unlikely to add before release ====
+  - Spectator mode
+  - 3D Skyboxes
+  - Low graphics mode    ( Diffuse render only, very low end computer support )
+  - Support for mobile controls
+  - Support for controller
+  - Twitch integration (very unlikely)
+  ==== Commission Work ====
+  - Voice work for ... Announcer, Fox, Shiek, Puff
+  - Sound effect work for ... ( All SFX from melee need to be replaced )
+  - Game Music ... (This is not likely to happen but possibly chiptune/synthwave music ? )
 */
 
 public abstract class GameLobby {
@@ -45,7 +84,7 @@ public abstract class GameLobby {
     this.settings = settings;
     
     name = settings.get("game_name", "Default Name");
-    maxPlayers = settings.get("max_players", 6);
+    maxPlayers = settings.get("max_players", 6, 2, 32);
     
     players = new ArrayList();
     loading = new ArrayList();

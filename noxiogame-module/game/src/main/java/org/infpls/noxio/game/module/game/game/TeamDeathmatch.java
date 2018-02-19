@@ -8,7 +8,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 public class TeamDeathmatch extends TeamGame {
   
   public TeamDeathmatch(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 25));
+    super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
   }
   
   private boolean firstBlood = false; // Flag to check if first blood has been awarded or not!

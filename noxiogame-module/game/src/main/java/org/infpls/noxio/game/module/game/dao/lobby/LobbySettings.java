@@ -35,7 +35,7 @@ public class LobbySettings extends GameSettings {
   public static LobbySettings parseSettings(final String raw) {
     try {
       final Map<String,Object> map = parseBlock(raw, 0);
-      return convertFromMap(map);
+      return convertFromMap((Map)map.get("lobby"));
     }
     catch(IndexOutOfBoundsException | NullPointerException ex) {
       System.err.println("LobbySettings::parseSettings() Error parsing game settings data :: ");

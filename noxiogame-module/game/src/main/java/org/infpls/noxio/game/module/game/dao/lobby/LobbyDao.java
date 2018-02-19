@@ -22,10 +22,8 @@ public class LobbyDao {
     }
   }
   
-  public GameLobby createLobby(final String name) throws IOException {
-    final LobbySettings settings = new LobbySettings();
-    settings.set("game_name", name);
-    GameLobby lobby = new CustomLobby(settings);
+  public GameLobby createLobby(final LobbySettings ls) throws IOException {
+    GameLobby lobby = new CustomLobby(ls);
     lobbies.add(lobby);
     lobby.start();
     return lobby;

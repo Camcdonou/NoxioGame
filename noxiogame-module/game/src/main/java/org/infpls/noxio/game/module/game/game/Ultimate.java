@@ -13,9 +13,9 @@ public class Ultimate extends SoloGame {
   private int scoreTimer;
   
   public Ultimate(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 25));
+    super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
     
-    scoreTimeAdjust = settings.get("score_time_adjust", 120);
+    scoreTimeAdjust = settings.get("score_time_adjust", 120, 30, 300);
     
     scoreTimer = 0;
     ultimate = null;

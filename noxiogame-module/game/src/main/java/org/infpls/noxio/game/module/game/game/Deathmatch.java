@@ -9,7 +9,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 public class Deathmatch extends SoloGame {
     
   public Deathmatch(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 15));
+    super(lobby, map, settings, settings.get("score_to_win", 15, 1, 99));
   }
 
   private boolean firstBlood = false; // Flag to check if first blood has been awarded or not!

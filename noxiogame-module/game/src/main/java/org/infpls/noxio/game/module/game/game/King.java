@@ -13,10 +13,10 @@ public class King extends SoloGame {
   private final boolean staticHill;
   private int hillSpawnRotation, moveTimer;
   public King(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 25));
+    super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
 
-    staticHill = settings.get("static_hill", 1)==1;
-    scoreToMove = settings.get("score_to_move", 10);
+    staticHill = settings.get("static_hill", 1, 0, 1)==1;
+    scoreToMove = settings.get("score_to_move", 7, 1, 99);
     
     moveTimer = 0;
     hillSpawnRotation = 0;

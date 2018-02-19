@@ -9,7 +9,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 public class CaptureTheFlag extends TeamGame {
 
   public CaptureTheFlag(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 3));
+    super(lobby, map, settings, settings.get("score_to_win", 3, 1, 25));
     
     spawnFlags();
   }

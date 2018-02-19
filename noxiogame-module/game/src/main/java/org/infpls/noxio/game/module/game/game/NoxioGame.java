@@ -39,8 +39,8 @@ public abstract class NoxioGame {
     deleted = new ArrayList();
     update = new ArrayList();
     
-    respawnTime = settings.get("respawn_time", 30);
-    penaltyTime = settings.get("penalty_time", 90);
+    respawnTime = settings.get("respawn_time", 30, 0, 300);
+    penaltyTime = settings.get("penalty_time", 90, 0, 300);
     
     frame = 0;
     gameOver = false;

@@ -55,25 +55,30 @@ public class Lobby extends SessionState {
   
   private void createLobby(PacketB03 p) throws IOException {
     /* Make sure data is valid */
-    if(!Validation.isAlphaNumericWithSpaces(p.getName())) {
-      sendPacket(new PacketB05("Lobby name must be alpha-numeric characters only."));
-      return;
-    }
-    if(p.getName().length() < 4) {
-      sendPacket(new PacketB05("Lobby name must be at least 4 characters."));
-      return;
-    }
-    if(p.getName().length() > 32) {
-      sendPacket(new PacketB05("Lobby name cannot be longer than 32 characters."));
-      return;
+    final LobbySettings ls = LobbySettings.parseSettings(p.getSettings());
+    if(ls == null) {
+      sendPacket(new PacketB05("Syntax error in settings data. Failed to parse.")); return;
     }
     
-    GameLobby gl = lobbyDao.createLobby(p.getName());
+    final String gameName = ls.get("game_name", session.getUser() + "s Lobby");
+    if(!Validation.isAlphaNumericWithSpaces(gameName)) {
+      sendPacket(new PacketB05("Lobby name must be alpha-numeric characters only.")); return;
+    }
+    
+    if(gameName.length() < 3 || gameName.length() > 18) {
+      sendPacket(new PacketB05("Lobby name must be between 3 and 18 characters.")); return;
+    }
+    
+    if(!Validation.isAlphaNumericWithSpaces(ls.getRotation(0).get("map_name", "final"))) {
+      sendPacket(new PacketB05("Stop trying to break things you jerk.")); return;
+    }
+
+    GameLobby gl = lobbyDao.createLobby(ls);
     if(gl != null) {
       session.joinGame(gl);
     }
     else {
-      sendPacket(new PacketB05("Failed to create lobby."));
+      sendPacket(new PacketB05("Error during lobby creation."));
     }
   }
   

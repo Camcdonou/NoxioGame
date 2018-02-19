@@ -17,7 +17,7 @@ public abstract class TeamGame extends NoxioGame {
     
     scores = new int[]{0,0};
     scoreToWin = stw;
-    autoBalanceTeams = settings.get("auto_balance_teams", 1)==1;
+    autoBalanceTeams = settings.get("auto_balance_teams", 1, 0, 1)==1;
   }
   
   @Override
