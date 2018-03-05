@@ -26,6 +26,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   ==== Core Functions ====
   - HTTPS + WSS Support
   - Database setup
+  - Patch hash salting
   - Storage of usersettings and userdata
   - Create filestore for user uploaded content
   - Setup secure paypal payment, credit/debit payment, and patreon support page
