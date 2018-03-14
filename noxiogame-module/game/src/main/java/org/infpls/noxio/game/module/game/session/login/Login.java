@@ -68,14 +68,16 @@ public class Login extends SessionState {
     rd.close();
     
     Gson gson = new GsonBuilder().create();
-    PacketL03 r = gson.fromJson(result.toString(), PacketL03.class);
+    Packet pkt = gson.fromJson(result.toString(), Packet.class);
     
-    if(r.getResult()) {
+    if(pkt.getType().equals("l04")) {
+      final PacketL04 r = gson.fromJson(result.toString(), PacketL04.class);
       ServerInfo info = infoDao.getServerInfo();
       sendPacket(new PacketL01(info.getName(), info.getLocation(), info.getDescription()));
-      session.login(p.getUser(), p.getSid());
+      session.login(r.getData(), p.getSid());
     }
-    else {
+    else if(pkt.getType().equals("l03")) {
+      final PacketL03 r = gson.fromJson(result.toString(), PacketL03.class);
       session.close("Failed to validate user: " + r.getMessage());
     }
   }

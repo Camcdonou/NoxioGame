@@ -24,13 +24,13 @@ import org.infpls.noxio.game.module.game.util.Salt;
 
 /* Finalizing list ::
   ==== Core Functions ====
-  - HTTPS + WSS Support
-  - Database setup
-  - Patch hash salting
+  + HTTPS + WSS Support ( IMPLEMENTED INTO SEPERATE BRANCH )
+  + Database setup      ( MYSQL SERVER IS NOT RUNNING ON PRODUCTION YET! NEEDS SSL )
+  + Patch hash salting  ( UPGRADE SHA256 TO STRONGER HASHING )
   - Storage of usersettings and userdata
   - Create filestore for user uploaded content
   - Setup secure paypal payment, credit/debit payment, and patreon support page
-  - Email authentication
+  + Email authentication
   - Password change
   - Display name
   - Warn users if HW accel is off (Also look into report of bad performance ? (NVM it was actually just someone with HW accel off. no worries here)) (also delete fallback mode (and ban emily))

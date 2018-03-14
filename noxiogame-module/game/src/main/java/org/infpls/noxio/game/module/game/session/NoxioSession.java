@@ -1,11 +1,12 @@
 package org.infpls.noxio.game.module.game.session;
-
 import java.io.*;
 import com.google.gson.*;
 import org.springframework.web.socket.*;
 
+ 
 import org.infpls.noxio.game.module.game.dao.DaoContainer;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.dao.user.*;
 import org.infpls.noxio.game.module.game.session.error.*;
 import org.infpls.noxio.game.module.game.session.login.Login;
 import org.infpls.noxio.game.module.game.session.lobby.Lobby;
@@ -15,7 +16,8 @@ public final class NoxioSession {
   private final WebSocketSession webSocket;
   private final DaoContainer dao;
   
-  private String user, sid;
+  private UserData user;
+  private String sid;
   private final SessionThread sessionThread;
   private SessionState sessionState;
  
@@ -68,7 +70,7 @@ public final class NoxioSession {
     changeState("g", gl);
   }
   
-  public void login(final String user, final String sid) throws IOException {
+  public void login(final UserData user, final String sid) throws IOException {
     if(loggedIn()) { throw new IOException("This session is already logged in!"); }
     this.user = user;
     this.sid = sid;
@@ -80,7 +82,7 @@ public final class NoxioSession {
   }
   
   public String getUser() {
-    return user;
+    return user.name;
   }
   
   public String getSessionId() {
