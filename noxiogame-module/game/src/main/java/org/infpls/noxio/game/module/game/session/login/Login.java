@@ -80,6 +80,8 @@ public class Login extends SessionState {
       final PacketL03 r = gson.fromJson(result.toString(), PacketL03.class);
       session.close("Failed to validate user: " + r.getMessage());
     }
+    
+    conn.disconnect();
   }
 
   @Override

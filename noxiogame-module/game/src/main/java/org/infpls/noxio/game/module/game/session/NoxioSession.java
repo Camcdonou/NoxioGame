@@ -78,11 +78,16 @@ public final class NoxioSession {
   }
   
   public boolean loggedIn() {
-    return user != null;
+    return user != null && isOpen();
   }
   
   public String getUser() {
+    if(!loggedIn()) { return null; }
     return user.name;
+  }
+  
+  public UserData getUserData() {
+    return user;
   }
   
   public String getSessionId() {

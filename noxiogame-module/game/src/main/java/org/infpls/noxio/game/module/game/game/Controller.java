@@ -4,10 +4,12 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.util.*;
+import org.infpls.noxio.game.module.game.dao.user.UserData;
 
 final public class Controller {
   private final NoxioGame game;
-  private final String user, sid;   // Username and Session ID of the player
+  private final String sid;   // Session ID of the player
+  private final UserData user; // User info, settings, and unlocks
   
   private int team;                 // Team this player is on, -1 if no teams.
   private GameObject object;        // Object this controller is controlling
@@ -20,30 +22,30 @@ final public class Controller {
   private int respawnPenalty;
   private boolean penalized;
   
-  private final Score score;        // DEPRECATED?? no????
+  public final Score score;    // Handles all stats and score related data
   
   private final List<String> update; // List of "impulse" updates on this frame. These are things that happen as single events such as whispers.
   
   private static final float VIEW_DISTANCE = 12.0f; /* Anything farther than this is out of view and not updated */
   
-  public Controller(final NoxioGame game, final String user, final String sid) {
-    this(game, user, sid, -1);
+  public Controller(final NoxioGame game, final NoxioSession player) {
+    this(game, player, -1);
   }
   
-  public Controller(final NoxioGame game, final String user, final String sid, final int team) {
+  public Controller(final NoxioGame game, final NoxioSession player, final int team) {
     this.game = game;
-    this.user = user;
-    this.sid = sid;
+    sid = player.getSessionId();
+    user = player.getUserData();
     
-    this.direction = new Vec2(0.0f, 1.0f); this.speed = 0.0f;
-    this.action = new ArrayList();
+    direction = new Vec2(0.0f, 1.0f); speed = 0.0f;
+    action = new ArrayList();
 
-    this.respawnTimer = 0;
-    this.respawnPenalty = 0;
-    this.penalized = false;
+    respawnTimer = 0;
+    respawnPenalty = 0;
+    penalized = false;
     
-    this.score = new Score();
-    this.update = new ArrayList();
+    score = new Score();
+    update = new ArrayList();
     this.team = team;
   }
   
@@ -57,6 +59,7 @@ final public class Controller {
       PLY::RSPWNTMR - rst;<int time>;
       SYS::WHISPER  - wsp;<string txt>;
       SYS::ANNOUNCE - anc;<string code>;
+      SYS::ADDCREDS - crd;<int credits>;
   */
   public void generateUpdateData(final StringBuilder sb) {
     if(object != null) {
@@ -81,6 +84,10 @@ final public class Controller {
     for(int i=0;i<update.size();i++) {
       sb.append(update.get(i));
     }
+    
+    int cc = score.getCreditChange();
+    if(cc > 0) { sb.append("crd;"); sb.append(cc); sb.append(";"); }
+    
     update.clear();
   }
   
@@ -164,20 +171,22 @@ final public class Controller {
     update.add("rst;"+respawnTimer+";");
   }
   
-  public void destroy() {
+  /* Called when this controller is either being removed from a player leaving the game or when the game has ended. */
+  /* Returns stats accumulated in this game */
+  public Score.Stats destroy() {
     if(object != null) {
       object.kill();
     }
+    return score.getStats();
   }
   
   public void penalize() { penalized = true; respawnPenalty++; }
   public boolean respawnReady() { return respawnTimer<=0; }
   public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
   public void announce(final String code) { update.add("anc;"+code+";"); }
-  public String getUser() { return user; }
+  public String getUser() { return user.name; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }
   public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } game.sendMessage(getUser() + " joined " + (team==0?"Red":"Blue") + " Team."); }
   public GameObject getControlled() { return object; }
-  public Score getScore() { return score; }
 }

@@ -11,29 +11,33 @@ public class TeamDeathmatch extends TeamGame {
     super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
   }
   
-  private boolean firstBlood = false; // Flag to check if first blood has been awarded or not!
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
-    if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory (BUGGED SEE FUNCTION)
+    if(isGameOver()) { return; }
     final Controller victim = getControllerByObject(killed);
-    if(killer != null && victim != null && killer != victim) {
-      if(!firstBlood) { announce("fb," + killer.getUser()); firstBlood = true; }
-      if(killer.getTeam() != victim.getTeam()) { scores[killer.getTeam()==0?0:1]++; }
-      announceKill(killer, victim);
+    
+    if(announceKill(killer, victim)) {
+      scores[killer.getTeam()==0?0:1]++;
     }
-    else if(victim != null) { victim.getScore().death(); }
+    
     updateScore();
     announceObjective();
+    
     int winr;
     if(scores[0] >= scoreToWin) { gameOver("Red Team wins!"); winr = 0; }
     else if(scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); winr = 1; }
     else { return; }
     if(scores[winr==0?1:0] == 0) {
       for(int i=0;i<controllers.size();i++) {
-        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); }
-        else { controllers.get(i).announce("hu"); }
+        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); controllers.get(i).score.perfect(); }
+        else { controllers.get(i).announce("hu"); controllers.get(i).score.humiliation(); }
       }
     }
+    for(int i=0;i<controllers.size();i++) {
+      if(controllers.get(i).getTeam() == winr) { controllers.get(i).score.win(); }
+      else { controllers.get(i).score.lose(); }
+    }
+    
   }
 
   @Override

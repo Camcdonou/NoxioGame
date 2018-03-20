@@ -12,20 +12,36 @@ public class Deathmatch extends SoloGame {
     super(lobby, map, settings, settings.get("score_to_win", 15, 1, 99));
   }
 
-  private boolean firstBlood = false; // Flag to check if first blood has been awarded or not!
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
-    if(killer != null && victim != null && killer != victim) {
-      if(!firstBlood) { announce("fb," + killer.getUser()); firstBlood = true; }
-      announceKill(killer, victim);
-      if(killer.getScore().getKills() >= scoreToWin) {
+
+    if(announceKill(killer, victim)) {
+      if(killer.score.getKills() >= scoreToWin) {
+        if(killer.score.getDeaths() < 1) { killer.announce("pf"); killer.score.perfect(); }
         gameOver(killer.getUser() + " wins!");
-        if(killer.getScore().getDeaths() < 1) { killer.announce("pf"); }
+
+        final boolean bsort = true;
+        final Controller[] cs = controllers.toArray(new Controller[0]);
+        for(int i=0;i<cs.length-1;i++) {
+          if(cs[i].score.getKills() < cs[i+1].score.getKills()) {
+            final Controller swp = cs[i];
+            cs[i] = cs[i+1]; cs[i+1] = swp;
+          }
+          if(i>=cs.length-1 && !bsort) { i=0; }
+        }
+
+        for(int i=0;i<cs.length;i++) {
+          switch(i/(cs.length/4)) {
+            case 0 : { cs[i].score.win(); }
+            case 1 : { cs[i].score.neutral(); }
+            case 2 : { cs[i].score.neutral(); }
+            case 3 : { cs[i].score.lose(); }
+          }
+        }
       }
     }
-    else if(victim != null) { victim.getScore().death(); }
     updateScore();
     announceObjective();
   }
@@ -39,13 +55,13 @@ public class Deathmatch extends SoloGame {
     if(controllers.size() < 1) { return; } // No players
     Controller newLead = controllers.get(0);
     for(int i=1;i<controllers.size();i++) {
-      if(controllers.get(i).getScore().getKills() > newLead.getScore().getKills()) {
+      if(controllers.get(i).score.getKills() > newLead.score.getKills()) {
         newLead = controllers.get(i);
       }
     }
-    if(lead == null || newLead.getScore().getKills() > lead.getScore().getKills() && newLead.getScore().getKills() < scoreToWin) {
+    if(lead == null || newLead.score.getKills() > lead.score.getKills() && newLead.score.getKills() < scoreToWin) {
       if(lead != null) { lead.announce("ll"); newLead.announce("gl"); }
-      if(newLead.getScore().getKills() > 0) { lead = newLead; }
+      if(newLead.score.getKills() > 0) { lead = newLead; }
     }
   }
   

@@ -2,17 +2,27 @@ package org.infpls.noxio.game.module.game.dao.lobby;
 
 import java.io.IOException;
 import java.util.*;
+import org.infpls.noxio.game.module.game.dao.server.InfoDao;
 import org.infpls.noxio.game.module.game.util.Scung;
 
 public class LobbyDao {
+  private HttpThread httpToAuth;
   private final List<GameLobby> lobbies; /* This is a list of all active user NoxioSessions. */
   
   public LobbyDao() {
     lobbies = new ArrayList();
+  }
+  
+  /* @TODO: This class has brought to light a major design problem. We need to ditch spring configuration for a better (static) solution. This will be a major rework. */
+  /* Starts HttpThread and default lobbies */
+  public void start(final InfoDao info) {
+    httpToAuth = new HttpThread(info);
+    httpToAuth.start();
+    
     try {
       List<LobbySettings> lss = LobbySettings.parseMultipleSettings(Scung.readFile("lobby.defaults"));
       for(int i=0;i<lss.size();i++) {
-        final OfficialLobby lob = new OfficialLobby(lss.get(i));
+        final OfficialLobby lob = new OfficialLobby(httpToAuth, lss.get(i));
         lobbies.add(lob);
         lob.start();
       }
@@ -23,7 +33,7 @@ public class LobbyDao {
   }
   
   public GameLobby createLobby(final LobbySettings ls) throws IOException {
-    GameLobby lobby = new CustomLobby(ls);
+    GameLobby lobby = new CustomLobby(httpToAuth, ls);
     lobbies.add(lobby);
     lobby.start();
     return lobby;
@@ -72,5 +82,9 @@ public class LobbyDao {
       loblist.add(sb.toString());
     }
     return loblist;
+  }
+
+  public void destroy() {
+    httpToAuth.close();
   }
 }

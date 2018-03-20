@@ -71,6 +71,7 @@ public abstract class GameLobby {
   protected final List<NoxioSession> players, loading;
   
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
+  public final HttpThread httpToAuth; /* Seperate thread for sending post game stats over http */
   protected NoxioGame game; /* The actual game object */
   
   private final InputSync inputs; /* Packets that the game must handle are stored until a gamestep happens. This is for synchronization. */
@@ -80,7 +81,7 @@ public abstract class GameLobby {
   
   private int gameCount;    // Number of times the game has ended and restarted
   protected boolean closed; // Clean this shit up!
-  public GameLobby(final LobbySettings settings) throws IOException {
+  public GameLobby(final HttpThread http, final LobbySettings settings) throws IOException {
     lid = Salt.generate();
     this.settings = settings;
     
@@ -99,6 +100,7 @@ public abstract class GameLobby {
     newGame();
 
     loop = new GameLoop(this);
+    httpToAuth = http;
   }
   
   /* It's apparently dangerous to start the thread in the constructor because ********REASONS********* so here we are! */
@@ -106,6 +108,7 @@ public abstract class GameLobby {
   
   private void newGame() throws IOException {
     gameCount++;
+    if(game != null) { game.destroy(); }
     final GameSettings gs = settings.getRotation(gameCount);
     final String gametype = gs.get("gametype", "deathmatch");
     final NoxioMap map = new NoxioMap(gs.get("map_name", "final"));
@@ -144,7 +147,7 @@ public abstract class GameLobby {
     }
     catch(Exception ex) {
       System.err.println("## CRITICAL ## Game step exception!");
-      System.err.println("## STATE    ## lobbyName=" + name + "gameOver=" + game.isGameOver());
+      System.err.println("## STATE    ## lobbyName=" + name + " ... gameOver=" + game.isGameOver());
       ex.printStackTrace();
       System.err.println("## CRITICAL ## Attempting to close lobby!");
       try { close("The Game Lobby encoutered an error and had to close. Sorry!"); System.err.println("## INFO     ## Closed Lobby Successfully!"); }

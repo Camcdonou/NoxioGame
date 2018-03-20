@@ -41,9 +41,9 @@ public abstract class SoloGame extends NoxioGame {
     sb.append(";");
     for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getUser()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
     for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getTeam()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getScore().getKills()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getScore().getDeaths()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getScore().getObjectives()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).score.getKills()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).score.getDeaths()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).score.getObjectives()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
     
     update.add(sb.toString());
   }

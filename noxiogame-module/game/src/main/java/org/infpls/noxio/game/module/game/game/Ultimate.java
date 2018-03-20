@@ -68,9 +68,9 @@ public class Ultimate extends SoloGame {
   public void reportKill(final Controller killer, final GameObject killed) {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
-    if(killer != null && victim != null && killer != victim) {
-      announceKill(killer, victim);
-        final GameObject obj = killer.getControlled();
+    
+    if(announceKill(killer, victim)) {
+      final GameObject obj = killer.getControlled();
       if(killed == ultimate) {
         if(obj != null && !obj.isDead()) { makeUltimate(killer, obj); reportObjective(killer, obj); }
         else { makeUltimate(); }
@@ -80,21 +80,40 @@ public class Ultimate extends SoloGame {
       }
     }
     else if(victim != null) {
-      victim.getScore().death();
       if(killed == ultimate) { makeUltimate(); }
     }
+    
     updateScore();
   }
   
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
     if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory @TODO: doesnt work, look at actual value instead.
-    player.getScore().objective();
+    player.score.ultimateControl();
     updateScore();
     announceObjective();
-    if(player.getScore().getObjectives() >= scoreToWin) {
+    if(player.score.getObjectives() >= scoreToWin) {
+      if(player.score.getDeaths() < 1) { player.announce("pf"); player.score.perfect(); }
       gameOver(player.getUser() + " wins!");
-      if(player.getScore().getDeaths() < 1) { player.announce("pf"); }
+      
+      final boolean bsort = true;
+      final Controller[] cs = controllers.toArray(new Controller[0]);
+      for(int i=0;i<cs.length-1;i++) {
+        if(cs[i].score.getObjectives()< cs[i+1].score.getObjectives()) {
+          final Controller swp = cs[i];
+          cs[i] = cs[i+1]; cs[i+1] = swp;
+        }
+        if(i>=cs.length-1 && !bsort) { i=0; }
+      }
+
+      for(int i=0;i<cs.length;i++) {
+        switch(i/(cs.length/4)) {
+          case 0 : { cs[i].score.win(); }
+          case 1 : { cs[i].score.neutral(); }
+          case 2 : { cs[i].score.neutral(); }
+          case 3 : { cs[i].score.lose(); }
+        }
+      }
     }
   }
   
@@ -104,13 +123,13 @@ public class Ultimate extends SoloGame {
     if(controllers.size() < 1) { return; } // No players
     Controller newLead = controllers.get(0);
     for(int i=1;i<controllers.size();i++) {
-      if(controllers.get(i).getScore().getObjectives() > newLead.getScore().getObjectives()) {
+      if(controllers.get(i).score.getObjectives() > newLead.score.getObjectives()) {
         newLead = controllers.get(i);
       }
     }
-    if(lead == null || newLead.getScore().getObjectives() > lead.getScore().getObjectives() && newLead.getScore().getObjectives() < scoreToWin) {
+    if(lead == null || newLead.score.getObjectives() > lead.score.getObjectives() && newLead.score.getObjectives() < scoreToWin) {
       if(lead != null) { lead.announce("ll"); newLead.announce("gl"); }
-      if(newLead.getScore().getObjectives() > 0) { lead = newLead; }
+      if(newLead.score.getObjectives() > 0) { lead = newLead; }
     }
   }  
   @Override

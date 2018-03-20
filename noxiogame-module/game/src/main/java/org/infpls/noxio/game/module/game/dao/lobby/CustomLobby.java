@@ -6,8 +6,8 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class CustomLobby extends GameLobby {
   protected NoxioSession hostPlayer;
-  public CustomLobby(final LobbySettings settings) throws IOException {
-    super(settings);
+  public CustomLobby(final HttpThread http, final LobbySettings settings) throws IOException {
+    super(http, settings);
     hostPlayer = null;
   }
   

@@ -8,6 +8,7 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.session.PacketH01;
 import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class NoxioGame {
@@ -229,7 +230,7 @@ public abstract class NoxioGame {
   }
   
   public void join(final NoxioSession player) throws IOException {
-    controllers.add(new Controller(this, player.getUser(), player.getSessionId()));
+    controllers.add(new Controller(this, player));
     generateJoinPacket(player);
     updateScore();
   }
@@ -237,7 +238,8 @@ public abstract class NoxioGame {
   public void leave(final NoxioSession player) {
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getSid().equals(player.getSessionId())) {
-        controllers.get(i).destroy();
+        final String usr = controllers.get(i).getUser();
+        sendStats(usr, controllers.get(i).destroy());
         controllers.remove(i);
         return;
       }
@@ -252,19 +254,28 @@ public abstract class NoxioGame {
   
   /* Called after each score change, announces gametype specific events */ // @TODO: not called anywhere in super class, currently has subclass implement call. weird. mabye fix this?
   public abstract void announceObjective();
+  
   /* Called after <killer> has scored a kill on <killed>, if there was a multi or a spree it is announced */
-  public final void announceKill(final Controller killer, final Controller killed) {
+  /* Returns true if the kill was (1. a player killing another player, 2. the players were on opposing teams or no team). Otherwise false. */
+  /* Also records any stats to the the Score class */
+  private boolean firstBlood = false; // Flag to check if first blood has been awarded or not!
+  public final boolean announceKill(final Controller killer, final Controller killed) {
+    if(killed == null) { return false; }
+    int kjc = killed.score.death();
+    
+    if(killer == killed || killer == null) { return false; }
+    
     if(killer.getTeam() != -1 && killer.getTeam() == killed.getTeam()) {
       killer.penalize();
-      killed.getScore().death();
-      killer.announce("btl"); killed.announce("btd");
-      return;
+      killer.announce("btl"); killer.score.betrayl();
+      killed.announce("btd"); killed.score.betrayed();
+      return true;
     }
-    killer.getScore().kill(frame);
-    int kjc = killed.getScore().death();
-    if(kjc >= 5 && kjc < 10) { killer.announce("kj"); }
-    else if(kjc >= 10) { announce("er," + killer.getUser() + "," + killed.getUser()); sendMessage("Killjoy (" + killer.getUser() + ")"); }
-    final int m = killer.getScore().getMulti();
+    killer.score.kill(frame);
+    if(!firstBlood) { announce("fb," + killer.getUser()); killer.score.firstBlood(); firstBlood = true; }
+    if(kjc >= 5 && kjc < 10) { killer.announce("kj"); killer.score.killJoy(); }
+    else if(kjc >= 10) { announce("er," + killer.getUser() + "," + killed.getUser()); sendMessage("Killjoy (" + killer.getUser() + ")"); killer.score.endedReign(); }
+    final int m = killer.score.getMulti();
     if(m > 1) {
       switch(m) {
         case 2  : { killer.announce("mk,2"); break; }
@@ -277,7 +288,7 @@ public abstract class NoxioGame {
         default : { killer.announce("mk,9"); sendMessage("Multikill X" + m + " (" + killer.getUser() + ")"); break; }
       }
     }
-    final int s = killer.getScore().getSpree();
+    final int s = killer.score.getSpree();
     switch(s) {
       case 5  : { killer.announce("sp,5"); break; }
       case 10 : { killer.announce("sp,10"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X10 (" + killer.getUser() + ")"); break; }
@@ -286,6 +297,7 @@ public abstract class NoxioGame {
       case 25 : { killer.announce("sp,25"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X25 (" + killer.getUser() + ")"); break; }
       default : { break; }
     }
+    return false;
   }
   
   /* Annouce Codes;
@@ -335,8 +347,21 @@ public abstract class NoxioGame {
     gameOver = true; resetTimer = 210;
   }
   
+  /* Sends stats recorded in this match to the auth server */
+  public void sendStats(final String user, final Score.Stats stats) {
+    lobby.httpToAuth.push(new PacketH01(user, stats));
+  }
+  
+  public void destroy() {
+    while(controllers.size() > 0) {
+      final String usr = controllers.get(0).getUser();
+      sendStats(usr, controllers.get(0).destroy());
+      controllers.remove(0);
+    }
+  }
+  
   public void close() {
-    /* Do things! */
+    destroy();
   }
   
   public abstract int getScoreToWin();                                          // Returns number of points needed to win the game

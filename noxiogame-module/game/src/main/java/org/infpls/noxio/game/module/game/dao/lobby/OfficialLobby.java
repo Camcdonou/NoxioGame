@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class OfficialLobby extends GameLobby {
-  public OfficialLobby(final LobbySettings settings) throws IOException {
-    super(settings);
+  public OfficialLobby(final HttpThread http, final LobbySettings settings) throws IOException {
+    super(http, settings);
   }
   
   @Override
