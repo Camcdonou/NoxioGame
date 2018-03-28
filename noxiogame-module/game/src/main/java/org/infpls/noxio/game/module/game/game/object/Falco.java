@@ -1,9 +1,22 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import java.util.List;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Falco extends Player {
+  public static enum Permutation {
+    CRT_N(0, UserUnlocks.Key.CHAR_CRATE),
+    CRT_ORN(1, UserUnlocks.Key.ALT_CRATEORANGE);
+    
+    public final int permutation;
+    public final UserUnlocks.Key unlock;
+    Permutation(int permutation, UserUnlocks.Key unlock) {
+       this.permutation = permutation;
+       this.unlock = unlock;
+    }
+  }
+  
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 35;
   private static final int DASH_COOLDOWN_LENGTH = 45, CHARGE_TIME_LENGTH = 20;
   private static final int TAUNT_COOLDOWN_LENGTH = 10;
@@ -13,12 +26,12 @@ public class Falco extends Player {
   
   private boolean channelDash;
   private int blipCooldown, dashCooldown, blipPower, dashPower, criticalTimer;
-  public Falco(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, -1);
+  public Falco(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+    this(game, oid, position, perm, -1);
   }
   
-  public Falco(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position, team);
+  public Falco(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+    super(game, oid, position, perm.permutation, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.1f; friction = 0.725f;
@@ -101,5 +114,5 @@ public class Falco extends Player {
   }
   
   @Override
-  public String type() { return "flc"; }
+  public String type() { return "crt"; }
 }

@@ -1,10 +1,23 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import java.util.List;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Shiek extends Player {
+  public static enum Permutation {
+    VOX_N(0, UserUnlocks.Key.CHAR_VOXEL),
+    VOX_GRN(1, UserUnlocks.Key.ALT_VOXELGREEN);
+    
+    public final int permutation;
+    public final UserUnlocks.Key unlock;
+    Permutation(int permutation, UserUnlocks.Key unlock) {
+       this.permutation = permutation;
+       this.unlock = unlock;
+    }
+  }
+  
   private static final int FLASH_COOLDOWN_LENGTH = 30, MARK_COOLDOWN_LENGTH = 10, FLASH_STUN_LENGTH = 45, FLASH_CHARGE_LENGTH = 10;
   private static final int BANG_COOLDOWN_LENGTH = 22, BANG_POWER_USE = 15, BANG_POWER_MAX = 80;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
@@ -14,12 +27,12 @@ public class Shiek extends Player {
   private Vec2 mark;
   private boolean channelFlash;
   private int flashCooldown, bangCooldown, bangPower;
-  public Shiek(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, -1);
+  public Shiek(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+    this(game, oid, position, perm, -1);
   }
   
-  public Shiek(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position, team);
+  public Shiek(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+    super(game, oid, position, perm.permutation, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.755f;
@@ -171,5 +184,5 @@ public class Shiek extends Player {
   }
   
   @Override
-  public String type() { return "shk"; }
+  public String type() { return "vox"; }
 }

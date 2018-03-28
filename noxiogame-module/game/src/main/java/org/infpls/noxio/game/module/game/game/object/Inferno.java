@@ -1,17 +1,29 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Inferno extends Player {
+  public static enum Permutation {
+    INF_N(0, UserUnlocks.Key.CHAR_INFERNO);
+    
+    public final int permutation;
+    public final UserUnlocks.Key unlock;
+    Permutation(int permutation, UserUnlocks.Key unlock) {
+    this.permutation = permutation;
+     this.unlock = unlock;
+    }
+  }
+  
   private final static int GEN_COOLDOWN_LENGTH = 10, TAUNT_COOLDOWN_LENGTH = 30;
 
   private int genCooldown;
-  public Inferno(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, -1);
+  public Inferno(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+    this(game, oid, position, perm, -1);
   }
   
-  public Inferno(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position, team);
+  public Inferno(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+    super(game, oid, position, perm.permutation, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;

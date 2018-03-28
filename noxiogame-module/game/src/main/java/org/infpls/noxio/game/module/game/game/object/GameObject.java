@@ -17,14 +17,16 @@ public abstract class GameObject {
   protected final int oid;         /* Object ID */
   public int bitIs;                /* No touchy */
   
-  protected int team;             /* Team id for various uses, -1 is "No Team" id. */
+  public final int permutation;      /* Used to set special *alternate* visuals to an object. 0 always refers to the default. */
+  public final int team;             /* Team id. -1 is 'no team', 0 is 'red team', 1 is 'blue team' */
+  protected int color;               /* Sets custom color on this object, this value is interpreted differntly based on team. 0 is default. */
   
   protected boolean dead;
   protected Vec2 position, velocity;
-  public GameObject(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, new Vec2());
+  public GameObject(final NoxioGame game, final int oid, final Vec2 position, final int permutation) {
+    this(game, oid, position, permutation, -1);
   }
-  public GameObject(final NoxioGame game, final int oid, final Vec2 position, final Vec2 velocity) {
+  public GameObject(final NoxioGame game, final int oid, final Vec2 position, final int permutation, final int team) {
     this.game = game;
     
     this.oid = oid;
@@ -32,8 +34,10 @@ public abstract class GameObject {
     
     this.dead = false;
     this.position = position;
-    this.velocity = velocity;
-    this.team = -1;
+    this.velocity = new Vec2();
+    this.permutation = permutation;
+    this.team = team;
+    this.color = 0;
   }
   
   public abstract void step();
@@ -46,6 +50,8 @@ public abstract class GameObject {
   public final int getOid() { return oid; }
   public final boolean is(final int flag) { return (bitIs & flag) == flag; }
   public abstract String type();
+  public final int color() { return color; }
+  public final void setColor(int c) { color = c; }
   
   public final Vec2 getPosition() { return position; }
   public final Vec2 getVelocity() { return velocity; }

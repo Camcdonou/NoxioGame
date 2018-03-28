@@ -19,13 +19,13 @@ public abstract class Player extends Mobile {
   protected final List<String> action;       // Action to be performed on the next frame
   protected final List<String> effects;      // List of actions performed that will be sent to the client on the next update
   
-  protected boolean ultimate;
+  protected boolean objective;               // If this is flagged then this played is considered a gametype "objective" and will be globally visible and marked.
   
   protected Flag holding;
   
   protected int channelTimer, tauntCooldown, stunTimer;
-  public Player(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position);
+  public Player(final NoxioGame game, final int oid, final Vec2 position, final int permutation, final int team) {
+    super(game, oid, position, permutation, team);
     /* Bitmask Type */
     bitIs = bitIs | Types.PLAYER;
     
@@ -43,8 +43,7 @@ public abstract class Player extends Mobile {
     moveSpeed = 0.0375f; jumpHeight = 0.175f;
     
     /* State */
-    this.ultimate = false;
-    this.team = team;
+    objective = false;
     
     /* Timers */
     stunTimer = 0;
@@ -153,7 +152,6 @@ public abstract class Player extends Mobile {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
-    sb.append(team); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");
@@ -186,7 +184,7 @@ public abstract class Player extends Mobile {
   /* Used for 'ultimate lifeform' gamemode. Simply sends an effect id to the client to flag this player as the ultimate lifeform. */
   public final void ultimate() {
     effects.add("ult");
-    ultimate = true;
+    objective = true; /* @TODO: deprecate this system in favor a generic "isObjective" system */
   }
   
   /* Test given circle at <vec2 p> w/ radius <float r> against other players and return hits */ 
@@ -226,7 +224,7 @@ public abstract class Player extends Mobile {
   }
   
   @Override
-  public boolean isGlobal() { return ultimate; }
+  public boolean isGlobal() { return objective; }
   
   @Override
   public void stun(int time) {

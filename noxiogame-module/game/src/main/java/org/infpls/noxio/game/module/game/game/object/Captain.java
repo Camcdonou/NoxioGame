@@ -1,9 +1,21 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import java.util.List;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Captain extends Player {
+  public static enum Permutation {
+    CRG_N(0, UserUnlocks.Key.CHAR_CARGO);
+    
+    public final int permutation;
+    public final UserUnlocks.Key unlock;
+    Permutation(int permutation, UserUnlocks.Key unlock) {
+       this.permutation = permutation;
+       this.unlock = unlock;
+    }
+  }
+  
   private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30;
   private static final int KICK_COOLDOWN_LENGTH = 60, KICK_LENGTH = 7;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
@@ -13,12 +25,12 @@ public class Captain extends Player {
   private Vec2 punchDirection, kickDirection;
   private boolean chargePunch;
   private int punchCooldown, kickCooldown, chargeTimer, kickTimer;
-  public Captain(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, -1);
+  public Captain(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+    this(game, oid, position, perm, -1);
   }
   
-  public Captain(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position, team);
+  public Captain(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+    super(game, oid, position, perm.permutation, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -143,5 +155,5 @@ public class Captain extends Player {
   }
   
   @Override
-  public String type() { return "cap"; }
+  public String type() { return "crg"; }
 }

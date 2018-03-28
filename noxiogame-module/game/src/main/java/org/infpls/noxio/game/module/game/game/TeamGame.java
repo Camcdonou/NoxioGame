@@ -29,7 +29,7 @@ public abstract class TeamGame extends NoxioGame {
     final Vec2 sp = findSafeSpawn(spawns);
     
     int oid = createOid();
-    Player player = makePlayerObject(charSel, sp, c.getTeam());
+    Player player = makePlayerObject(c, charSel, sp, c.getTeam());
     addObject(player);
     c.setControl(player);
   }

@@ -19,8 +19,8 @@ public abstract class Mobile extends GameObject {
   private float vspeed;
   protected boolean intangible, immune, grounded;
     
-  public Mobile(final NoxioGame game, final int oid, final Vec2 position) {
-    super(game, oid, position);
+  public Mobile(final NoxioGame game, final int oid, final Vec2 position, final int permutation, final int team) {
+    super(game, oid, position, permutation, team);
     /* Bitmask Type */
     bitIs = bitIs | Types.MOBILE;
     

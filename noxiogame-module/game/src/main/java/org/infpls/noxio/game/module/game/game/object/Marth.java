@@ -1,9 +1,22 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import java.util.*;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Marth extends Player {
+  public static enum Permutation {
+    QUA_N(0, UserUnlocks.Key.CHAR_QUAD),
+    QUA_FIR(1, UserUnlocks.Key.ALT_QUADFIRE);
+    
+    public final int permutation;
+    public final UserUnlocks.Key unlock;
+    Permutation(int permutation, UserUnlocks.Key unlock) {
+       this.permutation = permutation;
+       this.unlock = unlock;
+    }
+  }
+  
   private static final int SLASH_COOLDOWN_LENGTH = 20, SLASH_COMBO_LENGTH = 3, SLASH_COMBO_DEGEN = 90, SLASH_STUN_LENGTH = 15, SLASH_COMBO_STUN_LENGTH = 25;
   private static final float SLASH_RANGE = 1.0f, SLASH_ANGLE = 120f, SLASH_SEGMENT_DISTANCE=5f, SLASH_IMPULSE = 0.55f, SLASH_COMBO_IMPULSE = 1.05f;
   private static final int COUNTER_COOLDOWN_LENGTH = 45, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 30;
@@ -16,12 +29,12 @@ public class Marth extends Player {
   private Vec2 counterDirection;
   private int combo;
   private int slashCooldown, counterCooldown, comboTimer;
-  public Marth(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, -1);
+  public Marth(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+    this(game, oid, position, perm, -1);
   }
   
-  public Marth(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position, team);
+  public Marth(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+    super(game, oid, position, perm.permutation, team);
     
     /* Settings */
     radius = 0.5f; weight = 0.9f; friction = 0.705f;
@@ -63,7 +76,6 @@ public class Marth extends Player {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
-    sb.append(team); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");
@@ -203,5 +215,5 @@ public class Marth extends Player {
   }
   
   @Override
-  public String type() { return "mar"; }
+  public String type() { return "qua"; }
 }

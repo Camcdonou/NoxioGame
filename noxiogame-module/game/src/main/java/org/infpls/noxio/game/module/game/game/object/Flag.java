@@ -14,7 +14,7 @@ public class Flag extends Mobile {
   private final static int DROP_COOLDOWN_TIME = 45, RESET_COOLDOWN_TIME = 900;
   private final static float KNOCKBACK_REDUCTION_MULT = 0.4f;
   public Flag(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position);
+    super(game, oid, position, 0, team);
     /* Bitmask Type */
     bitIs = bitIs | Types.FLAG;
     
@@ -28,7 +28,6 @@ public class Flag extends Mobile {
     radius = 0.1f; weight = 0.5f; friction = 0.725f;
     
     /* State */
-    this.team = team;
     intangible = true;
     immune = false;
     
@@ -76,7 +75,6 @@ public class Flag extends Mobile {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
-    sb.append(team); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");

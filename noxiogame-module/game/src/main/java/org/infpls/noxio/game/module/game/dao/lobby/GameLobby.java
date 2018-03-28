@@ -27,21 +27,22 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + HTTPS + WSS Support ( IMPLEMENTED INTO SEPERATE BRANCH )
   + Database setup      ( MYSQL SERVER IS NOT RUNNING ON PRODUCTION YET! NEEDS SSL )
   + Patch hash salting  ( UPGRADE SHA256 TO STRONGER HASHING )
-  - Storage of usersettings and userdata
+  + Storage of usersettings and userdata
   - Create filestore for user uploaded content
   - Setup secure paypal payment, credit/debit payment, and patreon support page
   + Email authentication
   - Password change
   - Display name
+  ! Setup server adress whitelist and info dao to store things props
   - Warn users if HW accel is off (Also look into report of bad performance ? (NVM it was actually just someone with HW accel off. no worries here)) (also delete fallback mode (and ban emily))
   ==== Creation of UserData ====
-  - Implement statistics and credits
-  - Implement unlocks (free unlocks & payed user unlocks)
-  - Implement global ranking meter (lifetime credits)
+  + Implement statistics and credits
+  + Implement unlocks (free unlocks & payed user unlocks)
+  + Implement global ranking meter (lifetime credits)
   ==== Expansion of UserSettings ====
   - Volume slider expansion ... ( Master, Music, Announcer, Voice, SFX )
   - Custom colors, win sounds, patterns, sprays ( Server side usersettings )
-  - Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
+  + Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
   ==== Required Features. Will add ====
   - Create custom game menus
   - Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF )
@@ -50,6 +51,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Create a handful of alt skins for unlocks
   - Optimize decals, very very bad performance with them
   ==== Extra Features. Unlikely to add before release ====
+  - Improve chat log, it's very bad performance wise and lacks features
+  - Move all javascript constants into the actual function instead of the constructor. Small performance change.
   - Spectator mode
   - 3D Skyboxes
   - Low graphics mode    ( Diffuse render only, very low end computer support )
@@ -60,6 +63,18 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Voice work for ... Announcer, Fox, Shiek, Puff
   - Sound effect work for ... ( All SFX from melee need to be replaced )
   - Game Music ... (This is not likely to happen but possibly chiptune/synthwave music ? )
+*/
+
+/* Unlock list additions -
+  - Custom Color and Phase Colors as seperate things
+  - Ironman BTW
+  - Hitmarker
+  - Color Match x3
+  - Edgey Dark Shine
+  - Blood Shine
+  - Rainbow Shine
+  - Minecraft Block
+  - Windows Error Message
 */
 
 public abstract class GameLobby {

@@ -1,21 +1,35 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
 import java.util.List;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
 public class Fox extends Player {
+  public static enum Permutation {
+    BOX_N(0, UserUnlocks.Key.CHAR_BOX),
+    BOX_RED(1, UserUnlocks.Key.ALT_BOXRED),
+    BOX_GLD(2, UserUnlocks.Key.ALT_BOXGOLD);
+    
+    public final int permutation;
+    public final UserUnlocks.Key unlock;
+    Permutation(int permutation, UserUnlocks.Key unlock) {
+       this.permutation = permutation;
+       this.unlock = unlock;
+    }
+  }
+  
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30;
   private static final int DASH_COOLDOWN_LENGTH = 15, DASH_POWER_MAX = 60, DASH_POWER_ADD = 30, DASH_STUN_TIME = 30;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float BLIP_IMPULSE = 0.875f, DASH_IMPULSE = 0.25f, BLIP_RADIUS = 0.6f;
   
   private int blipCooldown, dashCooldown, blipPower, dashPower;
-  public Fox(final NoxioGame game, final int oid, final Vec2 position) {
-    this(game, oid, position, -1);
+  public Fox(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+    this(game, oid, position, perm, -1);
   }
   
-  public Fox(final NoxioGame game, final int oid, final Vec2 position, final int team) {
-    super(game, oid, position, team);
+  public Fox(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+    super(game, oid, position, perm.permutation, team);
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -77,5 +91,5 @@ public class Fox extends Player {
   }
   
   @Override
-  public String type() { return "fox"; }
+  public String type() { return "box"; }
 }

@@ -68,6 +68,14 @@ public class UserSettings {
       useCustomSound = ucs;
       customSoundFile = csf;
     }
+    /* team=0 returns red team color, team=1 returns blue team color, all else returns regular color */
+    public int getColor(int team) {
+      switch(team) {
+        case 0 : { return redColor; }
+        case 1 : { return blueColor; }
+        default : { return color; }
+      }
+    }
   }
   
   public class Toggle {

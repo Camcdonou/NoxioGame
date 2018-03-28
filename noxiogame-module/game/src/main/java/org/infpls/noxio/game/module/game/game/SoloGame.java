@@ -29,7 +29,7 @@ public abstract class SoloGame extends NoxioGame {
     final Vec2 sp = findSafeSpawn(spawns);
     
     int oid = createOid();
-    Player player = makePlayerObject(charSel, sp);
+    Player player = makePlayerObject(c, charSel, sp);
     addObject(player);
     c.setControl(player);
   }

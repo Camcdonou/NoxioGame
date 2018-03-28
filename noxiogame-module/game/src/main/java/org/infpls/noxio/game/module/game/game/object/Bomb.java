@@ -15,7 +15,7 @@ public class Bomb extends Mobile {
 
   private int detonationTimer;
   public Bomb(final NoxioGame game, final int oid, final Vec2 position, final int team, final int timer, final Player owner) {
-    super(game, oid, position);
+    super(game, oid, position, 0, team);
     
     this.owner = owner;
     
@@ -26,7 +26,6 @@ public class Bomb extends Mobile {
     
     /* State */
     intangible = true;
-    this.team = team;
     
     /* Timers */
     detonationTimer = timer;
@@ -103,7 +102,6 @@ public class Bomb extends Mobile {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
-    sb.append(team); sb.append(";");
     position.toString(sb); sb.append(";");
     velocity.toString(sb); sb.append(";");
     sb.append(getHeight()); sb.append(";");

@@ -8,6 +8,7 @@ import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.session.PacketH01;
 import org.infpls.noxio.game.module.game.util.Oak;
 
@@ -94,7 +95,7 @@ public abstract class NoxioGame {
   /* EX: chat messages, object creation, object deletion */
   /* Arrays are commas seperated value lists such as 1,54,6,23,12 or big,fat,booty,blaster
   /* Table of different data structures that are generated --
-      OBJ::CREATE   -  crt;<int oid>;<string type>;<vec2 pos>;<vec2 vel>;
+      OBJ::CREATE   -  crt;<string type>;<int oid>;<vec2 pos>;<int permutation>;<int team>;<int color>;
       OBJ::DELETE   -  del;<int oid>;<vec2 pos>;
       SYS::SCORE    -  scr;<String gametype>;<String description>;<String[] players>;<String[] scores>;<float[] meter>;<float[] r>;<float[] g>;<float[] b>;
       SYS::MESSAGE  -  msg;<String message>;
@@ -102,8 +103,8 @@ public abstract class NoxioGame {
       SYS::GAMEOVER -  end;<String winner>;
       DBG::TICK     -  tck;<long tick>;<long sent>;
   */
-  private final List<GameObject> created, deleted;  // List of objects create/deleted on this frame. These changes come first in update data.
-  protected final List<String> update;                // List of "impulse" updates on this frame. These are things that happen as single events such as chat messages.
+  private final List<GameObject> created, deleted;   // List of objects create/deleted on this frame. These changes come first in update data.
+  protected final List<String> update;               // List of "impulse" updates on this frame. These are things that happen as single events such as chat messages.
   public void generateUpdatePackets(final long tick) {
     final StringBuilder sba = new StringBuilder(); // Append to start
     final StringBuilder sbb = new StringBuilder(); // Append to end
@@ -115,7 +116,9 @@ public abstract class NoxioGame {
       sba.append(obj.getOid()); sba.append(";");
       sba.append(obj.type()); sba.append(";");
       obj.getPosition().toString(sba); sba.append(";");
-      obj.getVelocity().toString(sba); sba.append(";");
+      sba.append(obj.permutation); sba.append(";");
+      sba.append(obj.team); sba.append(";");
+      sba.append(obj.color()); sba.append(";");
     }
     for(int i=0;i<deleted.size();i++) {
       final GameObject obj = deleted.get(i);
@@ -156,7 +159,9 @@ public abstract class NoxioGame {
       sb.append(obj.getOid()); sb.append(";");
       sb.append(obj.type()); sb.append(";");
       obj.getPosition().toString(sb); sb.append(";");
-      obj.getVelocity().toString(sb); sb.append(";");
+      sb.append(obj.permutation); sb.append(";");
+      sb.append(obj.team); sb.append(";");
+      sb.append(obj.color()); sb.append(";");
     }
     lobby.sendPacket(new PacketG10(sb.toString()), player);
   }
@@ -192,18 +197,74 @@ public abstract class NoxioGame {
   }
   
   protected abstract void spawnPlayer(final Controller c, final Queue<String> q);
-  protected final Player makePlayerObject(final String id, final Vec2 pos) { return makePlayerObject(id, pos, -1); }
-  protected final Player makePlayerObject(final String id, final Vec2 pos, final int team) {
-    switch(id) {
-      case "inf" : { return new Inferno(this, createOid(), pos, team); }
-      case "fox" : { return new Fox(this, createOid(), pos, team); }
-      case "flc" : { return new Falco(this, createOid(), pos, team); }
-      case "mar" : { return new Marth(this, createOid(), pos, team); }
-      case "shk" : { return new Shiek(this, createOid(), pos, team); }
-      case "puf" : { return new Puff(this, createOid(), pos, team); }
-      case "cap" : { return new Captain(this, createOid(), pos, team); }
-      default : { return new Fox(this, createOid(), pos, team); }
+  protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos) { return makePlayerObject(c, id, pos, -1); }
+  protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos, final int team) {
+    /* @TODO: use reflection to meme this in a more efficent way? very low priority */
+    
+    /* BOX_x :: Fox.java */
+    for(Fox.Permutation perm : Fox.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Fox po = new Fox(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
     }
+      
+    /* CRT_x :: Falco.java */
+    for(Falco.Permutation perm : Falco.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Falco po = new Falco(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
+    }
+      
+    /* QUA_x :: Marth.java */
+    for(Marth.Permutation perm : Marth.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Marth po = new Marth(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
+    }
+      
+    /* VOX_x :: Shiek.java */
+    for(Shiek.Permutation perm : Shiek.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Shiek po = new Shiek(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
+    }
+      
+    /* BLK_x :: Puff.java */
+    for(Puff.Permutation perm : Puff.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Puff po = new Puff(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
+    }
+      
+    /* CRG_x :: Captain.java */
+    for(Captain.Permutation perm : Captain.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Captain po = new Captain(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
+    }
+    
+    /* INF_x :: Inferno.java */
+    for(Inferno.Permutation perm : Inferno.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Inferno po = new Inferno(this, createOid(), pos, perm, team);
+        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        return po;
+      }
+    }
+    
+    return new Fox(this, createOid(), pos, Fox.Permutation.BOX_N, team); /* Default */
   }
   
   private final static float SAFE_SPAWN_RADIUS = 2.5f;

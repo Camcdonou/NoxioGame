@@ -9,7 +9,7 @@ import org.infpls.noxio.game.module.game.dao.user.UserData;
 final public class Controller {
   private final NoxioGame game;
   private final String sid;   // Session ID of the player
-  private final UserData user; // User info, settings, and unlocks
+  public final UserData user; // User info, settings, and unlocks
   
   private int team;                 // Team this player is on, -1 if no teams.
   private GameObject object;        // Object this controller is controlling

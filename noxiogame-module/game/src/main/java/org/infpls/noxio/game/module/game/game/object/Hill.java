@@ -11,7 +11,7 @@ public class Hill extends GameObject {
   private final Map<Integer, Integer> scoreTimers;
   
   public Hill(final NoxioGame game, final int oid, final Vec2 position, final Vec2 size) {
-    super(game, oid, position);
+    super(game, oid, position, 0);
     /* Bitmask Type */
     bitIs = bitIs | Types.HILL;
     
@@ -65,7 +65,6 @@ public class Hill extends GameObject {
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
-    sb.append(team); sb.append(";");
     position.toString(sb); sb.append(";");
     size.toString(sb); sb.append(";");
   }
