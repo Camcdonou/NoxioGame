@@ -2,6 +2,7 @@ package org.infpls.noxio.game.module.game.game;
 
 import java.io.IOException;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
@@ -9,6 +10,14 @@ public class TeamDeathmatch extends TeamGame {
   
   public TeamDeathmatch(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
+  }
+  
+  private Controller topPlayer() {
+    Controller top = controllers.get(0);
+    for(int i=1;i<controllers.size();i++) {
+      if(top.score.getKills() < controllers.get(i).score.getKills()) { top = controllers.get(i); }
+    }
+    return top;
   }
   
   @Override
@@ -22,10 +31,18 @@ public class TeamDeathmatch extends TeamGame {
     
     updateScore();
     announceObjective();
-    
+        
     int winr;
-    if(scores[0] >= scoreToWin) { gameOver("Red Team wins!"); winr = 0; }
-    else if(scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); winr = 1; }
+    if(scores[0] >= scoreToWin) {
+      final Controller top = topPlayer();
+      gameOver("Red Team wins!", "MVP -> " + top.getUser() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+      winr = 0;
+    }
+    else if(scores[1] >= scoreToWin) {
+      final Controller top = topPlayer();
+      gameOver("Blue Team wins!", "MVP -> " + top.getUser() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+      winr = 1;
+    }
     else { return; }
     if(scores[winr==0?1:0] == 0) {
       for(int i=0;i<controllers.size();i++) {

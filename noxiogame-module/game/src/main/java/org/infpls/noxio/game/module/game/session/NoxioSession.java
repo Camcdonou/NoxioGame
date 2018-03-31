@@ -82,7 +82,6 @@ public final class NoxioSession {
   }
   
   public String getUser() {
-    if(!loggedIn()) { return null; }
     return user.name;
   }
   

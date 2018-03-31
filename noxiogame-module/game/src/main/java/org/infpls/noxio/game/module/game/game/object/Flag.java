@@ -68,11 +68,6 @@ public class Flag extends Mobile {
      Note: onBase is an int where 1 is true, 0 is false. Booleans suck for networking with javscript
   */
   public void generateUpdateData(final StringBuilder sb) {
-    final Controller c = game.getControllerByObject(this);
-    final String name;
-    if(c != null) { name = c.getUser(); }
-    else { name = ""; }
-    
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
     position.toString(sb); sb.append(";");

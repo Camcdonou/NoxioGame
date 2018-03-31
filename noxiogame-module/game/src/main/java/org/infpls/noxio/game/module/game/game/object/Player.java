@@ -158,7 +158,7 @@ public abstract class Player extends Mobile {
     sb.append(getVSpeed()); sb.append(";");
     look.toString(sb); sb.append(";");
     sb.append(speed); sb.append(";");
-    sb.append(name); sb.append(";");
+    sb.append(name); sb.append(";"); /* @TODO: send this a single time instead all the time */
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }

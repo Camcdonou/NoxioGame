@@ -94,7 +94,7 @@ public class Ultimate extends SoloGame {
     announceObjective();
     if(player.score.getObjectives() >= scoreToWin) {
       if(player.score.getDeaths() < 1) { player.announce("pf"); player.score.perfect(); }
-      gameOver(player.getUser() + " wins!");
+      gameOver(player.getUser() + " wins!", "[CUSTOM WIN MESSAGE]", player.getCustomSound());
       
       final boolean bsort = true;
       final Controller[] cs = controllers.toArray(new Controller[0]);
@@ -107,11 +107,11 @@ public class Ultimate extends SoloGame {
       }
 
       for(int i=0;i<cs.length;i++) {
-        switch(i/(cs.length/4)) {
-          case 0 : { cs[i].score.win(); }
-          case 1 : { cs[i].score.neutral(); }
-          case 2 : { cs[i].score.neutral(); }
-          case 3 : { cs[i].score.lose(); }
+        switch((int)(4f*(((float)i+1)/cs.length))) {
+          case 1 : { cs[i].score.win(); break; }
+          case 2 : { cs[i].score.neutral(); break; }
+          case 3 : { cs[i].score.neutral(); break; }
+          case 4 : { cs[i].score.lose(); break; }
         }
       }
     }

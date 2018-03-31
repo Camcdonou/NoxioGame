@@ -73,6 +73,14 @@ public class TeamKing extends TeamGame {
     updateScore();
   }
   
+  private Controller topPlayer() {
+    Controller top = controllers.get(0);
+    for(int i=1;i<controllers.size();i++) {
+      if(top.score.getObjectives() < controllers.get(i).score.getObjectives()) { top = controllers.get(i); }
+    }
+    return top;
+  }
+  
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
     if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory @TODO: doesnt work, look at actual value instead.
@@ -82,9 +90,18 @@ public class TeamKing extends TeamGame {
     updateScore();
     announceObjective();
     if(moveTimer++ > scoreToMove) { moveHill(); }
+
     int winr;
-    if( scores[0] >= scoreToWin) { gameOver("Red Team wins!"); winr = 0; }
-    else if( scores[1] >= scoreToWin) { gameOver("Blue Team wins!"); winr = 1; }
+    if(scores[0] >= scoreToWin) {
+      final Controller top = topPlayer();
+      gameOver("Red Team wins!", "MVP -> " + top.getUser() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+      winr = 0;
+    }
+    else if(scores[1] >= scoreToWin) {
+      final Controller top = topPlayer();
+      gameOver("Blue Team wins!", "MVP -> " + top.getUser() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+      winr = 1;
+    }
     else { return; }
     if(scores[winr==0?1:0] == 0) {
       for(int i=0;i<controllers.size();i++) {

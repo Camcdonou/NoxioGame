@@ -60,9 +60,6 @@ public class Hill extends GameObject {
      obj;<int oid>;<int team>;<vec2 pos>;<vec2 size>;
   */
   public void generateUpdateData(final StringBuilder sb) {
-    final Controller c = game.getControllerByObject(this);
-    final String name = c!=null?c.getUser():"";
-    
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");
     position.toString(sb); sb.append(";");

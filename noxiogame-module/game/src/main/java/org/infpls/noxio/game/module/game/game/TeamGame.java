@@ -97,6 +97,8 @@ public abstract class TeamGame extends NoxioGame {
     controllers.add(controller);
     generateJoinPacket(player);
     updateScore();
+    final String csm = controller.getCustomSound();
+    if(csm != null) { update.add("snd;" + csm + ";"); }
   }
   
   @Override

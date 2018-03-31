@@ -95,17 +95,18 @@ public abstract class NoxioGame {
   /* EX: chat messages, object creation, object deletion */
   /* Arrays are commas seperated value lists such as 1,54,6,23,12 or big,fat,booty,blaster
   /* Table of different data structures that are generated --
-      OBJ::CREATE   -  crt;<string type>;<int oid>;<vec2 pos>;<int permutation>;<int team>;<int color>;
+      OBJ::CREATE   -  crt;<String type>;<int oid>;<vec2 pos>;<int permutation>;<int team>;<int color>;
       OBJ::DELETE   -  del;<int oid>;<vec2 pos>;
       SYS::SCORE    -  scr;<String gametype>;<String description>;<String[] players>;<String[] scores>;<float[] meter>;<float[] r>;<float[] g>;<float[] b>;
       SYS::MESSAGE  -  msg;<String message>;
-      SYS::ANNOUNCE -  anc;<string code>;
-      SYS::GAMEOVER -  end;<String winner>;
+      SYS::ANNOUNCE -  anc;<String code>;
+      SYS::LOADSND  -  snd;<String customSoundFile>;
+      SYS::GAMEOVER -  end;<String head>;<String foot>;<String customSoundFile>;
       DBG::TICK     -  tck;<long tick>;<long sent>;
   */
   private final List<GameObject> created, deleted;   // List of objects create/deleted on this frame. These changes come first in update data.
   protected final List<String> update;               // List of "impulse" updates on this frame. These are things that happen as single events such as chat messages.
-  public void generateUpdatePackets(final long tick) {
+  public final void generateUpdatePackets(final long tick) {
     final StringBuilder sba = new StringBuilder(); // Append to start
     final StringBuilder sbb = new StringBuilder(); // Append to end
     
@@ -151,7 +152,7 @@ public abstract class NoxioGame {
     }
   }
   
-  protected void generateJoinPacket(NoxioSession player) {
+  protected final void generateJoinPacket(NoxioSession player) {
     final StringBuilder sb = new StringBuilder();
     for(int i=0;i<objects.size();i++) {
       final GameObject obj = objects.get(i);
@@ -162,6 +163,10 @@ public abstract class NoxioGame {
       sb.append(obj.permutation); sb.append(";");
       sb.append(obj.team); sb.append(";");
       sb.append(obj.color()); sb.append(";");
+    }
+    for(int i=0;i<controllers.size();i++) {
+      final String csm = controllers.get(i).getCustomSound();
+      if(!csm.equals("")) { sb.append("snd;"); sb.append(csm); sb.append(";"); }
     }
     lobby.sendPacket(new PacketG10(sb.toString()), player);
   }
@@ -291,9 +296,12 @@ public abstract class NoxioGame {
   }
   
   public void join(final NoxioSession player) throws IOException {
-    controllers.add(new Controller(this, player));
+    final Controller c = new Controller(this, player);
+    controllers.add(c);
     generateJoinPacket(player);
     updateScore();
+    final String csm = c.getCustomSound();
+    if(!csm.equals("")) { update.add("snd;" + csm + ";"); }
   }
   
   public void leave(final NoxioSession player) {
@@ -324,13 +332,13 @@ public abstract class NoxioGame {
     if(killed == null) { return false; }
     int kjc = killed.score.death();
     
-    if(killer == killed || killer == null) { return false; }
+    if(killer == null || killer == killed) { return false; }
     
     if(killer.getTeam() != -1 && killer.getTeam() == killed.getTeam()) {
       killer.penalize();
       killer.announce("btl"); killer.score.betrayl();
       killed.announce("btd"); killed.score.betrayed();
-      return true;
+      return false;
     }
     killer.score.kill(frame);
     if(!firstBlood) { announce("fb," + killer.getUser()); killer.score.firstBlood(); firstBlood = true; }
@@ -358,7 +366,7 @@ public abstract class NoxioGame {
       case 25 : { killer.announce("sp,25"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X25 (" + killer.getUser() + ")"); break; }
       default : { break; }
     }
-    return false;
+    return true;
   }
   
   /* Annouce Codes;
@@ -401,10 +409,10 @@ public abstract class NoxioGame {
   public void sendMessage(final String msg) {
     update.add("msg;"+msg+";");
   }
-  
-  public void gameOver(String msg) {
+    
+  public void gameOver(String head, String foot, String soundFile) {
     announce("go");
-    update.add("end;"+msg+";");
+    update.add("end;" + head + ";" + foot + ";" + soundFile + ";");
     gameOver = true; resetTimer = 210;
   }
   

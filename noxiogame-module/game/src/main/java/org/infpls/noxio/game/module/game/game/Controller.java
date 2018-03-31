@@ -5,6 +5,7 @@ import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.util.*;
 import org.infpls.noxio.game.module.game.dao.user.UserData;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 
 final public class Controller {
   private final NoxioGame game;
@@ -128,7 +129,7 @@ final public class Controller {
     final NoxioSession host = game.lobby.getHost();
     if(host != null) {
       if(host.getSessionId().equals(sid)) {
-        game.gameOver("Game reset by lobby owner!");
+        game.gameOver("Game reset by lobby owner!", "What a dork!", null);
       }
       else {
         whisper("Only the lobby host can reset!");
@@ -178,6 +179,14 @@ final public class Controller {
       object.kill();
     }
     return score.getStats();
+  }
+  
+  /* Returns custom sound file name IF this user has it unlocked and has one set */
+  public String getCustomSound() {
+    if(user.unlocks.has(UserUnlocks.Key.FT_SOUND) && user.settings.game.useCustomSound) {
+       return user.settings.game.customSoundFile;
+    }
+    return "";
   }
   
   public void penalize() { penalized = true; respawnPenalty++; }
