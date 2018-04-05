@@ -22,19 +22,19 @@ public class CustomLobby extends GameLobby {
   protected void leave(NoxioSession player) throws IOException {
     super.leave(player);
     if(players.size() < 1) { close(); return; }
-    if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getUser() + " is now the lobby host."); }
+    if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getDisplay() + " is now the lobby host."); }
   }
   
   @Override
   public void remove(NoxioSession player) throws IOException {
     super.remove(player);
     if(players.size() < 1) { close(); return; }
-    if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getUser() + " is now the lobby host."); }
+    if(player == hostPlayer) { hostPlayer = players.get(0); game.sendMessage(hostPlayer.getDisplay() + " is now the lobby host."); }
   }
     
   @Override
   public NoxioSession getHost() { return hostPlayer; }
   
   @Override
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, game.gametypeName(), hostPlayer == null ? "N/A" : getHost().getUser(), players.size(), maxPlayers); }
+  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, game.gametypeName(), hostPlayer == null ? "N/A" : getHost().getDisplay(), players.size(), maxPlayers); }
 }

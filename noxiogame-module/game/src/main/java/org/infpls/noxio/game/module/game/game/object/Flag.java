@@ -64,8 +64,8 @@ public class Flag extends Mobile {
    
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<int onBase>;<string[] effects>
-     Note: onBase is an int where 1 is true, 0 is false. Booleans suck for networking with javscript
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<int onBase>;<string[] effects>
+     Note: onBase is an int where 1 is true, 0 is false.
   */
   public void generateUpdateData(final StringBuilder sb) {
     sb.append("obj"); sb.append(";");

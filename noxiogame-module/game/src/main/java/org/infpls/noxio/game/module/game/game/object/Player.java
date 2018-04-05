@@ -148,7 +148,7 @@ public abstract class Player extends Mobile {
   */
   public void generateUpdateData(final StringBuilder sb) {
     final Controller c = game.getControllerByObject(this);
-    final String name = c!=null?c.getUser():"";
+    final String name = c!=null?c.getDisplay():""; /* @TODO: fucking oof, change this. massively inefficent and wasteful of bandwidth */
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");

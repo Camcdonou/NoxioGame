@@ -81,6 +81,10 @@ public final class NoxioSession {
     return user != null && isOpen();
   }
   
+  public String getDisplay() {
+    return user.display;
+  }
+  
   public String getUser() {
     return user.name;
   }

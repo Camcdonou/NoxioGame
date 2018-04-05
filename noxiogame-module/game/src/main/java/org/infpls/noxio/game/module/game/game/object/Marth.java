@@ -68,11 +68,11 @@ public class Marth extends Player {
   
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<string[] effects>
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<vec2 counterDirection>;<string[] effects>
   */
   public void generateUpdateData(final StringBuilder sb) {
     final Controller c = game.getControllerByObject(this);
-    final String name = c!=null?c.getUser():"";
+    final String name = c!=null?c.getDisplay():"";
     
     sb.append("obj"); sb.append(";");
     sb.append(oid); sb.append(";");

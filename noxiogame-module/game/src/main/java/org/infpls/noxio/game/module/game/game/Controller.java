@@ -140,7 +140,7 @@ final public class Controller {
   
   private void chatMessage(final Queue<String> q) {
     final String msg = q.remove();
-    game.sendMessage(this.user + " > " + msg);
+    game.sendMessage(getDisplay() + " > " + msg);
   }
   
   public void step() {
@@ -194,8 +194,9 @@ final public class Controller {
   public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
   public void announce(final String code) { update.add("anc;"+code+";"); }
   public String getUser() { return user.name; }
+  public String getDisplay() { return user.display; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }
-  public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } game.sendMessage(getUser() + " joined " + (team==0?"Red":"Blue") + " Team."); }
+  public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } game.sendMessage(getDisplay() + " joined " + (team==0?"Red":"Blue") + " Team."); }
   public GameObject getControlled() { return object; }
 }

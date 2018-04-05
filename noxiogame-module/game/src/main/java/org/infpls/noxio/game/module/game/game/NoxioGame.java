@@ -341,29 +341,29 @@ public abstract class NoxioGame {
       return false;
     }
     killer.score.kill(frame);
-    if(!firstBlood) { announce("fb," + killer.getUser()); killer.score.firstBlood(); firstBlood = true; }
+    if(!firstBlood) { announce("fb," + killer.getDisplay()); killer.score.firstBlood(); firstBlood = true; }
     if(kjc >= 5 && kjc < 10) { killer.announce("kj"); killer.score.killJoy(); }
-    else if(kjc >= 10) { announce("er," + killer.getUser() + "," + killed.getUser()); sendMessage("Killjoy (" + killer.getUser() + ")"); killer.score.endedReign(); }
+    else if(kjc >= 10) { announce("er," + killer.getDisplay() + "," + killed.getDisplay()); sendMessage("Killjoy (" + killer.getDisplay() + ")"); killer.score.endedReign(); }
     final int m = killer.score.getMulti();
     if(m > 1) {
       switch(m) {
         case 2  : { killer.announce("mk,2"); break; }
         case 3  : { killer.announce("mk,3"); break; }
-        case 4  : { killer.announce("mk,4"); sendMessage("Multikill X4 (" + killer.getUser() + ")"); break; }
-        case 5  : { killer.announce("mk,5"); sendMessage("Multikill X5 (" + killer.getUser() + ")"); break; }
-        case 6  : { killer.announce("mk,6"); sendMessage("Multikill X6 (" + killer.getUser() + ")"); break; }
-        case 7  : { killer.announce("mk,7"); sendMessage("Multikill X7 (" + killer.getUser() + ")"); break; }
-        case 8  : { killer.announce("mk,8"); sendMessage("Multikill X8 (" + killer.getUser() + ")"); break; }
-        default : { killer.announce("mk,9"); sendMessage("Multikill X" + m + " (" + killer.getUser() + ")"); break; }
+        case 4  : { killer.announce("mk,4"); sendMessage("Multikill X4 (" + killer.getDisplay() + ")"); break; }
+        case 5  : { killer.announce("mk,5"); sendMessage("Multikill X5 (" + killer.getDisplay() + ")"); break; }
+        case 6  : { killer.announce("mk,6"); sendMessage("Multikill X6 (" + killer.getDisplay() + ")"); break; }
+        case 7  : { killer.announce("mk,7"); sendMessage("Multikill X7 (" + killer.getDisplay() + ")"); break; }
+        case 8  : { killer.announce("mk,8"); sendMessage("Multikill X8 (" + killer.getDisplay() + ")"); break; }
+        default : { killer.announce("mk,9"); sendMessage("Multikill X" + m + " (" + killer.getDisplay() + ")"); break; }
       }
     }
     final int s = killer.score.getSpree();
     switch(s) {
       case 5  : { killer.announce("sp,5"); break; }
-      case 10 : { killer.announce("sp,10"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X10 (" + killer.getUser() + ")"); break; }
-      case 15 : { killer.announce("sp,15"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X15 (" + killer.getUser() + ")"); break; }
-      case 20 : { killer.announce("sp,20"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X20 (" + killer.getUser() + ")"); break; }
-      case 25 : { killer.announce("sp,25"); announce("oc,"+killer.getUser()); sendMessage("Killing Spree X25 (" + killer.getUser() + ")"); break; }
+      case 10 : { killer.announce("sp,10"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X10 (" + killer.getDisplay() + ")"); break; }
+      case 15 : { killer.announce("sp,15"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X15 (" + killer.getDisplay() + ")"); break; }
+      case 20 : { killer.announce("sp,20"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X20 (" + killer.getDisplay() + ")"); break; }
+      case 25 : { killer.announce("sp,25"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X25 (" + killer.getDisplay() + ")"); break; }
       default : { break; }
     }
     return true;

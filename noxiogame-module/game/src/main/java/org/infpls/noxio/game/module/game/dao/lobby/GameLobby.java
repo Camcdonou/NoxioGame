@@ -26,15 +26,15 @@ import org.infpls.noxio.game.module.game.util.Salt;
   ==== Core Functions ====
   + HTTPS + WSS Support ( IMPLEMENTED INTO SEPERATE BRANCH )
   + Database setup      ( MYSQL SERVER IS NOT RUNNING ON PRODUCTION YET! NEEDS SSL )
-  + Patch hash salting  ( UPGRADE SHA256 TO STRONGER HASHING )
+  + Patch hash salting + using bcrypt for password storage
   + Storage of usersettings and userdata
   + Create filestore for user uploaded content
   - Setup secure paypal payment, credit/debit payment, and patreon support page
   + Email authentication
-  - Password change
-  - Display name
-  ! Setup server adress whitelist and info dao to store things props
-  - Warn users if HW accel is off (Also look into report of bad performance ? (NVM it was actually just someone with HW accel off. no worries here)) (also delete fallback mode (and ban emily))
+  + Password change
+  + Setup server adress whitelist and info dao to store things props (done, confirm its safe, maybe add soms ssh keys or w/e)
+  + Warn users if HW accel is off (Also look into report of bad performance ? (could be improved but it does exist and work)
+  + Guest Mode
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
@@ -44,13 +44,14 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Custom colors, win sounds
   + Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
   ==== Required Features. Will add ====
-  - Create custom game menus
+  ~ Create custom game menus
   - Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF, Payloadish )
   - Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps )
   - Improve existing sky
   - Create a handful of alt skins for unlocks
   - Optimize decals, very very bad performance with them
   ==== Extra Features. Unlikely to add before release ====
+  - Display name
   - Improve chat log, it's very bad performance wise and lacks features
   - Move all javascript constants into the actual function instead of the constructor. Small performance change.
   - Spectator mode
@@ -61,6 +62,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Twitch integration (very unlikely)
   - Sprays
   - Patterns
+  - Delete fallback mode as we abandonded that system ages ago. (and ban emily)
+  - Forgot username email
   ==== Commission Work ====
   - Voice work for ... Announcer, Fox, Shiek, Puff
   - Sound effect work for ... ( All SFX from melee need to be replaced )
@@ -231,7 +234,7 @@ public abstract class GameLobby {
     if(players.contains(player)) { player.close("Lobby Doppleganger Error."); return false; }
     players.add(player);
     loading.add(player);
-    game.sendMessage(player.getUser() + " connected.");
+    game.sendMessage(player.getDisplay() + " connected.");
     return true;
   }
   
@@ -241,7 +244,7 @@ public abstract class GameLobby {
     if(!players.contains(player) || !loading.contains(player)) { remove(player); player.close("Lobby Ghost Error."); return false; } /* A thing that can happen and cause null pointers. Only possible if load times are long on clients and they leave lobby and come back AFAIK */
     loading.remove(player);
     game.join(player);
-    game.sendMessage(player.getUser() + " joined the game.");
+    game.sendMessage(player.getDisplay() + " joined the game.");
     return true;
   }
   
@@ -249,14 +252,14 @@ public abstract class GameLobby {
     if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
     while(loading.remove(player));
     game.leave(player);
-    if(players.size() >= 1) { game.sendMessage(player.getUser() + " left the game."); }
+    if(players.size() >= 1) { game.sendMessage(player.getDisplay() + " left the game."); }
   }
   
   public void remove(NoxioSession player) throws IOException {
     if(!players.remove(player)) { return; } /* If the player attempting to leave is not in the game then don't bother with the rest of this. */
     while(loading.remove(player));
     game.leave(player);
-    if(players.size() >= 1) { game.sendMessage(player.getUser() + " disconnected."); }
+    if(players.size() >= 1) { game.sendMessage(player.getDisplay() + " disconnected."); }
   }
   
   public void remove(NoxioSession player, final String message) throws IOException { player.sendPacket(new PacketG06(message)); remove(player); }

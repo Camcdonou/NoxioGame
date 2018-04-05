@@ -82,7 +82,7 @@ public class King extends SoloGame {
     if(moveTimer++ > scoreToMove) { moveHill(); }
     if(player.score.getObjectives() >= scoreToWin) {
       if(player.score.getDeaths() < 1) { player.announce("pf"); player.score.perfect(); }
-      gameOver(player.getUser() + " wins!", "[CUSTOM WIN MESSAGE]", player.getCustomSound());
+      gameOver(player.getDisplay() + " wins!", "[CUSTOM WIN MESSAGE]", player.getCustomSound());
       
       final boolean bsort = true;
       final Controller[] cs = controllers.toArray(new Controller[0]);

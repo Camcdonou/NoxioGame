@@ -94,12 +94,12 @@ public class TeamKing extends TeamGame {
     int winr;
     if(scores[0] >= scoreToWin) {
       final Controller top = topPlayer();
-      gameOver("Red Team wins!", "MVP -> " + top.getUser() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+      gameOver("Red Team wins!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
       winr = 0;
     }
     else if(scores[1] >= scoreToWin) {
       final Controller top = topPlayer();
-      gameOver("Blue Team wins!", "MVP -> " + top.getUser() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+      gameOver("Blue Team wins!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
       winr = 1;
     }
     else { return; }

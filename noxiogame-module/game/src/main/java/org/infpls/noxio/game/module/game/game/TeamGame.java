@@ -77,7 +77,7 @@ public abstract class TeamGame extends NoxioGame {
     final StringBuilder sb = new StringBuilder();
     sb.append("scr;");
     for(int i=0;i<scores.length;i++) { sb.append(scores[i]); if(i<scores.length-1) { sb.append(","); } } sb.append(";");
-    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getUser()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
+    for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getDisplay()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
     for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getTeam()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
     for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).score.getKills()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
     for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).score.getDeaths()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");
