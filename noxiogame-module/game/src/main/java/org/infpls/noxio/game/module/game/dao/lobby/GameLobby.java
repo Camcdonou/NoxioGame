@@ -35,6 +35,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Setup server adress whitelist and info dao to store things props (done, confirm its safe, maybe add soms ssh keys or w/e)
   + Warn users if HW accel is off (Also look into report of bad performance ? (could be improved but it does exist and work)
   + Guest Mode
+  - 20xx logging/Oak to a seperate file
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
