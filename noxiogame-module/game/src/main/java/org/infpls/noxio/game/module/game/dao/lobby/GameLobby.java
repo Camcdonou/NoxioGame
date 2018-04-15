@@ -36,6 +36,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Warn users if HW accel is off (Also look into report of bad performance ? (could be improved but it does exist and work)
   + Guest Mode
   - 20xx logging/Oak to a seperate file
+  - Look into registering next frame draw at start of draw instead of end.
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
