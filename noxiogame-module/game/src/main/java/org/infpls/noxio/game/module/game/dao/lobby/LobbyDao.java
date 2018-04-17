@@ -2,7 +2,7 @@ package org.infpls.noxio.game.module.game.dao.lobby;
 
 import java.io.IOException;
 import java.util.*;
-import org.infpls.noxio.game.module.game.dao.server.InfoDao;
+import org.infpls.noxio.game.module.game.util.Oak;
 import org.infpls.noxio.game.module.game.util.Scung;
 
 public class LobbyDao {
@@ -11,12 +11,7 @@ public class LobbyDao {
   
   public LobbyDao() {
     lobbies = new ArrayList();
-  }
-  
-  /* @TODO: This class has brought to light a major design problem. We need to ditch spring configuration for a better (static) solution. This will be a major rework. */
-  /* Starts HttpThread and default lobbies */
-  public void start(final InfoDao info) {
-    httpToAuth = new HttpThread(info);
+    httpToAuth = new HttpThread();
     httpToAuth.start();
     
     try {
@@ -28,7 +23,7 @@ public class LobbyDao {
       }
     }
     catch(IOException ex) {
-      ex.printStackTrace();
+      Oak.log(Oak.Level.ERR, "Error during setup of default lobbies.", ex);
     }
   }
   
@@ -85,6 +80,14 @@ public class LobbyDao {
   }
 
   public void destroy() {
-    httpToAuth.close();
+    try {
+      for(int i=0;i<lobbies.size();i++) {
+        lobbies.get(i).close("Game server is shutting down...");
+      }
+      httpToAuth.close();
+    }
+    catch(IOException ex) {
+      Oak.log(Oak.Level.ERR, "Error during server shutdown.", ex);
+    }
   }
 }

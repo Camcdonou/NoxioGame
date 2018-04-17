@@ -2,6 +2,7 @@ package org.infpls.noxio.game.module.game.session;
 
 import java.io.IOException;
 import java.util.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 /* This class handles the sending of packets to connected clients */
 /* This is done on a seperate thread to prevent blocks in the game loop */
@@ -40,28 +41,26 @@ public class SessionThread extends Thread {
         else { doWait(); }
       }
       catch(IOException | IllegalStateException ex) {
-        System.err.println("SessionThread::run() Exception during SessionThread send for user: " + session.getUser());
-        System.err.println("SessionThread::run() Closing connection...");
-        ex.printStackTrace();
+        Oak.log(Oak.Level.ERR, "Exception during SessionThread send for user: '" + session.getUser() + "'. Closing connection.", ex);
         forceClose();
       }
     }
     if(forceClose) {
-      System.err.println("SessionThread::run() Unsafe SessionThread close for user: " + session.getUser());
+      Oak.log(Oak.Level.WARN, "Unsafe SessionThread close for user: '" + session.getUser() + "'");
       try { if(session.isOpen()) { session.close(); } }
-      catch(IOException ex) { System.err.println("SessionThread::forceClose() ## CRITICAL ## Failed to force close SessionThread."); ex.printStackTrace(); }
-      System.err.println("SessionThread::run() resolved for user: " + session.getUser());
+      catch(IOException ex) { Oak.log(Oak.Level.ERR, "Failed to force close SessionThread for user: '" + session.getUser() + "'", ex); }
+      Oak.log(Oak.Level.INFO, "SessionThread resolved for user: '" + session.getUser() + "'");
     }
     closed = true;
   }
   
-  private synchronized void doWait() { try { wait(); } catch(InterruptedException ex) { ex.printStackTrace(); } }
+  private synchronized void doWait() { try { wait(); } catch(InterruptedException ex) { Oak.log(Oak.Level.ERR, "Interrupt Exception.", ex); } }
   private synchronized void doNotify() { notify(); }
   
   public void checkTimeout() {
     final long now = System.currentTimeMillis();
     if(sending && ((now - sendTime) > SEND_TIMEOUT)) {
-      System.err.println("SessionThread::checkTimeout() Send Timeout exceeded for user: " + session.getUser() + " :: lastSend=" + sendTime + " now=" + now + " diff=" + (now-sendTime));
+      Oak.log(Oak.Level.WARN, "Send Timeout exceeded for user: " + session.getUser() + " :: lastSend=" + sendTime + " now=" + now + " diff=" + (now-sendTime));
       forceClose();
     }
   }
@@ -90,15 +89,15 @@ public class SessionThread extends Thread {
     final long start = System.currentTimeMillis();
     long now = start;
     while(!closed && ((now - start) < CLOSE_WAIT_TIMEOUT)) { now = System.currentTimeMillis(); }
-    if(!closed) { System.err.println("SessionThread::blockingWaitForClose() TIMED OUT WAITING FOR CLOSE! user: " + session.getUser()); }
+    if(!closed) { Oak.log(Oak.Level.ERR, "TIMED OUT WAITING FOR CLOSE! user: '" + session.getUser() + "'"); }
     return closed;
   }
   
   private void forceClose() {
     if(forceClose) { return; }
     forceClose = true;
-    System.err.println("SessionThread::forceClose() call for user: " + session.getUser());
-    try { System.err.println("SessionThread::forceClose() kicking user from game: " + session.getUser()); session.leaveGame(); } catch(IOException ex) { ex.printStackTrace(); }
+    Oak.log(Oak.Level.WARN, "ForceClose call for user: '" + session.getUser() + "'");
+    try { Oak.log(Oak.Level.INFO, "Kicking user from game: '" + session.getUser() + "'"); session.leaveGame(); } catch(IOException ex) { Oak.log(Oak.Level.ERR, "Failed to kick user from game.", ex); }
     doNotify();
   }
 }

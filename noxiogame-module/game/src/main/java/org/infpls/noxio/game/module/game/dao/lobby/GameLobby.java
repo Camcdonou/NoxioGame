@@ -6,6 +6,7 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.session.ingame.*;
 import org.infpls.noxio.game.module.game.game.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 import org.infpls.noxio.game.module.game.util.Salt;
 
 /* OLD TODO :: innacurate and out of date
@@ -24,19 +25,20 @@ import org.infpls.noxio.game.module.game.util.Salt;
 
 /* Finalizing list ::
   ==== Core Functions ====
-  + HTTPS + WSS Support ( IMPLEMENTED INTO SEPERATE BRANCH )
-  + Database setup      ( MYSQL SERVER IS NOT RUNNING ON PRODUCTION YET! NEEDS SSL )
+  - MERGE ALL CHANGES TO HTTPS, SETUP HTTPS/SSL FOR SQL, SETUP PAYPAL PROPERTIES
+  + HTTPS + WSS Support
+  + Database setup
   + Patch hash salting + using bcrypt for password storage
   + Storage of usersettings and userdata
   + Create filestore for user uploaded content
-  - Setup secure paypal payment, credit/debit payment, and patreon support page
+  + Setup secure paypal payment, credit/debit payment, and patreon support page
   + Email authentication
   + Password change
   + Setup server adress whitelist and info dao to store things props (done, confirm its safe, maybe add soms ssh keys or w/e)
   + Warn users if HW accel is off (Also look into report of bad performance ? (could be improved but it does exist and work)
   + Guest Mode
-  - 20xx logging/Oak to a seperate file
-  - Look into registering next frame draw at start of draw instead of end.
+  + 20xx logging/Oak to a seperate file
+  - Look into registering next frame draw at start of draw instead of end. (unlikely to have any effect)
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
@@ -174,19 +176,15 @@ public abstract class GameLobby {
       
     }
     catch(Exception ex) {
-      System.err.println("## CRITICAL ## Game step exception!");
-      System.err.println("## STATE    ## lobbyName=" + name + " ... gameOver=" + game.isGameOver());
-      ex.printStackTrace();
-      System.err.println("## CRITICAL ## Attempting to close lobby!");
-      try { close("The Game Lobby encoutered an error and had to close. Sorry!"); System.err.println("## INFO     ## Closed Lobby Successfully!"); }
+      Oak.log(Oak.Level.CRIT, "Game step exception ??? lobbyName=" + name + " ... gameOver=" + game.isGameOver(), ex);
+      Oak.log(Oak.Level.ERR,"Attempting to close lobby nicely!");
+      try { close("The Game Lobby encoutered an error and had to close. Sorry!"); Oak.log(Oak.Level.INFO, "Lobby closed correctly."); }
       catch(IOException ioex) {
-        System.err.println("## CRITICAL ## Failed to close lobby correctly!");
-        System.err.println("## CRITICAL ## Ejecting players manually!");
+        Oak.log(Oak.Level.ERR, "Failed to close lobby correctly! Ejecting players manually!", ioex);
         closed = true;
-        ioex.printStackTrace();
         for(int i=0;i<players.size();i++) {
           try { players.get(i).close(ex); }
-          catch(Exception pioex) { System.err.println("## CRITICAL ## Very bad! Better start praying!"); pioex.printStackTrace(); }
+          catch(Exception pioex) { Oak.log(Oak.Level.CRIT, "Very bad! Better start praying!", pioex); }
         }
       }
     }
@@ -295,7 +293,7 @@ public abstract class GameLobby {
         return;
       }
     }
-    System.err.println("GameLobby::sendPacket() - Invalid User SID '" + sid + "'");
+    Oak.log(Oak.Level.WARN, "Invalid User SID: '" + sid + "'");
   }
   
   /* Send a packet to a specific player */
@@ -341,8 +339,7 @@ public abstract class GameLobby {
           sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
         }
         catch(InterruptedException ex) {
-          System.err.println("## CRITICAL ## Game loop thread interupted by exception!");
-          ex.printStackTrace();
+          Oak.log(Oak.Level.CRIT, "Game loop thread interupted by exception!", ex);
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
         }
       }

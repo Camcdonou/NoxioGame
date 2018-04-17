@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 
 public class InGame extends SessionState {
@@ -65,8 +66,7 @@ public class InGame extends SessionState {
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(Exception ex) { /* IOException | NullPointerException | JsonParseException */
-      System.err.println("User: " + session.getUser() + " threw Exception @ InGame.handlePacket()");
-      ex.printStackTrace();
+      Oak.log(Oak.Level.WARN, "User: '" + session.getUser() + "' threw Unknown Exception", ex);
       close(ex);
     }
   }

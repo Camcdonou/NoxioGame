@@ -1,15 +1,14 @@
 package org.infpls.noxio.game.module.game.session.login;
 
 import org.infpls.noxio.game.module.game.session.Packet;
+import org.infpls.noxio.game.module.game.util.Settable;
 
 public class PacketL01 extends Packet {
-  private final String name, location, description;
-  public PacketL01(final String name, final String location, final String description) {
+  private final Settable.ServerInfo info;
+  public PacketL01(final Settable.ServerInfo info) {
     super("l01");
-    this.name = name; this.location = location; this.description = description;
+    this.info = info;
   }
   
-  public String getName() { return name; }
-  public String getLocation() { return location; }
-  public String getDescription() { return description; }    
+  public Settable.ServerInfo getServerInfo() { return info; }
 }

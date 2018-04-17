@@ -65,7 +65,7 @@ public abstract class NoxioGame {
         }
       }
       else {
-        Oak.log("Invalid User Input :: " + (c!=null?c.getUser():"<NULL_CONTROLLER>") + "@NoxioGame.handlePackets", 1);
+        Oak.log(Oak.Level.WARN, "Invalid User Input: '" + (c!=null?c.getUser():"[NULL_CONTROLLER]") + "'");
       }
     }
   }

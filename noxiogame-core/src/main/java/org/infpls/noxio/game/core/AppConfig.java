@@ -7,7 +7,6 @@ import org.springframework.web.servlet.config.annotation.*;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "org.infpls.noxio.game")
-@PropertySource("classpath:noxio.properties")
 public class AppConfig extends WebMvcConfigurerAdapter {
 
   @Override

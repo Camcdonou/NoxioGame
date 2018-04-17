@@ -4,23 +4,20 @@ import com.google.gson.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import org.infpls.noxio.game.module.game.dao.server.InfoDao;
 import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.session.PacketH09;
+import org.infpls.noxio.game.module.game.util.Oak;
+import org.infpls.noxio.game.module.game.util.Settable;
 
 /* This class handles the sending of packets to connected clients */
 /* This is done on a seperate thread to prevent blocks in the game loop */
 /* If a websocket is blocked for more than 15 seconds on sending a packet it will initiate a force close on it */
-public class HttpThread extends Thread {
-  private final InfoDao info;            // Hacky, gross, please fix this if you get a chance @TODO:
-  
+public class HttpThread extends Thread {  
   private List<Packet> out;        // Outgoing packet queue
   private final Gson gson;
     
   private boolean closed;
-  public HttpThread(final InfoDao info) {
-    this.info = info;
-    
+  public HttpThread() {
     out = new ArrayList();
     gson = new GsonBuilder().create();
     
@@ -45,7 +42,7 @@ public class HttpThread extends Thread {
     final String content = gson.toJson(p);
     HttpURLConnection connection = null;
     try {
-      final URL to = new URL("http://" + info.getAuthServerAddress() + "/noxioauth/report");
+      final URL to = new URL("http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/noxioauth/report");
 
       //Create connection
       connection = (HttpURLConnection)to.openConnection();
@@ -83,14 +80,13 @@ public class HttpThread extends Thread {
       /* Return type of h09 is "error message" so we write that to logs */
       if(p.getType().equals("h09")) {
         final PacketH09 pkth = gson.fromJson(response.toString(), PacketH09.class);
-        System.err.println("HttpThread::sendPost - Request returned error: " + pkth.getMessage());
+        Oak.log(Oak.Level.ERR, "Request returned error: " + pkth.getMessage());
       }
       
     } catch(MalformedURLException ex) {
-      System.err.println("HttpThread::new - Invalid URL : " + "http://" + info.getAuthServerAddress() + "/noxioauth/report");
-      ex.printStackTrace();
+      Oak.log(Oak.Level.ERR, "Invalid URL : " + "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/noxioauth/report", ex);
     } catch (IOException e) {
-      e.printStackTrace();
+      Oak.log(Oak.Level.ERR, "IOException during HTTP POST.", e);
     } finally {
       if(connection != null) {
         connection.disconnect(); 
@@ -98,7 +94,7 @@ public class HttpThread extends Thread {
     }
   }
   
-  private synchronized void doWait() { try { wait(); } catch(InterruptedException ex) { ex.printStackTrace(); } }
+  private synchronized void doWait() { try { wait(); } catch(InterruptedException ex) { Oak.log(Oak.Level.ERR, "Interrupt Exception.", ex); } }
   private synchronized void doNotify() { notify(); }
   
   public void push(final Packet p) { if(closed) { return; } syncPacketAccess(false, p); doNotify(); }

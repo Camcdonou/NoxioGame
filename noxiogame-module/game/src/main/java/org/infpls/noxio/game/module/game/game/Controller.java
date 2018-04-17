@@ -99,7 +99,7 @@ final public class Controller {
       case "05" : { inputAction(q); break; }
       case "06" : { inputReset(q); break; }
       case "08" : { chatMessage(q); break; }
-      default : { Oak.log("Invalid User Input '" + id + "' " + user + "@Controller.handlePacket", 1); break; }
+      default : { Oak.log(Oak.Level.WARN, "Invalid User Input: '" + id + "' User: '" + user + "'"); break; }
     }
   }
   

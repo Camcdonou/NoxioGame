@@ -4,23 +4,15 @@ import com.google.gson.*;
 import java.io.*;
 import java.io.IOException;
 import java.net.*;
-import org.infpls.noxio.game.module.game.dao.server.ServerInfo;
 
-import org.infpls.noxio.game.module.game.dao.server.InfoDao;
-import org.infpls.noxio.game.module.game.dao.user.UserDao;
 import org.infpls.noxio.game.module.game.session.*;
+import org.infpls.noxio.game.module.game.util.Settable;
 
 
 public class Login extends SessionState {
   
-  private final UserDao userDao;
-  private final InfoDao infoDao;
-  
-  public Login(final NoxioSession session, final UserDao userDao, final InfoDao infoDao) throws IOException {
+  public Login(final NoxioSession session) throws IOException {
     super(session);
-    
-    this.userDao = userDao;
-    this.infoDao = infoDao;
     
     sendPacket(new PacketS00('l'));
   }
@@ -50,12 +42,10 @@ public class Login extends SessionState {
   
   /* Validate user/sid then send back result */
   private void userLogin(final PacketL00 p) throws IOException {
-    /* @FIXME This is a blocking method that does a HTTP GET */
-    /* If you don't fix it in the next 3 commits I'll come to your house and kill you */
-    /* I know where you live. */
-
+    /* @TODO: this is blocking but it's probably okay. research and decide. */
+    /* @TODO: move this type of get to a static class? */
     /* @FIXME also the app name is hardcoded here, make that a prop later. */
-    final String address = "http://" + infoDao.getAuthServerAddress() + "/noxioauth/validate/" + p.getUser() + "/" + p.getSid();
+    final String address = "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/noxioauth/validate/" + p.getUser() + "/" + p.getSid();
     StringBuilder result = new StringBuilder();
     URL url = new URL(address);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -72,8 +62,7 @@ public class Login extends SessionState {
     
     if(pkt.getType().equals("l04")) {
       final PacketL04 r = gson.fromJson(result.toString(), PacketL04.class);
-      ServerInfo info = infoDao.getServerInfo();
-      sendPacket(new PacketL01(info.getName(), info.getLocation(), info.getDescription()));
+      sendPacket(new PacketL01(Settable.getServerInfo()));
       session.login(r.getData(), p.getSid());
     }
     else if(pkt.getType().equals("l03")) {

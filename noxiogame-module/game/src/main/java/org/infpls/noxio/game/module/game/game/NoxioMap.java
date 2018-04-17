@@ -41,7 +41,7 @@ public class NoxioMap {
     tileSet = new ArrayList();
     for(int i=0;i<ts.length;i++) {
       final String[] t = ts[i].split(",");
-      if(t.length < 2) { Oak.log("Error parsing map file: " + mapName + " FIELD_1 @NoxioMap.new", 2); continue; }
+      if(t.length < 2) { Oak.log(Oak.Level.ERR, "Error parsing map file: " + mapName + " FIELD_1"); continue; }
       tileSet.add(new Tile(t[0], t[1]));
     }
     
@@ -73,7 +73,7 @@ public class NoxioMap {
     doodadSet = new ArrayList();
     for(int i=0;i<dp.length;i++) {
       final String[] d = dp[i].split(",");
-      if(d.length < 2) { Oak.log("Error parsing map file: " + mapName + " FIELD_4 @NoxioMap.new", 2); continue; }
+      if(d.length < 2) { Oak.log(Oak.Level.ERR, "Error parsing map file: " + mapName + " FIELD_4"); continue; }
       doodadSet.add(new Tile(d[0], d[1]));
     }
     
@@ -82,7 +82,7 @@ public class NoxioMap {
     doodads = new ArrayList();
     for(int i=0;i<dds.length;i++) {
       final String[] d = dds[i].split(",");
-      if(d.length < 4) { Oak.log("Error parsing map file: " + mapName + " FIELD_5 @NoxioMap.new", 2); continue; }
+      if(d.length < 4) { Oak.log(Oak.Level.ERR, "Error parsing map file: " + mapName + " FIELD_5"); continue; }
       doodads.add(new Doodad(Integer.parseInt(d[0]), new Vec3(Float.parseFloat(d[1]), Float.parseFloat(d[2]), Float.parseFloat(d[3])), Float.parseFloat(d[4]), Float.parseFloat(d[5])));
     }
     
@@ -91,7 +91,7 @@ public class NoxioMap {
     floor = new ArrayList();
     for(int i=0;i<cf.length;i++) {
       final String[] f = cf[i].split(",");
-      if(f.length < 6) { Oak.log("Error parsing map file: " + mapName + " FIELD_6 @NoxioMap.new", 2); continue; }
+      if(f.length < 6) { Oak.log(Oak.Level.ERR, "Error parsing map file: " + mapName + " FIELD_6"); continue; }
       final Vec2[] p = new Vec2[f.length/2]; //If this isn't even then you are fucked in so many different ways.
       for(int j=0, k=0;j<f.length;j+=2) {
         p[k++] = new Vec2(Float.parseFloat(f[j])-0.5f, Float.parseFloat(f[j+1])-0.5f); /* @TODO: Offset is sort of??? Unexplained??? Map editor error? */
@@ -104,7 +104,7 @@ public class NoxioMap {
     wall = new ArrayList();
     for(int i=0;i<cw.length;i++) {
       final String[] w = cw[i].split(",");
-      if(w.length < 6) { Oak.log("Error parsing map file: " + mapName + " FIELD_7 @NoxioMap.new", 2); continue; }
+      if(w.length < 6) { Oak.log(Oak.Level.ERR, "Error parsing map file: " + mapName + " FIELD_7"); continue; }
       final Vec2[] p = new Vec2[w.length/2]; //If this isn't even then you are fucked in so many different ways.
       for(int j=0, k=0;j<w.length;j+=2, k++) {
         p[k] = new Vec2(Float.parseFloat(w[j])-0.5f, Float.parseFloat(w[j+1])-0.5f); /* @TODO: Offset is sort of??? Unexplained??? Map editor error? */
@@ -117,7 +117,7 @@ public class NoxioMap {
     spawns = new ArrayList();
     for(int i=0;i<sps.length;i++) {
       final String[] spwn = sps[i].split(",");
-      if(spwn.length < 4) { Oak.log("Error parsing map file: " + mapName + " FIELD_8 @NoxioMap.new", 2); continue; }
+      if(spwn.length < 4) { Oak.log(Oak.Level.ERR, "Error parsing map file: " + mapName + " FIELD_8"); continue; }
       final String[] sgts = new String[spwn.length-4];
       for(int j=4, k=0;j<spwn.length;j++, k++) {
         sgts[k] = spwn[j];

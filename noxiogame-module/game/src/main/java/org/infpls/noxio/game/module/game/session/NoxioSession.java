@@ -11,6 +11,7 @@ import org.infpls.noxio.game.module.game.session.error.*;
 import org.infpls.noxio.game.module.game.session.login.Login;
 import org.infpls.noxio.game.module.game.session.lobby.Lobby;
 import org.infpls.noxio.game.module.game.session.ingame.InGame;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 public final class NoxioSession {
   private final WebSocketSession webSocket;
@@ -54,7 +55,7 @@ public final class NoxioSession {
   private void changeState(final String id, final Object generic) throws IOException {
     if(sessionState != null) { sessionState.destroy(); }
     switch(id) { 
-      case "l" : { sessionState = new Login(this, dao.getUserDao(), dao.getInfoDao()); break; }
+      case "l" : { sessionState = new Login(this); break; }
       case "b" : { sessionState = new Lobby(this, dao.getLobbyDao()); break; }
       case "g" : { sessionState = new InGame(this, (GameLobby)generic); break; }
       default : throw new IOException("Invalid State Exception. What the fuck are you doing? @" + user);
@@ -118,6 +119,7 @@ public final class NoxioSession {
   
   /* Error connection close */
   public void close(final String message) throws IOException {
+    Oak.log(Oak.Level.WARN, "Connection closed for user: '" + (loggedIn()?getUser():"Not Logged In") + "' with message: " + message);
     sessionThread.close();
     if(sessionThread.blockingWaitForClose()) { sendImmiediate(new PacketX00(message)); }
     webSocket.close(CloseStatus.NOT_ACCEPTABLE);
@@ -125,6 +127,7 @@ public final class NoxioSession {
   
   /* Exception connection close */
   public void close(final Exception ex) throws IOException {
+    Oak.log(Oak.Level.WARN, "Connection closed for user: '" + (loggedIn()?getUser():"Not Logged In") + "' with Exception: ", ex);
     sessionThread.close();
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);

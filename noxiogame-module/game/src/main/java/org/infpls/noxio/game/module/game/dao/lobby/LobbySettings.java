@@ -1,6 +1,7 @@
 package org.infpls.noxio.game.module.game.dao.lobby;
 
 import java.util.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 public class LobbySettings extends GameSettings {
   private final List<GameSettings> rotation;
@@ -14,6 +15,8 @@ public class LobbySettings extends GameSettings {
   
   /* ================== Static Methods ================== */
   
+  /* I can't remember why I wrote my own JSON parser here. I think I had a good reason? */
+  /* AFAIK this class works perfectly so no need to change it. */
   public static List<LobbySettings> parseMultipleSettings(final String raw) {
     try {
       final List<LobbySettings> lss = new ArrayList();
@@ -25,9 +28,8 @@ public class LobbySettings extends GameSettings {
       return lss;
     }
     catch(IndexOutOfBoundsException | NullPointerException ex) {
-      System.err.println("LobbySettings::parseMultipleSettings() Error parsing game settings data :: ");
-      System.err.println(raw);
-      ex.printStackTrace();
+      Oak.log(Oak.Level.ERR, "Error parsing game settings data.");
+      Oak.log(Oak.Level.INFO, "Raw settings data: " + raw, ex);
       return null;
     }
   }
@@ -38,9 +40,8 @@ public class LobbySettings extends GameSettings {
       return convertFromMap((Map)map.get("lobby"));
     }
     catch(IndexOutOfBoundsException | NullPointerException ex) {
-      System.err.println("LobbySettings::parseSettings() Error parsing game settings data :: ");
-      System.err.println(raw);
-      ex.printStackTrace();
+      Oak.log(Oak.Level.ERR, "Error parsing game settings data.");
+      Oak.log(Oak.Level.INFO, "Raw settings data: " + raw, ex);
       return null;
     }
   }
