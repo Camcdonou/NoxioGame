@@ -17,7 +17,25 @@ lobbies: [
         map_name: "combat",
         score_to_win: "15",
         respawn_time: "30",
+      }
+    ]
+  },
+  {
+    game_name: "ELIM Test #1",
+    max_players: "6",
+    rotation: [
+      {
+        gametype: "elimination",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "30",
       },
+      {
+        gametype: "elimination",
+        map_name: "final",
+        score_to_win: "15",
+        respawn_time: "30",
+      }
     ]
   },
   {
@@ -63,6 +81,30 @@ lobbies: [
     ]
   },
   {
+    game_name: "TELIM Test #1",
+    max_players: "12",
+    rotation: [
+      {
+        gametype: "teamelimination",
+        map_name: "war",
+        score_to_win: "25",
+        respawn_time: "30"
+      },
+      {
+        gametype: "teamelimination",
+        map_name: "battle",
+        score_to_win: "25",
+        respawn_time: "30"
+      },
+      {
+        gametype: "teamelimination",
+        map_name: "penultimate",
+        score_to_win: "25",
+        respawn_time: "30"
+      }
+    ]
+  },
+  {
     game_name: "CTF Test #1",
     max_players: "12",
     rotation: [
@@ -101,6 +143,54 @@ lobbies: [
         map_name: "penultimate",
         score_to_win: "5",
         respawn_time: "150"
+      }
+    ]
+  },
+  {
+    game_name: "ASS TEST #1",
+    max_players: "12",
+    rotation: [
+      {
+        gametype: "assault",
+        map_name: "war",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "assault",
+        map_name: "battle",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "assault",
+        map_name: "penultimate",
+        score_to_win: "3",
+        respawn_time: "90"
+      }
+    ]
+  },
+  {
+    game_name: "FREE TEST #1",
+    max_players: "10",
+    rotation: [
+      {
+        gametype: "freestyleflag",
+        map_name: "war",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "freestyleflag",
+        map_name: "penultimate",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "freestyleflag",
+        map_name: "battle",
+        score_to_win: "3",
+        respawn_time: "90"
       }
     ]
   },
@@ -159,6 +249,42 @@ lobbies: [
         respawn_time: "90",
         static_hill: "1",
         score_to_move: "7"
+      }
+    ]
+  },
+  {
+    game_name: "ULT Test #1",
+    max_players: "5",
+    rotation: [
+      {
+        gametype: "ultimate",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "60"
+      },
+      {
+        gametype: "ultimate",
+        map_name: "final",
+        score_to_win: "15",
+        respawn_time: "60"
+      }
+    ]
+  },
+  {
+    game_name: "RAB Test #1",
+    max_players: "8",
+    rotation: [
+      {
+        gametype: "rabbit",
+        map_name: "war",
+        score_to_win: "15",
+        respawn_time: "60"
+      },
+      {
+        gametype: "rabbit",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "60"
       }
     ]
   }

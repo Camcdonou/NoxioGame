@@ -9,29 +9,27 @@ import org.infpls.noxio.game.module.game.session.*;
 public abstract class TeamGame extends NoxioGame {
   
   protected final int[] scores;
-  protected final int scoreToWin;
   protected final boolean autoBalanceTeams;
   
   public TeamGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, final int stw) throws IOException {
-    super(lobby, map, settings);
+    super(lobby, map, settings, stw);
     
     scores = new int[]{0,0};
-    scoreToWin = stw;
     autoBalanceTeams = settings.get("auto_balance_teams", 1, 0, 1)==1;
   }
   
   @Override
-  protected void spawnPlayer(final Controller c, final Queue<String> q) {
+  protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
     final String charSel = q.remove();
-    if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
+    if(c.getControlled() != null || !c.respawnReady()) { return false; } /* Already controlling an object */
 
-    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeName(), c.getTeam());
+    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeId(), c.getTeam());
     final Vec2 sp = findSafeSpawn(spawns);
     
-    int oid = createOid();
     Player player = makePlayerObject(c, charSel, sp, c.getTeam());
     addObject(player);
     c.setControl(player);
+    return true;
   }
   
   @Override
@@ -99,6 +97,15 @@ public abstract class TeamGame extends NoxioGame {
     updateScore();
     final String csm = controller.getCustomSound();
     if(csm != null) { update.add("snd;" + csm + ";"); }
+  }
+  
+  /* Sends announce code to all players on specified team */
+  public final void announceTeam(final int team, final String code) {
+    for(int i=0;i<controllers.size();i++) {
+      final Controller c = controllers.get(i);
+      if(c.getTeam() != team) { continue; }
+      c.announce(code);
+    }
   }
   
   @Override

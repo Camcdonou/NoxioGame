@@ -76,7 +76,4 @@ public class Deathmatch extends SoloGame {
 
   @Override
   public int objectiveBaseId() { return 0; }
-  
-  @Override
-  public int getScoreToWin() { return scoreToWin; }
 }

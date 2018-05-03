@@ -145,10 +145,15 @@ public abstract class GameLobby {
     final NoxioMap map = new NoxioMap(gs.get("map_name", "final"));
     switch(gametype.toLowerCase()) {
       case "deathmatch" : { game = new Deathmatch(this, map, gs); break; }
+      case "elimination" : { game = new Elimination(this, map, gs); break; }
       case "king" : { game = new King(this, map, gs); break; }
       case "ultimate" : { game = new Ultimate(this, map, gs); break; }
+      case "rabbit" : { game = new Rabbit(this, map, gs); break; }
       case "teamdeathmatch" : { game = new TeamDeathmatch(this, map, gs); break; }
+      case "teamelimination" : { game = new TeamElimination(this, map, gs); break; }
       case "capturetheflag" : { game = new CaptureTheFlag(this, map, gs); break; }
+      case "freestyleflag" : { game = new FreestyleFlag(this, map, gs); break; }
+      case "assault" : { game = new Assault(this, map, gs); break; }
       case "teamking" : { game = new TeamKing(this, map, gs); break; }
       default : { game = new Deathmatch(this, map, gs); break; }
     }
@@ -163,7 +168,7 @@ public abstract class GameLobby {
         GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
           final NoxioSession player = players.get(i);
-          player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, game.getScoreToWin(), game.isTeamGame(), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
+          player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, game.scoreToWin, game.isTeamGame(), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */
           loading.add(player); /* We don't check for duplicates because if the situation arises where a player loading and a new game triggers we need them to return load finished twice. */
           /* @FIXME while the above comment describes what should happen this might need testing and maybe we need to ID our loads to make sure that the right load is done before allowing the player to join the game */
         }
@@ -201,7 +206,7 @@ public abstract class GameLobby {
             if(!evt.getSession().isOpen()) { break; }                                     /* Check to make sure connection is still active. */
             if(!connect(evt.getSession())) { evt.getSession().sendPacket(new PacketG06("Connection failed.")); evt.getSession().leaveGame(); }
             else { GameLobbyInfo info = getInfo(); evt.getSession().sendPacket(
-              new PacketG01(name, game.gametypeName(), maxPlayers, game.getScoreToWin(), game.isTeamGame(), game.objectiveBaseId(), game.map));
+              new PacketG01(name, game.gametypeName(), maxPlayers, game.scoreToWin, game.isTeamGame(), game.objectiveBaseId(), game.map));
             }
             break;
           }

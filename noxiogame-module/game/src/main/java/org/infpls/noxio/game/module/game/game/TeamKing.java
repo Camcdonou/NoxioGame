@@ -25,7 +25,7 @@ public class TeamKing extends TeamGame {
   }
   
   private Hill createHill() {
-    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeName());
+    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeId());
     final Vec2 hs;
     final float size;
     if(hillSpawns.isEmpty()) {
@@ -46,7 +46,7 @@ public class TeamKing extends TeamGame {
   private void moveHill() {
     moveTimer = 0;
     if(staticHill) { return; }
-    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeName());
+    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeId());
     final Vec2 hs;
     final float size;
     if(hillSpawns.isEmpty()) {
@@ -83,7 +83,7 @@ public class TeamKing extends TeamGame {
   
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
-    if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory @TODO: doesnt work, look at actual value instead.
+    if(isGameOver()) { return; }
     if(player.getTeam()==0) { scores[0]++; }
     else { scores[1]++; }
     player.score.hillControl();
@@ -105,8 +105,8 @@ public class TeamKing extends TeamGame {
     else { return; }
     if(scores[winr==0?1:0] == 0) {
       for(int i=0;i<controllers.size();i++) {
-        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); }
-        else { controllers.get(i).announce("hu"); }
+        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); controllers.get(i).score.perfect(); }
+        else { controllers.get(i).announce("hu"); controllers.get(i).score.humiliation(); }
       }
     }
     for(int i=0;i<controllers.size();i++) {
@@ -127,7 +127,4 @@ public class TeamKing extends TeamGame {
   
   @Override
   public int objectiveBaseId() { return 2; }
-  
-  @Override
-  public int getScoreToWin() { return scoreToWin; }
 }

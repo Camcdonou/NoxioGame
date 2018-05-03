@@ -6,9 +6,9 @@ import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
-public class CaptureTheFlag extends TeamGame {
+public class Assault extends TeamGame {
 
-  public CaptureTheFlag(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
+  public Assault(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 3, 1, 25));
     
     spawnFlags();
@@ -20,9 +20,9 @@ public class CaptureTheFlag extends TeamGame {
     final Vec2 rsl, bsl;
     rsl = rs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)+1f, map.getBounds()[1]*0.5f):rs.get(0).getPos();
     bsl = bs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)-1f, map.getBounds()[1]*0.5f):bs.get(0).getPos();
-    final Flag rf, bf;
-    rf = new Flag(this, createOid(), rsl, 0);
-    bf = new Flag(this, createOid(), bsl, 1);
+    final FlagAssault rf, bf;
+    rf = new FlagAssault(this, createOid(), rsl, 0);
+    bf = new FlagAssault(this, createOid(), bsl, 1);
     addObject(rf);
     addObject(bf);
   }
@@ -85,7 +85,7 @@ public class CaptureTheFlag extends TeamGame {
   }
   
   @Override
-  public String gametypeName() { return "Capture The Flag"; }
+  public String gametypeName() { return "Assault"; }
   
   @Override
   public int objectiveBaseId() { return 1; }

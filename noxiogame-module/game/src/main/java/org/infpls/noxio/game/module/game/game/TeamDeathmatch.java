@@ -2,7 +2,6 @@ package org.infpls.noxio.game.module.game.game;
 
 import java.io.IOException;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
-import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
@@ -72,7 +71,4 @@ public class TeamDeathmatch extends TeamGame {
   
   @Override
   public int objectiveBaseId() { return 0; }
-  
-  @Override
-  public int getScoreToWin() { return scoreToWin; }
 }

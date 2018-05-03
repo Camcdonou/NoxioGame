@@ -16,6 +16,7 @@ public abstract class NoxioGame {
   
   public final GameLobby lobby;
   
+  public final int scoreToWin;
   public final int respawnTime;       // Number of frames that a respawn takes
   public final int penaltyTime;       // Number of extra frames you wait if penalized for team kill or w/e
   
@@ -29,7 +30,7 @@ public abstract class NoxioGame {
   public final List<GameObject> objects;        // Objects populating the game world
     
   private int idGen; /* Used to generate OIDs for objects. */
-  public NoxioGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
+  public NoxioGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
     this.lobby = lobby;
     
     this.map = map;
@@ -41,6 +42,7 @@ public abstract class NoxioGame {
     deleted = new ArrayList();
     update = new ArrayList();
     
+    scoreToWin = stw;
     respawnTime = settings.get("respawn_time", 30, 0, 300);
     penaltyTime = settings.get("penalty_time", 90, 0, 300);
     
@@ -201,7 +203,7 @@ public abstract class NoxioGame {
     return null;
   }
   
-  protected abstract void spawnPlayer(final Controller c, final Queue<String> q);
+  protected abstract boolean spawnPlayer(final Controller c, final Queue<String> q); // Returns true is player is spawned
   protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos) { return makePlayerObject(c, id, pos, -1); }
   protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos, final int team) {
     /* @TODO: use reflection to meme this in a more efficent way? very low priority */
@@ -310,7 +312,7 @@ public abstract class NoxioGame {
         final String usr = controllers.get(i).getUser();
         sendStats(usr, controllers.get(i).destroy());
         controllers.remove(i);
-        return;
+        break;
       }
     }
     updateScore();
@@ -403,6 +405,15 @@ public abstract class NoxioGame {
     update.add("anc;"+code+";");
   }
   
+  /* Sends announce code to all players excluding <player> */
+  public final void announceExcluding(final Controller player, final String code) {
+    for(int i=0;i<controllers.size();i++) {
+      final Controller c = controllers.get(i);
+      if(c == player) { continue; }
+      c.announce(code);
+    }
+  }
+  
   public abstract void updateScore();
   
   /* Send a message that will appear in all players chatlog */
@@ -433,12 +444,14 @@ public abstract class NoxioGame {
     destroy();
   }
   
-  public abstract int getScoreToWin();                                          // Returns number of points needed to win the game
   public abstract int isTeamGame();                                             // Returns number of teams in ths game (generally 0 or 2 unless i add support for more)
   public int getFrame() { return frame; }
   public boolean isGameOver() { return gameOver; }                              // Game over, resetTimer counting down to new game
   public boolean isResetReady() { return resetTimer < 1 && gameOver; }          // Ready to start a new game
   public final int createOid() { return idGen++; }
-  public abstract String gametypeName();
+  public abstract String gametypeName();                                        // What is displayed to users EX: "Capture The Flag"
+  public final String gametypeId() {                                            // What is used to identify the gametype EX: "capturetheflag"
+    return gametypeName().toLowerCase().replaceAll(" ", "");
+  }
   public abstract int objectiveBaseId();                                        // ID for gametype objective, 0 = none, 1 = ctf flags, etc...
 }

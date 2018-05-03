@@ -21,7 +21,7 @@ final public class Controller {
   
   private int respawnTimer;
   private int respawnPenalty;
-  private boolean penalized;
+  private boolean penalized, roundLock;
   
   public final Score score;    // Handles all stats and score related data
   
@@ -44,6 +44,7 @@ final public class Controller {
     respawnTimer = 0;
     respawnPenalty = 0;
     penalized = false;
+    roundLock = false;
     
     score = new Score();
     update = new ArrayList();
@@ -58,6 +59,7 @@ final public class Controller {
       OBJ::HIDE     - hid;<int oid>;
       PLY::CONTROL  - ctl;<int oid>;
       PLY::RSPWNTMR - rst;<int time>;
+      PLY::RNDINFO  - rnd;<string message>; // Message can be blank string to signal game is in normal play
       SYS::WHISPER  - wsp;<string txt>;
       SYS::ANNOUNCE - anc;<string code>;
       SYS::ADDCREDS - crd;<int credits>;
@@ -190,7 +192,9 @@ final public class Controller {
   }
   
   public void penalize() { penalized = true; respawnPenalty++; }
-  public boolean respawnReady() { return respawnTimer<=0; }
+  public boolean respawnReady() { return respawnTimer<=0 && !roundLock; }
+  public void setRound(final String info) { update.add("rnd;"+info+";"); roundLock = true; }
+  public void clearRound() { update.add("rnd;;"); roundLock = false; }
   public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
   public void announce(final String code) { update.add("anc;"+code+";"); }
   public String getUser() { return user.name; }

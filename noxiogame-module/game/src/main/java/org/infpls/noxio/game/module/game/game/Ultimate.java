@@ -51,17 +51,20 @@ public class Ultimate extends SoloGame {
         if(controller != null) { reportObjective(controller, ultimate); }
       }
       if(ultimate.is(GameObject.Types.PLAYER)) {
-        ((Player)ultimate).ultimate();
+        ((Player)ultimate).objective();
       }
     }
   }
   
   @Override
-  protected void spawnPlayer(final Controller c, final Queue<String> q) {
-    super.spawnPlayer(c, q);
-    if((ultimate == null || ultimate.isDead()) && c.getControlled() != null) {
-      makeUltimate(c, c.getControlled());
+  protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
+    if(super.spawnPlayer(c, q)) { 
+      if((ultimate == null || ultimate.isDead()) && c.getControlled() != null) {
+        makeUltimate(c, c.getControlled());
+      }
+      return true;
     }
+    else { return false; }
   }
 
   @Override
@@ -88,7 +91,7 @@ public class Ultimate extends SoloGame {
   
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
-    if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory @TODO: doesnt work, look at actual value instead.
+    if(isGameOver()) { return; }
     player.score.ultimateControl();
     updateScore();
     announceObjective();
@@ -140,11 +143,8 @@ public class Ultimate extends SoloGame {
   }
   
   @Override
-  public String gametypeName() { return "Ultimate Lifeform"; }
+  public String gametypeName() { return "Ultimate"; }
   
   @Override
   public int objectiveBaseId() { return 3; }
-  
-  @Override
-  public int getScoreToWin() { return scoreToWin; }
 }

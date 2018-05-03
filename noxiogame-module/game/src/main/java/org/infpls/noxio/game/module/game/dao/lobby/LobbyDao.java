@@ -22,8 +22,8 @@ public class LobbyDao {
         lob.start();
       }
     }
-    catch(IOException ex) {
-      Oak.log(Oak.Level.ERR, "Error during setup of default lobbies.", ex);
+    catch(NullPointerException | IOException ex) {
+      Oak.log(Oak.Level.CRIT, "Error during setup of default lobbies.", ex);
     }
   }
   

@@ -1,66 +1,34 @@
 package org.infpls.noxio.game.module.game.game;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
-public class King extends SoloGame {
+public class Rabbit extends SoloGame {
 
-  private final Hill hill;
-  private final int scoreToMove;
-  private final boolean staticHill;
-  private int hillSpawnRotation, moveTimer;
-  public King(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
+  private final FlagRabbit flag;
+  
+  public Rabbit(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
-
-    staticHill = settings.get("static_hill", 1, 0, 1)==1;
-    scoreToMove = settings.get("score_to_move", 7, 1, 99);
     
-    moveTimer = 0;
-    hillSpawnRotation = 0;
-    
-    hill = createHill();
+    flag = spawnFlag();
   }
   
-  private Hill createHill() {
-    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeId());
-    final Vec2 hs;
-    final float size;
-    if(hillSpawns.isEmpty()) {
-      hs = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f);
-      size = 2f;
-    }
-    else {
-      int doot = hillSpawnRotation++%hillSpawns.size();
-      hs = hillSpawns.get(doot).getPos();
-      size = hillSpawns.get(doot).getTeam();
-    }
-    
-    final Hill h = new Hill(this, createOid(), hs, new Vec2(size));
-    addObject(h);
-    return h;
+  private FlagRabbit spawnFlag() {
+    List<NoxioMap.Spawn> fs = map.getSpawns("flag", gametypeId());
+    final Vec2 fsl;
+    fsl = fs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)+1f, map.getBounds()[1]*0.5f):fs.get(0).getPos();
+    final FlagRabbit f;
+    f = new FlagRabbit(this, createOid(), fsl, -1);
+    addObject(f);
+    return f;
   }
   
-  private void moveHill() {
-    moveTimer = 0;
-    if(staticHill) { return; }
-    List<NoxioMap.Spawn> hillSpawns = map.getSpawns("hill", gametypeId());
-    final Vec2 hs;
-    final float size;
-    if(hillSpawns.isEmpty()) {
-      hs = new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f);
-      size = 2f;
-    }
-    else {
-      int doot = hillSpawnRotation++%hillSpawns.size();
-      hs = hillSpawns.get(doot).getPos();
-      size = hillSpawns.get(doot).getTeam();
-    }
-    
-    hill.moveTo(hs, new Vec2(size));
-    announce("khm");
+  @Override
+  public void step() {
+    super.step();
   }
 
   @Override
@@ -68,18 +36,25 @@ public class King extends SoloGame {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
     final Controller victim = getControllerByObject(killed);
     
-    announceKill(killer, victim);
-
+    if(announceKill(killer, victim)) {
+      final GameObject obj = killer.getControlled();
+      if(obj != null && obj.is(GameObject.Types.PLAYER)) {
+        final Player ply = (Player)obj;
+        if(ply.getHolding() == flag) {
+          reportObjective(killer, flag);
+        }
+      }
+    }
+    
     updateScore();
   }
   
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
-    if(isGameOver()) { return; }                              // Prevents post game scores causing a double victory @TODO: doesnt work, look at actual value instead.
-    player.score.hillControl();
+    if(isGameOver()) { return; }
+    player.score.rabbitControl();
     updateScore();
     announceObjective();
-    if(moveTimer++ > scoreToMove) { moveHill(); }
     if(player.score.getObjectives() >= scoreToWin) {
       if(player.score.getDeaths() < 1) { player.announce("pf"); player.score.perfect(); }
       gameOver(player.getDisplay() + " wins!", "[CUSTOM WIN MESSAGE]", player.getCustomSound());
@@ -124,12 +99,12 @@ public class King extends SoloGame {
   public void join(final NoxioSession player) throws IOException {
     super.join(player);
     final Controller con = getController(player.getSessionId());
-    if(con != null) { con.announce("kh"); }
+    if(con != null) { con.announce("ulf"); }
   }
   
   @Override
-  public String gametypeName() { return "King"; }
+  public String gametypeName() { return "Rabbit"; }
   
   @Override
-  public int objectiveBaseId() { return 2; }
+  public int objectiveBaseId() { return 3; }
 }

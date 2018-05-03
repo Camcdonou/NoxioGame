@@ -6,13 +6,9 @@ import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 
 public abstract class SoloGame extends NoxioGame {
-  
-  protected final int scoreToWin;
-  
-  public SoloGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, final int stw) throws IOException {
-    super(lobby, map, settings);
     
-    scoreToWin = stw;
+  public SoloGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
+    super(lobby, map, settings, stw);
   }
   
   @Override
@@ -21,17 +17,17 @@ public abstract class SoloGame extends NoxioGame {
   }
   
   @Override
-  protected void spawnPlayer(final Controller c, final Queue<String> q) {
+  protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
     final String charSel = q.remove();
-    if(c.getControlled() != null || !c.respawnReady()) { return; } /* Already controlling an object */
+    if(c.getControlled() != null || !c.respawnReady()) { return false; } /* Already controlling an object */
     
-    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeName());
+    final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeId());
     final Vec2 sp = findSafeSpawn(spawns);
     
-    int oid = createOid();
     Player player = makePlayerObject(c, charSel, sp);
     addObject(player);
     c.setControl(player);
+    return true;
   }
   
   @Override

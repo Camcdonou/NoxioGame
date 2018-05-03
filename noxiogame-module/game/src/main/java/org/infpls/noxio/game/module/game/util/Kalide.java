@@ -30,7 +30,7 @@ public class Kalide {
   
   /* Max size of this array is 255 */
   private static final List<Color3f> REDS = Arrays.asList(
-    new Color3f(255, 0, 0), /* Considered a 'no color' slot. Uses default red color or is unused. */
+    new Color3f(192, 62, 62), /* Considered a 'no color' slot. Uses default red color or is unused. */
     new Color3f(255, 0, 0),
     new Color3f(255, 76, 76),
     new Color3f(223, 31, 31),
@@ -39,7 +39,7 @@ public class Kalide {
   
   /* Max size of this array is 255 */
   private static final List<Color3f> BLUES = Arrays.asList(
-    new Color3f(0, 0, 255), /* Considered a 'no color' slot. Uses default blue color or is unused. */
+    new Color3f(62, 62, 192), /* Considered a 'no color' slot. Uses default blue color or is unused. */
     new Color3f(0, 0, 255),
     new Color3f(76, 76, 255),
     new Color3f(31, 31, 223),

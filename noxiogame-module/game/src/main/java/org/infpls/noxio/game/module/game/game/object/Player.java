@@ -21,7 +21,7 @@ public abstract class Player extends Mobile {
   
   protected boolean objective;               // If this is flagged then this played is considered a gametype "objective" and will be globally visible and marked.
   
-  protected Flag holding;
+  protected Pickup holding;
   
   protected int channelTimer, tauntCooldown, stunTimer;
   public Player(final NoxioGame game, final int oid, final Vec2 position, final int permutation, final int team) {
@@ -101,40 +101,36 @@ public abstract class Player extends Mobile {
     movement();   // Apply player movement input
     physics();    // Object physics and collision
     actions();    // Perform action
-    pickup();     // Picking up objects like flags
+    pickups();    // Checking for and possibly picking up Pickup objects
     timers();     // Updates timers and flags for various things
   }
   
-  /* Pickup flag or whatever if you move over it */
-  public void pickup() {
+  /* If we touch a pickup call it's touch, and pick it up if the touch returns true */
+  public void pickups() {
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
-      if(obj.is(Types.FLAG)) {
-        final Flag flag = (Flag)(obj);
-        if(holding==null && flag.getPosition().distance(position) < flag.getRadius()+getRadius()) {
-          if(flag.pickup(this)) { holding = flag; }
-        }
-        if(flag.getPosition().distance(position) < flag.getRadius()+getRadius() && !flag.onBase()) {
-          if(flag.team == team && !flag.isHeld()) { flag.kill(); }
-        }
+      if(obj.is(Types.PICKUP)) {
+        final Pickup pickup = (Pickup)(obj);
+        if(pickup.getPosition().distance(position) > pickup.getRadius()+getRadius()) { continue; }
+        if(pickup.touch(this)) { holding = pickup; }
       }
     }
   }
   
   public void toss() {
-    if(holding==null) { return; }
-    final Flag f = holding;
-    drop();
-    f.setVelocity(velocity.scale(0.5f).add(look.scale(TOSS_IMPULSE)));
-    f.popup(TOSS_POPUP);
+    if(holding == null) { return; }
+    final Pickup p = holding;
+    p.dropped();
+    p.setVelocity(velocity.scale(0.5f));
+    p.setVelocity(velocity.scale(0.5f).add(look.scale(TOSS_IMPULSE)));
+    p.popup(TOSS_POPUP);
   }
   
   public void drop() {
-    if(holding==null) { return; }
-    final Flag f = holding;
-    holding = null;
-    f.drop();
-    f.setVelocity(velocity.scale(0.5f));
+    if(holding == null) { return; }
+    final Pickup p = holding;
+    p.dropped();
+    p.setVelocity(velocity.scale(0.5f));
   }
 
   @Override
@@ -181,10 +177,10 @@ public abstract class Player extends Mobile {
     effects.add("jmp");
   }
   
-  /* Used for 'ultimate lifeform' gamemode. Simply sends an effect id to the client to flag this player as the ultimate lifeform. */
-  public final void ultimate() {
-    effects.add("ult");
-    objective = true; /* @TODO: deprecate this system in favor a generic "isObjective" system */
+  /* Flags this player as an objective */
+  public final void objective() {
+    effects.add("obj");
+    objective = true;
   }
   
   /* Test given circle at <vec2 p> w/ radius <float r> against other players and return hits */ 
@@ -239,5 +235,5 @@ public abstract class Player extends Mobile {
     game.reportKill(tagTime-game.getFrame()<=TAG_CREDIT_GRACE_PERIOD?tagged:null, this);
   }
   
-  public Flag getHolding() { return holding; }
+  public Pickup getHolding() { return holding; }
 }
