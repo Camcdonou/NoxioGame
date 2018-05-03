@@ -25,7 +25,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
 
 /* Finalizing list ::
   ==== Core Functions ====
-  - MERGE ALL CHANGES TO HTTPS, SETUP HTTPS/SSL FOR SQL, SETUP PAYPAL PROPERTIES
+  + MERGE ALL CHANGES TO HTTPS, SETUP PAYPAL PROPERTIES
+  - CONFIRM SECURITY OF SQL?
   + HTTPS + WSS Support
   + Database setup
   + Patch hash salting + using bcrypt for password storage
