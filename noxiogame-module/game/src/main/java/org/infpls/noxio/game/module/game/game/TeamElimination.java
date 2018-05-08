@@ -10,7 +10,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 public class TeamElimination extends TeamRoundGame {
   
   public TeamElimination(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
+    super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99), false);
   }
   
   @Override

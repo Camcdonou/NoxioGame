@@ -4,20 +4,22 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Queue;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.game.object.GameObject;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public abstract class TeamRoundGame extends TeamGame {
   public static final int MIN_PLAYERS = 4, ROUND_START_TIMER = 300, ROUND_GRACE_PERIOD = 150;
   
-  private boolean roundStarted, timerStarted;
-  protected boolean graceOver;
+  private boolean timerStarted;
+  protected boolean roundStarted, graceOver;
   private int roundStartTimer, graceTimer;
+  private final boolean allowRespawn; // Allow respawn during the round or only at the start of each round.
   
-  public TeamRoundGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
+  public TeamRoundGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw, boolean ar) throws IOException {
     super(lobby, map, settings, stw);
     
-    roundStarted = false; timerStarted = false; graceOver = false;
-    roundStartTimer = ROUND_START_TIMER; graceTimer = ROUND_GRACE_PERIOD;
+    allowRespawn = ar;
+    newRound();
   }
   
   @Override
@@ -31,15 +33,33 @@ public abstract class TeamRoundGame extends TeamGame {
     super.join(player);
     
     final Controller c = getController(player.getSessionId());
-    if(roundStarted && graceOver) { c.setRound("Waiting for end of round..."); }
+    if(roundStarted && graceOver) {
+      if(allowRespawn) { c.clearRound(); }
+      else { c.setRound("Waiting for end of round..."); }
+    }
     else if(roundStarted) { c.clearRound(); }
     else { c.setRound("..."); }
   }
   
   @Override
   protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
-    if(super.spawnPlayer(c, q)) { c.setRound("Waiting for end of round..."); return true; }
+    if(super.spawnPlayer(c, q)) {
+      if(allowRespawn) { c.clearRound(); }
+      else { c.setRound("Waiting for end of round..."); }
+      return true;
+    }
     else { return false; }
+  }
+  
+  protected final void newRound() {
+    roundStarted = false; timerStarted = false; graceOver = false;
+    roundStartTimer = ROUND_START_TIMER; graceTimer = ROUND_GRACE_PERIOD;
+    for(int i=0;i<objects.size();i++) {
+      final GameObject obj = objects.get(i);
+      if(obj.is(GameObject.Types.PLAYER)) {
+        obj.kill();
+      }
+    }
   }
   
   protected void roundCountdown() {
@@ -60,11 +80,7 @@ public abstract class TeamRoundGame extends TeamGame {
         controllers.get(i).setRound("Round starting in " + new BigDecimal((float)roundStartTimer/30).setScale(2, BigDecimal.ROUND_HALF_UP) + "...");
       }
       if(roundStartTimer-- < 1) {
-        for(int i=0;i<controllers.size();i++) {
-          final Controller c = controllers.get(i);
-          c.clearRound();
-        }
-        roundStarted = true;
+        roundStart();
       }
       return;
     }
@@ -73,10 +89,19 @@ public abstract class TeamRoundGame extends TeamGame {
       if(graceTimer-- < 1) {
         for(int i=0;i<controllers.size();i++) {
           final Controller c = controllers.get(i);
-          c.setRound("Waiting for end of round...");
+          if(allowRespawn) { c.clearRound(); }
+          else { c.setRound("Waiting for end of round..."); }
         }
         graceOver = true;
       }
     }
+  }
+  
+  protected void roundStart() {
+    for(int i=0;i<controllers.size();i++) {
+      final Controller c = controllers.get(i);
+      c.clearRound();
+    }
+    roundStarted = true;
   }
 }

@@ -40,6 +40,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Guest Mode
   + 20xx logging/Oak to a seperate file
   - Look into registering next frame draw at start of draw instead of end. (unlikely to have any effect)
+  - look into frame skipping because of 33 / 30
+  - Prod server bug, auto reconnect & file store oddity
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
@@ -50,7 +52,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
   ==== Required Features. Will add ====
   ~ Create custom game menus
-  - Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF, Payloadish )
+  + Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF, Payloadish, tug of war? )
   - Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps )
   - Improve existing sky
   - Create a handful of alt skins for unlocks
@@ -90,6 +92,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Mod
   - Gametype stuff add
   - UI toggles x2
+  - Caillou Hat
   - win message and unlock
 */
 
@@ -149,11 +152,13 @@ public abstract class GameLobby {
       case "king" : { game = new King(this, map, gs); break; }
       case "ultimate" : { game = new Ultimate(this, map, gs); break; }
       case "rabbit" : { game = new Rabbit(this, map, gs); break; }
+      case "tag" : { game = new Tag(this, map, gs); break; }
       case "teamdeathmatch" : { game = new TeamDeathmatch(this, map, gs); break; }
       case "teamelimination" : { game = new TeamElimination(this, map, gs); break; }
       case "capturetheflag" : { game = new CaptureTheFlag(this, map, gs); break; }
       case "freestyleflag" : { game = new FreestyleFlag(this, map, gs); break; }
       case "assault" : { game = new Assault(this, map, gs); break; }
+      case "bomb" : { game = new BombingRun(this, map, gs); break; }
       case "teamking" : { game = new TeamKing(this, map, gs); break; }
       default : { game = new Deathmatch(this, map, gs); break; }
     }

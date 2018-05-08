@@ -128,6 +128,7 @@ lobbies: [
       }
     ]
   },
+
   {
     game_name: "CTF Test #2",
     max_players: "24",
@@ -188,6 +189,30 @@ lobbies: [
       },
       {
         gametype: "freestyleflag",
+        map_name: "battle",
+        score_to_win: "3",
+        respawn_time: "90"
+      }
+    ]
+  },
+  {
+    game_name: "BOMB Test #1",
+    max_players: "12",
+    rotation: [
+      {
+        gametype: "bomb",
+        map_name: "war",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "bomb",
+        map_name: "penultimate",
+        score_to_win: "3",
+        respawn_time: "90"
+      },
+      {
+        gametype: "bomb",
         map_name: "battle",
         score_to_win: "3",
         respawn_time: "90"
@@ -282,6 +307,24 @@ lobbies: [
       },
       {
         gametype: "rabbit",
+        map_name: "combat",
+        score_to_win: "15",
+        respawn_time: "60"
+      }
+    ]
+  },
+  {
+    game_name: "TAG Test #1",
+    max_players: "8",
+    rotation: [
+      {
+        gametype: "tag",
+        map_name: "war",
+        score_to_win: "15",
+        respawn_time: "60"
+      },
+      {
+        gametype: "tag",
         map_name: "combat",
         score_to_win: "15",
         respawn_time: "60"

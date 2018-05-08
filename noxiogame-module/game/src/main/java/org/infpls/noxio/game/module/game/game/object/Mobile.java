@@ -49,6 +49,7 @@ public abstract class Mobile extends GameObject {
             final float weightOffset = weight/(mob.getWeight()+weight);
             final Vec2 push = norm.scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
             setVelocity(velocity.add(push));
+            game.reportTouch(this, mob);
           }
         }
       }

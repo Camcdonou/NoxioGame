@@ -183,6 +183,12 @@ public abstract class Player extends Mobile {
     objective = true;
   }
   
+  /* Removes objective status from this player */
+  public final void dejective() {
+    effects.add("jbo");
+    objective = false;
+  }
+  
   /* Test given circle at <vec2 p> w/ radius <float r> against other players and return hits */ 
   public List<Mobile> hitTest(final Vec2 p, final float r) {
     final List<Mobile> hits = new ArrayList();

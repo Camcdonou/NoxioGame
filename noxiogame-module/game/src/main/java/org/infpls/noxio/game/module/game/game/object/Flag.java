@@ -17,7 +17,6 @@ public class Flag extends Pickup {
     radius = 0.1f; weight = 0.5f; friction = 0.725f;
 
     /* Timers */
-    dropCooldown = 0;
   }
   
   @Override

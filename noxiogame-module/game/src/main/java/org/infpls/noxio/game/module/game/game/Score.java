@@ -16,9 +16,12 @@ public class Score {
     ENDREIGN_C = 25,
     FLAGCAP_C = 50,
     FLAGDEF_C = 10,
+    BOMB_C = 50,
+    BOMBDEF_C = 25,
     HILL_C = 5,
     ULT_C = 10,
     RAB_C = 15,
+    TAG_C = 10,
     PERFECT_C = 100,
     MULTIX_C = 10,
     SPREEX_C = 5;
@@ -67,9 +70,12 @@ public class Score {
   
   public void flagCapture() { objectives++; stats.flagCapture++; stats.credits += FLAGCAP_C; }
   public void flagDefense() { stats.flagDefense++; stats.credits += FLAGDEF_C; }
+  public void bomb() { objectives++; stats.credits += BOMB_C; }
+  public void bombDefense() { stats.credits += BOMBDEF_C; }
   public void hillControl() { objectives++; stats.hillControl++; stats.credits += HILL_C; }
   public void ultimateControl() { objectives++; stats.credits += ULT_C; }
   public void rabbitControl() { objectives++; stats.credits += RAB_C; }
+  public void tagControl() { objectives++; stats.credits += TAG_C; }
   
   public void perfect() { stats.perfect++; stats.credits += PERFECT_C; }
   public void humiliation() { stats.humiliation++; }

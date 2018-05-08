@@ -197,6 +197,7 @@ final public class Controller {
   public void clearRound() { update.add("rnd;;"); roundLock = false; }
   public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
   public void announce(final String code) { update.add("anc;"+code+";"); }
+  public void setClientTimer(String title, int time) { update.add("tim;" + title + ";" + time + ";"); }
   public String getUser() { return user.name; }
   public String getDisplay() { return user.display; }
   public String getSid() { return sid; }

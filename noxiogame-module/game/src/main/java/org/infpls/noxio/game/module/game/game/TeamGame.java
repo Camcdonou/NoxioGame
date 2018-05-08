@@ -108,6 +108,14 @@ public abstract class TeamGame extends NoxioGame {
     }
   }
   
+  public final void setClientTimerTeam(int team, String title, int time) {
+    for(int i=0;i<controllers.size();i++) {
+      final Controller c = controllers.get(i);
+      if(c.getTeam() != team) { continue; }
+      c.setClientTimer(title, time);
+    }
+  }
+  
   @Override
   public int isTeamGame() { return 2; }
 }

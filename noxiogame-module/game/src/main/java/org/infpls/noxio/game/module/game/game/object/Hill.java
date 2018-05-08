@@ -8,6 +8,7 @@ public class Hill extends GameObject {
   private static final int TIMER_SCORE_ADJUST = 90;
   
   protected Vec2 size;
+  private Polygon hitbox;
   private final Map<Integer, Integer> scoreTimers;
   
   public Hill(final NoxioGame game, final int oid, final Vec2 position, final Vec2 size) {
@@ -16,20 +17,13 @@ public class Hill extends GameObject {
     bitIs = bitIs | Types.HILL;
     
     /* Vars */
-    this.size = size;
     scoreTimers = new HashMap();
+    
+    moveTo(position, size);
   }
     
   @Override
-  public void step() {
-    final Vec2[] v = new Vec2[] {
-      position.add(new Vec2(size.x*0.5f, size.y*0.5f)),
-      position.add(new Vec2(size.x*-0.5f, size.y*0.5f)),
-      position.add(new Vec2(size.x*-0.5f, size.y*-0.5f)),
-      position.add(new Vec2(size.x*0.5f, size.y*-0.5f))
-    };
-    final Polygon hitbox = new Polygon(v);
-    
+  public void step() {    
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
       final Controller con = game.getControllerByObject(obj);
@@ -49,9 +43,18 @@ public class Hill extends GameObject {
     }
   }
   
-  public void moveTo(final Vec2 pos, final Vec2 size) {
+  public final void moveTo(final Vec2 pos, final Vec2 size) {
     setPosition(pos);
     this.size = size;
+    
+    final Vec2[] v = new Vec2[] {
+      position.add(new Vec2(size.x*0.5f, size.y*0.5f)),
+      position.add(new Vec2(size.x*-0.5f, size.y*0.5f)),
+      position.add(new Vec2(size.x*-0.5f, size.y*-0.5f)),
+      position.add(new Vec2(size.x*0.5f, size.y*-0.5f))
+    };
+    hitbox = new Polygon(v);
+    
     scoreTimers.clear();
   }
   

@@ -102,6 +102,7 @@ public abstract class NoxioGame {
       SYS::SCORE    -  scr;<String gametype>;<String description>;<String[] players>;<String[] scores>;<float[] meter>;<float[] r>;<float[] g>;<float[] b>;
       SYS::MESSAGE  -  msg;<String message>;
       SYS::ANNOUNCE -  anc;<String code>;
+      SYS::TIMER    -  tim;<String title>;<int frameTime>;     // Frame time is the number of frames till this timer is finished.
       SYS::LOADSND  -  snd;<String customSoundFile>;
       SYS::GAMEOVER -  end;<String head>;<String foot>;<String customSoundFile>;
       DBG::TICK     -  tck;<long tick>;<long sent>;
@@ -322,6 +323,7 @@ public abstract class NoxioGame {
   
   public abstract void reportKill(final Controller killer, final GameObject killed);
   public abstract void reportObjective(final Controller player, final GameObject objective);
+  public void reportTouch(Mobile a, Mobile b) { } /* Only used by the Tag gametype so generally an empty function. */
   
   /* Called after each score change, announces gametype specific events */ // @TODO: not called anywhere in super class, currently has subclass implement call. weird. mabye fix this?
   public abstract void announceObjective();
@@ -449,6 +451,7 @@ public abstract class NoxioGame {
   public boolean isGameOver() { return gameOver; }                              // Game over, resetTimer counting down to new game
   public boolean isResetReady() { return resetTimer < 1 && gameOver; }          // Ready to start a new game
   public final int createOid() { return idGen++; }
+  public final void setClientTimer(String title, int time) { update.add("tim;" + title + ";" + time + ";"); }
   public abstract String gametypeName();                                        // What is displayed to users EX: "Capture The Flag"
   public final String gametypeId() {                                            // What is used to identify the gametype EX: "capturetheflag"
     return gametypeName().toLowerCase().replaceAll(" ", "");
