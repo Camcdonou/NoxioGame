@@ -21,6 +21,18 @@ lobbies: [
     ]
   },
   {
+    game_name: "DM Test #2",
+    max_players: "2",
+    rotation: [
+      {
+        gametype: "deathmatch",
+        map_name: "attack",
+        score_to_win: "10",
+        respawn_time: "30",
+      }
+    ]
+  },
+  {
     game_name: "ELIM Test #1",
     max_players: "6",
     rotation: [
