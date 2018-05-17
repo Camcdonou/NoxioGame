@@ -21,6 +21,30 @@ lobbies: [
     ]
   },
   {
+    game_name: "New Map Test (gay lol)",
+    max_players: "12",
+    rotation: [
+      {
+        gametype: "ctf",
+        map_name: "last",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "rabbit",
+        map_name: "dig",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "king",
+        map_name: "attack",
+        score_to_win: "15",
+        respawn_time: "30",
+      }
+    ]
+  },
+  {
     game_name: "DM Test #2",
     max_players: "2",
     rotation: [

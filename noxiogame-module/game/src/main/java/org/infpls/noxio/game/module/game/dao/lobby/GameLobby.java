@@ -58,6 +58,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Create a handful of alt skins for unlocks
   - Optimize decals, very very bad performance with them
   ==== Extra Features. Unlikely to add before release ====
+  - Color Blind Mode
   - Display name
   - Improve chat log, it's very bad performance wise and lacks features
   - Move all javascript constants into the actual function instead of the constructor. Small performance change.
