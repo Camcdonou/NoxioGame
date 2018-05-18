@@ -53,6 +53,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   ==== Required Features. Will add ====
   ~ Create custom game menus
   + Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF, Payloadish, tug of war? )
+  - Name display limits
+  - Cache fixes
   - Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps )
   - Improve existing sky
   - Create a handful of alt skins for unlocks
