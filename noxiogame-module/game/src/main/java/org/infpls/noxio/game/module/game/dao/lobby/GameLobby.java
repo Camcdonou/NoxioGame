@@ -123,7 +123,7 @@ public abstract class GameLobby {
     this.settings = settings;
     
     name = settings.get("game_name", "Default Name");
-    maxPlayers = settings.get("max_players", 6, 2, 32);
+    maxPlayers = settings.get("max_players", 6, 2, 64);
     
     players = new ArrayList();
     loading = new ArrayList();
@@ -144,7 +144,6 @@ public abstract class GameLobby {
   public void start() { loop.start(); }
   
   private void newGame() throws IOException {
-    gameCount++;
     if(game != null) { game.destroy(); }
     final GameSettings gs = settings.getRotation(gameCount);
     final String gametype = gs.get("gametype", "deathmatch");
@@ -165,6 +164,7 @@ public abstract class GameLobby {
       case "teamking" : { game = new TeamKing(this, map, gs); break; }
       default : { game = new Deathmatch(this, map, gs); break; }
     }
+    gameCount++;
   }
 
   public void step(final long tick) {

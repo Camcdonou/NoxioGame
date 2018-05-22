@@ -22,7 +22,7 @@ public class LobbyDao {
         lob.start();
       }
     }
-    catch(NullPointerException | IOException ex) {
+    catch(NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException | IOException ex) {
       Oak.log(Oak.Level.CRIT, "Error during setup of default lobbies.", ex);
     }
   }
