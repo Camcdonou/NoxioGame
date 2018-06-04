@@ -9,31 +9,31 @@ lobbies: [
       {
         gametype: "deathmatch",
         map_name: "final",
-        score_to_win: "24",
+        score_to_win: "15",
         respawn_time: "30",
       },
       {
         gametype: "king",
         map_name: "combat",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "rabbit",
         map_name: "pre",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "ultimate",
         map_name: "final",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "tag",
         map_name: "pre",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       }
     ]
@@ -45,31 +45,31 @@ lobbies: [
       {
         gametype: "deathmatch",
         map_name: "war",
-        score_to_win: "24",
+        score_to_win: "15",
         respawn_time: "30",
       },
       {
         gametype: "king",
         map_name: "area",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "rabbit",
         map_name: "pre",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "ultimate",
         map_name: "combat",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "tag",
         map_name: "war",
-        score_to_win: "3",
+        score_to_win: "15",
         respawn_time: "90",
       }
     ]
@@ -81,7 +81,7 @@ lobbies: [
       {
         gametype: "teamdeathmatch",
         map_name: "war",
-        score_to_win: "24",
+        score_to_win: "25",
         respawn_time: "30",
       },
       {
@@ -93,7 +93,7 @@ lobbies: [
       {
         gametype: "teamking",
         map_name: "pre",
-        score_to_win: "3",
+        score_to_win: "25",
         respawn_time: "90",
       },
       {
@@ -153,7 +153,7 @@ lobbies: [
       {
         gametype: "teamelimination",
         map_name: "last",
-        score_to_win: "24",
+        score_to_win: "32",
         respawn_time: "30",
       },
       {
@@ -189,7 +189,7 @@ lobbies: [
       {
         gametype: "teamelimination",
         map_name: "big",
-        score_to_win: "24",
+        score_to_win: "64",
         respawn_time: "30",
       },
       {

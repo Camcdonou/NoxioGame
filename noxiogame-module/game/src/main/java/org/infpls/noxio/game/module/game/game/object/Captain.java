@@ -93,7 +93,7 @@ public class Captain extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = punchDirection;
-        mob.stun(PUNCH_STUN_LENGTH, this);
+        mob.stun(PUNCH_STUN_LENGTH, Mobile.HitStun.Fire);
         mob.knockback(normal.scale(PUNCH_IMPULSE), this);
       }
     }
@@ -145,8 +145,8 @@ public class Captain extends Player {
   }
   
   @Override
-  public void stun(int time) {
-    super.stun(time);
+  public void stun(int time, Mobile.HitStun type) {
+    super.stun(time, type);
     chargePunch = false;
     chargeTimer = 0;
     punchCooldown = 0;

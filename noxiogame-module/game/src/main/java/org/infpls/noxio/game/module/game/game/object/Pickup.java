@@ -6,8 +6,6 @@ import org.infpls.noxio.game.module.game.game.NoxioGame;
 public abstract class Pickup extends Mobile {
   protected Player held;               // Player holding this flag or null
   
-  protected final List<String> effects;  // List of actions performed that will be sent to the client on the next update
-  
   protected int lastHeld;
   protected int dropCooldown, resetCooldown;
   protected final static int DROP_COOLDOWN_TIME = 45, RESET_COOLDOWN_TIME = 900;
@@ -19,7 +17,6 @@ public abstract class Pickup extends Mobile {
     bitIs = bitIs | Types.PICKUP;
     
     /* Vars */
-    effects = new ArrayList();
     held = null;
     
     /* Settings */
@@ -100,7 +97,7 @@ public abstract class Pickup extends Mobile {
   @Override
   public void knockback(final Vec2 impulse, final Player p) { if(p.team != team) { super.knockback(impulse.scale(KNOCKBACK_REDUCTION_MULT), p); } }
   @Override
-  public void stun(final int time, final Player p) { if(p.team != team) { super.stun(time, p); } }
+  public void stun(final int time, Mobile.HitStun type, final Player p) { if(p.team != team) { super.stun(time, type, p); } }
   @Override
   public void popup(final float power, final Player p) { if(p.team != team) { super.popup(power*KNOCKBACK_REDUCTION_MULT, p); } }
 }

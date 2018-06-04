@@ -7,6 +7,15 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
 public abstract class Mobile extends GameObject {
+  public enum HitStun {
+    Electric("hte"), Generic("htg"), Slash("hts"), Fire("htf");
+    
+    public final String id;
+    HitStun(String id) {
+      this.id = id;
+    }
+  }
+  
   protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
   protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f;
   
@@ -18,6 +27,8 @@ public abstract class Mobile extends GameObject {
   public float height;
   private float vspeed;
   protected boolean intangible, immune, grounded;
+  
+  protected final List<String> effects;  // List of actions performed that will be sent to the client on the next update
     
   public Mobile(final NoxioGame game, final int oid, final Vec2 position, final int permutation, final int team) {
     super(game, oid, position, permutation, team);
@@ -27,6 +38,7 @@ public abstract class Mobile extends GameObject {
     /* Vars */
     tagged = null;
     tagTime = -1;
+    effects = new ArrayList();
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -99,6 +111,7 @@ public abstract class Mobile extends GameObject {
           fatalImpact = vspeed >= FATAL_IMPACT_SPEED;
           height = 0f; vspeed = 0f;
           grounded = true;
+          effects.add("lnd");
         }
         else {
           height += vspeed; vspeed -= 0.03f;   // Falling while above or below the floor 
@@ -196,8 +209,8 @@ public abstract class Mobile extends GameObject {
     return false;
   }
   
-  public void stun(final int time, final Player p) { stun(time); tag(p); }
-  public void stun(int time) { /* No Effect, Override */ }
+  public void stun(final int time, final Mobile.HitStun type, final Player p) { stun(time, type); tag(p); }
+  public void stun(int time, final Mobile.HitStun type) { effects.add(type.id); }
   public void knockback(final Vec2 impulse, final Player p) { knockback(impulse); tag(p); }
   public void knockback(final Vec2 impulse) { setVelocity(velocity.add(impulse)); }
   public void popup(float power, final Player p) { popup(power); tag(p); }

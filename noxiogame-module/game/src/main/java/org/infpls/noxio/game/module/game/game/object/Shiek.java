@@ -65,7 +65,7 @@ public class Shiek extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), this);
+        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), Mobile.HitStun.Electric, this);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
       }
       
@@ -112,7 +112,7 @@ public class Shiek extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(mark).normalize();
-      mob.stun(FLASH_STUN_LENGTH, this);
+      mob.stun(FLASH_STUN_LENGTH, Mobile.HitStun.Electric, this);
       mob.knockback(normal.scale(FLASH_IMPULSE), this);
     }
     
@@ -142,8 +142,8 @@ public class Shiek extends Player {
   }
   
   @Override
-  public void stun(int time) {
-    super.stun(time);
+  public void stun(int time, Mobile.HitStun type) {
+    super.stun(time, type);
     channelFlash = false;
     channelTimer = 0;
     flashCooldown = 0;

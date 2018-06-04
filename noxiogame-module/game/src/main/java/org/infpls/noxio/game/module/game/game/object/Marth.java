@@ -111,7 +111,7 @@ public class Marth extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, this);
+        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, Mobile.HitStun.Slash, this);
         mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
         combo++; comboTimer = SLASH_COMBO_DEGEN;
         effects.add(isCombo?"cht":"sht");
@@ -136,6 +136,7 @@ public class Marth extends Player {
   
   public void riposte() {
     effects.add("rip");
+    effects.add("crt");
 
     final float rad = (float)(Math.PI/180);
     final Vec2 dir = counterDirection!=null?counterDirection:look;
@@ -152,7 +153,7 @@ public class Marth extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), this); }
+      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), Mobile.HitStun.Slash, this); }
       if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
       if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER, this); }
       combo++; comboTimer = SLASH_COMBO_DEGEN;
@@ -198,17 +199,17 @@ public class Marth extends Player {
   }
   
   @Override
-  public void stun(int time, final Player player) {
+  public void stun(int time, Mobile.HitStun type, final Player player) {
     if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
       counterHit = true; counterStun = time; counterDirection = player.getPosition().subtract(position).normalize();
       return; // Immune to stun/popup/knockback during counters active frames
     } 
-    super.stun(time, player);
+    super.stun(time, type, player);
   }
   
   @Override
-  public void stun(int time) {
-    super.stun(time);
+  public void stun(int time, Mobile.HitStun type) {
+    super.stun(time, type);
     channelCounter = false;
     channelTimer = 0;
     counterCooldown = 0;

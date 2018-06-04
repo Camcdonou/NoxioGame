@@ -12,7 +12,7 @@ public class UserSettings {
   /* This constructor creates a usersettings with all default values. */
   public UserSettings(final String uid) {
     this.uid = uid;
-    volume = new Volume(.9f, .5f, .75f, .75f, .75f);
+    volume = new Volume(.9f, .5f, .75f, .75f, .75f, .75f);
     graphics = new Graphics(1f, 1f, 1f, 2048, false);
     control = new Control(false, 70, 68, 32, 84, 83, 192);
     game = new Game(0, 0, 0, false, null);
@@ -20,12 +20,13 @@ public class UserSettings {
   }
   
   public class Volume {
-    public final float master, music, voice, announcer, fx;
-    public Volume(float ma, float mu, float vo, float an, float f) {
+    public final float master, music, voice, announcer, ui, fx;
+    public Volume(float ma, float mu, float vo, float an, float u, float f) {
       master = Math.min(1f, Math.max(0f, ma));
       music = Math.min(1f, Math.max(0f, mu));
       voice = Math.min(1f, Math.max(0f, vo));
       announcer = Math.min(1f, Math.max(0f, an));
+      ui = Math.min(1f, Math.max(0f, u));
       fx = Math.min(1f, Math.max(0f, f));
     }
   }

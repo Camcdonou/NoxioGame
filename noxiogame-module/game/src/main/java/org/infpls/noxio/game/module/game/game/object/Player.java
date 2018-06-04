@@ -17,7 +17,6 @@ public abstract class Player extends Mobile {
   protected Vec2 look;                       // Normalized direction player is facing
   protected float speed;                     // Current scalar of max movement speed <0.0 to 1.0>
   protected final List<String> action;       // Action to be performed on the next frame
-  protected final List<String> effects;      // List of actions performed that will be sent to the client on the next update
   
   protected boolean objective;               // If this is flagged then this played is considered a gametype "objective" and will be globally visible and marked.
   
@@ -34,7 +33,6 @@ public abstract class Player extends Mobile {
     speed = 0.0f;
     
     action = new ArrayList();
-    effects = new ArrayList();
 
     holding = null;
     
@@ -229,9 +227,9 @@ public abstract class Player extends Mobile {
   public boolean isGlobal() { return objective; }
   
   @Override
-  public void stun(int time) {
+  public void stun(int time, final Mobile.HitStun type) {
+    super.stun(time, type);
     stunTimer = time;
-    effects.add("stn");
   }
   
   @Override

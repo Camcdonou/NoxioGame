@@ -68,9 +68,9 @@ public class Puff extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(REST_STUN_LENGTH, this);
+        mob.stun(REST_STUN_LENGTH, Mobile.HitStun.Generic, this);
         mob.knockback(normal.scale(REST_IMPULSE), this);
-        effects.add("hta");
+        effects.add("crt");
       }
       
       sleep();
@@ -108,10 +108,10 @@ public class Puff extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      mob.stun(POUND_STUN_LENGTH, this);
+      mob.stun(POUND_STUN_LENGTH, Mobile.HitStun.Generic, this);
       mob.knockback(normal.scale(POUND_IMPULSE), this);
       mob.popup(POUND_POPUP, this);
-      effects.add("htb");
+      effects.add("slp");
     }
   }
   
@@ -121,6 +121,7 @@ public class Puff extends Player {
   }
   
   private void wake() {
+    effects.add("wak");
     channelSleep = false;
     channelTimer = 0;
   }
@@ -134,9 +135,12 @@ public class Puff extends Player {
   }
   
   @Override
-  public void stun(int time) {
-    super.stun(time);
-    if(channelSleep) { wake(); }
+  public void stun(int time, Mobile.HitStun type) {
+    super.stun(time, type);
+    if(channelSleep) {
+      channelSleep = false;
+      channelTimer = 0;
+    }
     channelPound = false;
     channelTimer = 0;
     delayPound = false;
