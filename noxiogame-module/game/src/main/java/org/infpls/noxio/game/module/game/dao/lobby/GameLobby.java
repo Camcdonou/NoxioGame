@@ -42,6 +42,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Look into registering next frame draw at start of draw instead of end. (unlikely to have any effect)
   - look into frame skipping because of 33 / 30
   - Prod server bug, auto reconnect & file store oddity
+  - Syncrhonize access to sessions
+  - falln stuff =========== dien stuff =========== ui sound'n stuff =========== boyyyyy
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
