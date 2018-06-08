@@ -28,7 +28,7 @@ public class Tag extends SoloGame {
   private void makeIt() {
     for(int i=0;i<controllers.size();i++) {
       final GameObject obj = controllers.get(i).getControlled();
-      if(obj != null && !obj.isDead()) {
+      if(obj != null && obj.alive()) {
         makeIt(controllers.get(i), obj);
         return;
       }
@@ -47,7 +47,7 @@ public class Tag extends SoloGame {
     super.step();
     if(controllers.size() < 2) { return; }
     
-    if(it != null && !it.isDead()) {
+    if(it != null && it.alive()) {
       if(it.is(GameObject.Types.PLAYER)) {
         ((Player)it).objective();
       }
@@ -57,7 +57,7 @@ public class Tag extends SoloGame {
     for(int i=0;i<controllers.size();i++) {
       final Controller c = controllers.get(i);
       int sc = scoreTimers.get(c);
-      if(c.getControlled() == null || c.getControlled().isDead() || c.getControlled() == it) {
+      if(c.getControlled() == null || !c.getControlled().alive() || c.getControlled() == it) {
         sc = Math.max(0, sc-1);
       }
       else { sc++; }
@@ -79,7 +79,7 @@ public class Tag extends SoloGame {
     if(announceKill(killer, victim)) {
       final GameObject obj = killer.getControlled();
       if(killed == it) {
-        if(obj != null && !obj.isDead()) { makeIt(killer, obj); }
+        if(obj != null && obj.alive()) { makeIt(killer, obj); }
       }
     }
     

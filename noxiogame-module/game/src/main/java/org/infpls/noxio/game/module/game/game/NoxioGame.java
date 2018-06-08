@@ -84,9 +84,9 @@ public abstract class NoxioGame {
     }
     for(int i=0;i<objects.size();i++) {
       final GameObject obj = objects.get(i);
-      if(obj.isDead()) {
+      if(obj.destroyed()) {
         deleteObject(obj); i--;
-        obj.destroy();
+        obj.onDelete();
       }
       else { obj.step(); }
     }

@@ -96,11 +96,11 @@ public abstract class Player extends Mobile {
   
   @Override
   public void step() {
-    movement();   // Apply player movement input
-    physics();    // Object physics and collision
-    actions();    // Perform action
-    pickups();    // Checking for and possibly picking up Pickup objects
-    timers();     // Updates timers and flags for various things
+    if(alive()){ movement(); }   // Apply player movement input
+    physics();                   // Object physics and collision
+    if(alive()){ actions(); }    // Perform action
+    if(alive()){ pickups(); }    // Checking for and possibly picking up Pickup objects
+    if(alive()){ timers(); }     // Updates timers and flags for various things
   }
   
   /* If we touch a pickup call it's touch, and pick it up if the touch returns true */
@@ -234,9 +234,19 @@ public abstract class Player extends Mobile {
   
   @Override
   public void kill() {
+    if(!alive()) { return; }
     dead = true;
     drop();
     game.reportKill(tagTime-game.getFrame()<=TAG_CREDIT_GRACE_PERIOD?tagged:null, this);
+    tagged = null;
+  }
+  
+  @Override
+  public void destroyx() {
+    if(destroyed()) { return; }
+    if(alive()) { effects.add("xpl"); }
+    kill();
+    destroyed = true;
   }
   
   public Pickup getHolding() { return holding; }

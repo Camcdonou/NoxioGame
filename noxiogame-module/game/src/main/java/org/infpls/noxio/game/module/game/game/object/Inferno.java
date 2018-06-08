@@ -44,7 +44,7 @@ public class Inferno extends Player {
   public void actionA() {
     if(genCooldown <= 0) {
       genCooldown = GEN_COOLDOWN_LENGTH;
-      kill();
+      destroyx();
     }
   }
   

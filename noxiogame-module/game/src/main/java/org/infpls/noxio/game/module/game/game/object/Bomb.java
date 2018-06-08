@@ -125,18 +125,13 @@ public class Bomb extends Pickup {
   
   private void score() {
     game.reportObjective(game.getControllerByObject(lastHeldPlayer), this);
-    delete();
+    destroyx();
   }
   
   @Override
   public void kill() {
     reset();
     game.announce(team==0?"rfr":"bfr");
-  }
-  
-  /* Special function for bomb so we can actually remove it as the normal kill() method is overriden */
-  public void delete() {
-    dead = true;
   }
   
   protected void reset() {

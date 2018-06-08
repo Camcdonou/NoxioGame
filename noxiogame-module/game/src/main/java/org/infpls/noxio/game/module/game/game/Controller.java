@@ -148,7 +148,7 @@ final public class Controller {
   public void step() {
     if(respawnTimer > 0) { respawnTimer--; }
     if(object != null) {
-      if(object.isDead()) { objectDestroyed(); return; }
+      if(!object.alive()) { objectDead(); return; }
       if(object.is(GameObject.Types.PLAYER)) {
         Player p = (Player)object;
         p.setInput(direction, speed);
@@ -166,7 +166,7 @@ final public class Controller {
     update.add("ctl;"+obj.getOid()+";");
   }
   
-  private void objectDestroyed() {
+  private void objectDead() {
     object = null;
     respawnTimer = game.respawnTime + (penalized?(game.penaltyTime * respawnPenalty):0);
     penalized = false;
@@ -178,7 +178,7 @@ final public class Controller {
   /* Returns stats accumulated in this game */
   public Score.Stats destroy() {
     if(object != null) {
-      object.kill();
+      object.destroyx();
     }
     return score.getStats();
   }
@@ -202,6 +202,6 @@ final public class Controller {
   public String getDisplay() { return user.display; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }
-  public void setTeam(final int t) { team = t; if(object!=null) { object.kill(); } game.sendMessage(getDisplay() + " joined " + (team==0?"Red":"Blue") + " Team."); }
+  public void setTeam(final int t) { team = t; if(object!=null) { object.destroyx(); } game.sendMessage(getDisplay() + " joined " + (team==0?"Red":"Blue") + " Team."); }
   public GameObject getControlled() { return object; }
 }

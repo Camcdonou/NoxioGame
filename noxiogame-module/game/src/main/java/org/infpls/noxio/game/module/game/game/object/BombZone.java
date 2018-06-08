@@ -54,10 +54,5 @@ public class BombZone extends GameObject {
   public boolean isGlobal() { return true; }
   
   @Override
-  public void kill() {
-    dead = true;
-  }
-  
-  @Override
   public String type() { return "zon"; }
 }

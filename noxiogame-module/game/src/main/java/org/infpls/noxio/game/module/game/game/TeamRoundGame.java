@@ -57,7 +57,7 @@ public abstract class TeamRoundGame extends TeamGame {
     for(int i=0;i<objects.size();i++) {
       final GameObject obj = objects.get(i);
       if(obj.is(GameObject.Types.PLAYER)) {
-        obj.kill();
+        obj.destroyx();
       }
     }
   }

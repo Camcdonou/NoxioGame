@@ -111,7 +111,7 @@ public class BombingRun extends TeamRoundGame {
     
     newRound();
     setClientTimer("", -1);
-    if(bomb != null && zone != null) { bomb.delete(); zone.kill(); }
+    if(bomb != null && zone != null) { bomb.destroyx(); zone.destroyx(); }
     
     bomb = new Bomb(this, createOid(), spawns[offense], offense);
     zone = new BombZone(this, createOid(), spawns[defense], defense, new Vec2(2f, 2f));

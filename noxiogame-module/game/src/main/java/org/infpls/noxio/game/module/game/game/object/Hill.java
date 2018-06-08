@@ -73,9 +73,10 @@ public class Hill extends GameObject {
   public boolean isGlobal() { return true; }
   
   @Override
-  public void kill() {
-    /* You can't kill a game objective! */
-  }
+  public void kill() { }
+  
+  @Override
+  public void destroyx() { }
   
   @Override
   public String type() { return "hil"; }

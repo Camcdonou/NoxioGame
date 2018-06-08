@@ -78,7 +78,7 @@ public class Elimination extends SoloRoundGame {
     sb.append("scr;");
     sb.append(";");
     for(int i=0;i<controllers.size();i++) {
-      if(controllers.get(i).getControlled() == null || controllers.get(i).getControlled().isDead()) { sb.append("* "); }
+      if(controllers.get(i).getControlled() == null || !controllers.get(i).getControlled().alive()) { sb.append("* "); }
       sb.append(controllers.get(i).getDisplay()); if(i<controllers.size()-1) { sb.append(","); }
     } sb.append(";");
     for(int i=0;i<controllers.size();i++) { sb.append(controllers.get(i).getTeam()); if(i<controllers.size()-1) { sb.append(","); } } sb.append(";");

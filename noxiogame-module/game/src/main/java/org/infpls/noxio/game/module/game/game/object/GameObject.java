@@ -23,7 +23,7 @@ public abstract class GameObject {
   public final int team;             /* Team id. -1 is 'no team', 0 is 'red team', 1 is 'blue team' */
   protected int color;               /* Sets custom color on this object, this value is interpreted differntly based on team. 0 is default. */
   
-  protected boolean dead;
+  protected boolean dead, destroyed;
   protected Vec2 position, velocity;
   public GameObject(final NoxioGame game, final int oid, final Vec2 position, final int permutation) {
     this(game, oid, position, permutation, -1);
@@ -34,7 +34,7 @@ public abstract class GameObject {
     this.oid = oid;
     bitIs = 0x00000000;
     
-    this.dead = false;
+    this.dead = false; this.destroyed = false;
     this.position = position;
     this.velocity = new Vec2();
     this.permutation = permutation;
@@ -60,8 +60,10 @@ public abstract class GameObject {
   
   public boolean isGlobal() { return false; }    /* If this returns true this object ignores fog of war and is globally visible. */
     
-  public boolean isDead() { return dead; }       /* If this method returns true the object is destroyed on the next game tick. */
+  public boolean alive() { return !dead; }         /* Object is dead but not ready to be deleted. */
+  public boolean destroyed() { return destroyed; } /* If this method returns true the object is destroyed on the next game tick. */
   public void tag(final Player player) { }       /* When an offensive action hits this object the player who performed it is recorded and credited for points if it causes death. */
   public void kill() { dead = true; }            /* Marks as dead and does whatever dead things do */
-  public void destroy() { }                      /* Called right before removing the object from the game */
+  public void destroyx() { dead = true; destroyed = true; }    /* Mark as destroyed, ready to be deleted. */
+  public void onDelete() { }
 }

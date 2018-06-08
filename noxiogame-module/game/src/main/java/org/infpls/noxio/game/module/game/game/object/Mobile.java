@@ -17,7 +17,7 @@ public abstract class Mobile extends GameObject {
   }
   
   protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
-  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f;
+  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f, KILL_PLANE = -6f, DESTROY_PLANE = -120f;
   
   protected Controller tagged;
   protected int tagTime;
@@ -126,7 +126,14 @@ public abstract class Mobile extends GameObject {
 
     /* Final */
 
-    if(fatalImpact || height < -6.0f) {
+    if(!destroyed() && fatalImpact) {
+      destroyx();
+    }
+    else if(!destroyed() && height < DESTROY_PLANE) {
+      destroyx();
+    }
+    else if(alive() && height < KILL_PLANE) {
+      effects.add("fal");
       kill();
     }
     

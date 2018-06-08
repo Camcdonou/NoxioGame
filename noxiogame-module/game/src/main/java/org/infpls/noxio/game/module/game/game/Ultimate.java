@@ -25,7 +25,7 @@ public class Ultimate extends SoloGame {
   private void makeUltimate() {
     for(int i=0;i<controllers.size();i++) {
       final GameObject obj = controllers.get(i).getControlled();
-      if(obj != null && !obj.isDead()) {
+      if(obj != null && obj.alive()) {
         makeUltimate(controllers.get(i), obj);
         return;
       }
@@ -44,7 +44,7 @@ public class Ultimate extends SoloGame {
   public void step() {
     super.step();
     
-    if(ultimate != null && !ultimate.isDead()) {
+    if(ultimate != null && ultimate.alive()) {
       if(scoreTimer++ > scoreTimeAdjust) {
         scoreTimer = 0;
         final Controller controller = getControllerByObject(ultimate);
@@ -59,7 +59,7 @@ public class Ultimate extends SoloGame {
   @Override
   protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
     if(super.spawnPlayer(c, q)) { 
-      if((ultimate == null || ultimate.isDead()) && c.getControlled() != null) {
+      if((ultimate == null || !ultimate.alive()) && c.getControlled() != null) {
         makeUltimate(c, c.getControlled());
       }
       return true;
@@ -75,11 +75,11 @@ public class Ultimate extends SoloGame {
     if(announceKill(killer, victim)) {
       final GameObject obj = killer.getControlled();
       if(killed == ultimate) {
-        if(obj != null && !obj.isDead()) { makeUltimate(killer, obj); reportObjective(killer, obj); }
+        if(obj != null && obj.alive()) { makeUltimate(killer, obj); reportObjective(killer, obj); }
         else { makeUltimate(); }
       }
       else if(obj == ultimate) {
-        if(obj != null && !obj.isDead()) { reportObjective(killer, obj); }
+        if(obj != null && obj.alive()) { reportObjective(killer, obj); }
       }
     }
     else if(victim != null) {

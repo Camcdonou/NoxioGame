@@ -87,6 +87,9 @@ public class Flag extends Pickup {
     game.announce(team==0?"rfr":"bfr");
   }
   
+  @Override
+  public void destroyx() { kill(); }
+  
   protected void reset() {
     if(held != null) { held.drop(); }
     setPosition(base);

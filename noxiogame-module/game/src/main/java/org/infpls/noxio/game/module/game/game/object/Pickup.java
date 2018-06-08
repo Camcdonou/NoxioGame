@@ -92,6 +92,12 @@ public abstract class Pickup extends Mobile {
     dead = true;
   }
   
+  @Override
+  public void destroyx() {
+    kill();
+    destroyed = true;
+  }
+  
   public boolean isHeld() { return held!=null; }
   
   @Override
