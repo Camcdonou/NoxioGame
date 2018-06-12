@@ -1,6 +1,14 @@
 package org.infpls.noxio.game.module.game.game;
 
 public class Score {
+  private static enum SSFX { /* Score Sound Effect */
+    none(-1), minor(0), kill(1), big(2), major(3), global(4);
+    
+    public final int id;
+    SSFX(int id) {
+      this.id = id;
+    }
+  }
   private static final int MULTI_TIMER_LENGTH = 150; // Timer for multikills
   
   /* Number of credits awareded for various actions */
@@ -22,6 +30,7 @@ public class Score {
     ULT_C = 10,
     RAB_C = 15,
     TAG_C = 10,
+    KILLOBJ_C = 25,
     PERFECT_C = 100,
     MULTIX_C = 10,
     SPREEX_C = 5;
@@ -44,7 +53,7 @@ public class Score {
   public void kill(int frame) {
     kills++; spree++;
     stats.kill++;
-    stats.credits += KILL_C;
+    addCredits(KILL_C, SSFX.kill);
     if(frame - timer <= MULTI_TIMER_LENGTH) { multi++; }
     else { multi = 1; }
     timer = frame;
@@ -57,61 +66,62 @@ public class Score {
     return s;
   }
   
-  public void win() { stats.gameWin++; stats.credits += WIN_C; }
-  public void neutral() { stats.credits += NEUTRAL_C; }
-  public void lose() { if(deaths>0) { stats.gameLose++; } stats.credits += LOSE_C; } /* Don't count a loss unless you died. Prevents joining an active game and losing immiedately. */
+  public void win() { stats.gameWin++; addCredits(WIN_C, SSFX.global); }
+  public void neutral() { addCredits(NEUTRAL_C, SSFX.global); }
+  public void lose() { if(deaths>0) { stats.gameLose++; } addCredits(LOSE_C, SSFX.global); } /* Don't count a loss unless you died. Prevents joining an active game and losing immiedately. */
   
-  public void betrayl() { stats.betrayl++; stats.credits += BETRAYL_C; }
-  public void betrayed() { stats.betrayed++; stats.credits += BETRAYED_C; }
+  public void betrayl() { stats.betrayl++; addCredits(BETRAYL_C, SSFX.minor); }
+  public void betrayed() { stats.betrayed++; addCredits(BETRAYED_C, SSFX.minor); }
   
-  public void firstBlood() { stats.firstBlood++; stats.credits += FIRST_C; }
-  public void killJoy() { stats.killJoy++; stats.credits += KILLJOY_C; }
-  public void endedReign() { stats.endedReign++; stats.credits += ENDREIGN_C; }
+  public void firstBlood() { stats.firstBlood++; addCredits(FIRST_C, SSFX.kill); }
+  public void killJoy() { stats.killJoy++; addCredits(KILLJOY_C, SSFX.big); }
+  public void endedReign() { stats.endedReign++; addCredits(ENDREIGN_C, SSFX.big); }
   
-  public void flagCapture() { objectives++; stats.flagCapture++; stats.credits += FLAGCAP_C; }
-  public void flagDefense() { stats.flagDefense++; stats.credits += FLAGDEF_C; }
-  public void bomb() { objectives++; stats.credits += BOMB_C; }
-  public void bombDefense() { stats.credits += BOMBDEF_C; }
-  public void hillControl() { objectives++; stats.hillControl++; stats.credits += HILL_C; }
-  public void ultimateControl() { objectives++; stats.credits += ULT_C; }
-  public void rabbitControl() { objectives++; stats.credits += RAB_C; }
-  public void tagControl() { objectives++; stats.credits += TAG_C; }
+  public void flagCapture() { objectives++; stats.flagCapture++; addCredits(FLAGCAP_C, SSFX.global); }
+  public void flagDefense() { stats.flagDefense++; addCredits(FLAGDEF_C, SSFX.major); }
+  public void bomb() { objectives++; addCredits(BOMB_C, SSFX.global); }
+  public void bombDefense() { addCredits(BOMBDEF_C, SSFX.major); }
+  public void hillControl() { objectives++; stats.hillControl++; addCredits(HILL_C, SSFX.minor); }
+  public void ultimateControl() { objectives++; addCredits(ULT_C, SSFX.minor); }
+  public void rabbitControl() { objectives++; addCredits(RAB_C, SSFX.minor); }
+  public void tagControl() { objectives++; addCredits(TAG_C, SSFX.minor); }
+  public void killObjective() { objectives++; addCredits(KILLOBJ_C, SSFX.major); }
   
-  public void perfect() { stats.perfect++; stats.credits += PERFECT_C; }
+  public void perfect() { stats.perfect++; addCredits(PERFECT_C, SSFX.global); }
   public void humiliation() { stats.humiliation++; }
   
   public int getMulti() {
     switch(multi) {
-      case 2 : { stats.mkx02++; stats.credits += (MULTIX_C*multi); break; }
-      case 3 : { stats.mkx03++; stats.credits += (MULTIX_C*multi); break; }
-      case 4 : { stats.mkx04++; stats.credits += (MULTIX_C*multi); break; }
-      case 5 : { stats.mkx05++; stats.credits += (MULTIX_C*multi); break; }
-      case 6 : { stats.mkx06++; stats.credits += (MULTIX_C*multi); break; }
-      case 7 : { stats.mkx07++; stats.credits += (MULTIX_C*multi); break; }
-      case 8 : { stats.mkx08++; stats.credits += (MULTIX_C*multi); break; }
-      case 9 : { stats.mkx09++; stats.credits += (MULTIX_C*multi); break; }
-      case 10 : { stats.mkx10++; stats.credits += (MULTIX_C*multi); break; }
-      case 11 : { stats.mkx11++; stats.credits += (MULTIX_C*multi); break; }
-      case 12 : { stats.mkx12++; stats.credits += (MULTIX_C*multi); break; }
-      case 13 : { stats.mkx13++; stats.credits += (MULTIX_C*multi); break; }
-      case 14 : { stats.mkx14++; stats.credits += (MULTIX_C*multi); break; }
-      case 15 : { stats.mkx15++; stats.credits += (MULTIX_C*multi); break; }
-      case 16 : { stats.mkx16++; stats.credits += (MULTIX_C*multi); break; }
-      case 17 : { stats.mkx17++; stats.credits += (MULTIX_C*multi); break; }
-      case 18 : { stats.mkx18++; stats.credits += (MULTIX_C*multi); break; }
-      case 19 : { stats.mkx19++; stats.credits += (MULTIX_C*multi); break; }
-      case 20 : { stats.mkx20++; stats.credits += (MULTIX_C*multi); break; }
+      case 2 : { stats.mkx02++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 3 : { stats.mkx03++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 4 : { stats.mkx04++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 5 : { stats.mkx05++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 6 : { stats.mkx06++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 7 : { stats.mkx07++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 8 : { stats.mkx08++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 9 : { stats.mkx09++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 10 : { stats.mkx10++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 11 : { stats.mkx11++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 12 : { stats.mkx12++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 13 : { stats.mkx13++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 14 : { stats.mkx14++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 15 : { stats.mkx15++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 16 : { stats.mkx16++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 17 : { stats.mkx17++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 18 : { stats.mkx18++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 19 : { stats.mkx19++; addCredits((MULTIX_C*multi), SSFX.big); break; }
+      case 20 : { stats.mkx20++; addCredits((MULTIX_C*multi), SSFX.big); break; }
     }
     return multi;
   }
   public int getSpree() {
     switch(spree) {
-      case 5 : { stats.ksx05++; stats.credits += (SPREEX_C*spree); break; }
-      case 10 : { stats.ksx10++; stats.credits += (SPREEX_C*spree); break; }
-      case 15 : { stats.ksx15++; stats.credits += (SPREEX_C*spree); break; }
-      case 20 : { stats.ksx20++; stats.credits += (SPREEX_C*spree); break; }
-      case 25 : { stats.ksx25++; stats.credits += (SPREEX_C*spree); break; }
-      case 30 : { stats.ksx30++; stats.credits += (SPREEX_C*spree); break; }
+      case 5 : { stats.ksx05++; addCredits((SPREEX_C*spree), SSFX.big); break; }
+      case 10 : { stats.ksx10++; addCredits((SPREEX_C*spree), SSFX.big); break; }
+      case 15 : { stats.ksx15++; addCredits((SPREEX_C*spree), SSFX.big); break; }
+      case 20 : { stats.ksx20++; addCredits((SPREEX_C*spree), SSFX.big); break; }
+      case 25 : { stats.ksx25++; addCredits((SPREEX_C*spree), SSFX.big); break; }
+      case 30 : { stats.ksx30++; addCredits((SPREEX_C*spree), SSFX.big); break; }
     }
     return spree;
   }
@@ -120,8 +130,12 @@ public class Score {
   public int getKills() { return kills; }
   public int getDeaths() { return deaths; }
   
-  private int creditChange = 0;
-  public int getCreditChange() { final int ch = stats.credits - creditChange; creditChange = stats.credits; return ch; }
+  private int creditChange = 0, ssfxId = -1; // 0=accumulation, 1=kill, 2=big-kill, 3=objective, 4=global-objective(silent)
+  public int[] getCreditChange() { final int ch = stats.credits - creditChange; creditChange = stats.credits; int cpy = ssfxId; ssfxId = -1; return new int[]{ ch, cpy }; }
+  private void addCredits(int amount, SSFX ssfx) {
+    stats.credits += amount;
+    ssfxId = ssfxId < ssfx.id ? ssfx.id : ssfxId;
+  }
   
   public Stats getStats() { return stats; }
   

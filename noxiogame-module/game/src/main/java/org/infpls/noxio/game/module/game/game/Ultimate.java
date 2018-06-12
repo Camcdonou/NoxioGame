@@ -75,11 +75,11 @@ public class Ultimate extends SoloGame {
     if(announceKill(killer, victim)) {
       final GameObject obj = killer.getControlled();
       if(killed == ultimate) {
-        if(obj != null && obj.alive()) { makeUltimate(killer, obj); reportObjective(killer, obj); }
+        if(obj != null && obj.alive()) { killer.score.killObjective(); makeUltimate(killer, obj); reportObjective(killer, obj); }
         else { makeUltimate(); }
       }
       else if(obj == ultimate) {
-        if(obj != null && obj.alive()) { reportObjective(killer, obj); }
+        if(obj != null && obj.alive()) { killer.score.killObjective(); reportObjective(killer, obj); }
       }
     }
     else if(victim != null) {

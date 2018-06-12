@@ -16,7 +16,7 @@ public class UserDao {
   private final List<NoxioSession> sessions; /* This is a list of all active user NoxioSessions. */
   
   public UserDao() {
-    sessions = new ArrayList();
+    sessions = Collections.synchronizedList(new ArrayList());
   }
   
   public NoxioSession createSession(final WebSocketSession webSocket, DaoContainer dao) throws IOException {

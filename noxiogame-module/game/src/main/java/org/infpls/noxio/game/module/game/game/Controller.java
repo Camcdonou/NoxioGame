@@ -62,7 +62,7 @@ final public class Controller {
       PLY::RNDINFO  - rnd;<string message>; // Message can be blank string to signal game is in normal play
       SYS::WHISPER  - wsp;<string txt>;
       SYS::ANNOUNCE - anc;<string code>;
-      SYS::ADDCREDS - crd;<int credits>;
+      SYS::ADDCREDS - crd;<int credits>;<int level>;    // -1=none, 0=minor, 1=kill, 2=big-kill, 3=objective, 4=global-objective(silent)
   */
   public void generateUpdateData(final StringBuilder sb) {
     if(object != null) {
@@ -88,8 +88,8 @@ final public class Controller {
       sb.append(update.get(i));
     }
     
-    int cc = score.getCreditChange();
-    if(cc > 0) { sb.append("crd;"); sb.append(cc); sb.append(";"); }
+    int[] cc = score.getCreditChange();
+    if(cc[0] > 0) { sb.append("crd;"); sb.append(cc[0]); sb.append(";"); sb.append(cc[1]); sb.append(";"); }
     
     update.clear();
   }

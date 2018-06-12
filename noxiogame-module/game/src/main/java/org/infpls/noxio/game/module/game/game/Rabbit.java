@@ -41,6 +41,7 @@ public class Rabbit extends SoloGame {
       if(obj != null && obj.is(GameObject.Types.PLAYER)) {
         final Player ply = (Player)obj;
         if(ply.getHolding() == flag) {
+          killer.score.killObjective();
           reportObjective(killer, flag);
         }
       }

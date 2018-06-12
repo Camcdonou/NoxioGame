@@ -69,6 +69,14 @@ public class Hill extends GameObject {
     size.toString(sb); sb.append(";");
   }
   
+  public boolean isInside(GameObject obj) {
+    if(!obj.is(Types.MOBILE)) { return false; }
+    final Mobile mob = (Mobile)obj;
+    final boolean inside = Intersection.pointInPolygon(mob.getPosition(), hitbox);
+    final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
+    return inside || inst != null;
+  }
+  
   @Override
   public boolean isGlobal() { return true; }
   

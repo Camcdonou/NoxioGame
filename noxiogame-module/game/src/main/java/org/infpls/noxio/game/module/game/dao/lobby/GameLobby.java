@@ -42,22 +42,22 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Look into registering next frame draw at start of draw instead of end. (unlikely to have any effect)
   - look into frame skipping because of 33 / 30
   - Prod server bug, auto reconnect & file store oddity
-  - Syncrhonize access to sessions
-  - falln stuff =========== dien stuff =========== ui sound'n stuff =========== boyyyyy
+  * Syncrhonize access to sessions (appears to be done but should be tested)
+  - Sound rework as needed
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
   + Implement global ranking meter (lifetime credits)
   ==== Expansion of UserSettings ====
-  - Volume slider expansion ... ( Master, Music, Announcer, Voice, SFX )
+  + Volume slider expansion ... ( Master, Music, Announcer, Voice, SFX )
   + Custom colors, win sounds
   + Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
   ==== Required Features. Will add ====
   ~ Create custom game menus
   + Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF, Payloadish, tug of war? )
   - Name display limits
-  - Cache fixes
-  - Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps )
+  * Cache fixes
+  * Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps ) ( more maps, tile sets could use some improvements )
   - Improve existing sky
   - Create a handful of alt skins for unlocks
   - Optimize decals, very very bad performance with them

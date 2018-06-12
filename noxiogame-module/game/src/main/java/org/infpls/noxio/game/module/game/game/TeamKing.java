@@ -66,7 +66,11 @@ public class TeamKing extends TeamGame {
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {
     if(isGameOver()) { return; }                              // Prevents post game deaths causing a double victory
+    if(killer != null) { return; }
     final Controller victim = getControllerByObject(killed);
+    
+    final GameObject obj = killer.getControlled();
+    if(obj != null && killed != null && hill.isInside(obj) && obj.team != killed.team) { killer.score.killObjective(); }
     
     announceKill(killer, victim);
     
