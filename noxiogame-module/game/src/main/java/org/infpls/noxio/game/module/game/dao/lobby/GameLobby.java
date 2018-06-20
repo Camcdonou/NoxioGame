@@ -83,22 +83,39 @@ import org.infpls.noxio.game.module.game.util.Salt;
 */
 
 /* SQL list additions -
-  - Custom Color and Phase Colors as seperate things
-  - Ironman BTW
-  - Hitmarker
-  - Color Match x3
-  - Edgey Dark Shine
-  - Blood Shine
-  - Rainbow Shine
-  - Minecraft Block
-  - Windows Error Message
-  - Split premium into 3 types
-  - Admin
-  - Mod
-  - Gametype stuff add
-  - UI toggles x2
-  - Caillou Hat
-  - win message and unlock
+  - Patreon Supporter Flag
+  - More Gametype stats
+  - UI toggles
+  - New Volume sliders
+  - Win message and unlock
+  -------------------------- box-6 crate-5 voxel-4 cargo-4 block-4 quad-4
+  - Crate Voice 
+  - Cargo Voice 
+  - Quad Voice 
+  - Cargo Voice (InfernoPlus)
+  - Voxel Voice (Edgey Meme)
+  - Box Solid Gold
+  - Box Red
+  - Crate Orange
+  - Voxel Green
+  - Block Round
+  - Quad Fire
+  - Box Hitmarker
+  - Crate Fireshine
+  - Cargo Blackflame
+  - Crate Darkshine
+  - Box 4 Year Old
+  - Voxel Darkshine
+  - Box Rainbow Shine
+  - Voxel Rainbow Shine
+  - Crate Rainbow Shine
+  - Block Windows 98
+  - Quad Legend
+  - Quad Runescape
+  - Block Volatile (explodey)
+  - Box Blood Shine
+  - Block Roblock
+  - Cargo Minecraft
 */
 
 public abstract class GameLobby {

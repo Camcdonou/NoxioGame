@@ -19,9 +19,9 @@ public class Shiek extends Player {
   }
   
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30;
-  private static final int FLASH_COOLDOWN_LENGTH = 30, MARK_COOLDOWN_LENGTH = 10, FLASH_STUN_LENGTH = 45, FLASH_CHARGE_LENGTH = 5;
+  private static final int FLASH_COOLDOWN_LENGTH = 30, MARK_COOLDOWN_LENGTH = 10, FLASH_STUN_LENGTH = 45, FLASH_CHARGE_LENGTH = 7, FLASH_PENALTY_LENGTH = 5;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
-  private static final float FLASH_IMPULSE = 1.0f, FLASH_RADIUS = 0.7f;
+  private static final float FLASH_IMPULSE = 1.0f, FLASH_RADIUS = 0.8f;
   private static final float BLIP_IMPULSE = 0.875f, BLIP_RADIUS = 0.6f;
   
   private Vec2 mark;
@@ -117,6 +117,8 @@ public class Shiek extends Player {
     }
     
     mark = null;
+    
+    channelTimer = FLASH_PENALTY_LENGTH;
   }
   
   /* This fuction is simple and just returns a boolean true/false if the object is over solid ground */
