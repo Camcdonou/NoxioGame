@@ -6,7 +6,7 @@ import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.util.*;
 
 public class NoxioMap {
-  private final String name, description;
+  private final String file, name, description;
   private final List<String> gametypes;
   
   private final List<Tile> tileSet;
@@ -28,6 +28,7 @@ public class NoxioMap {
     
     /* Field#0 - Info */
     final String[] info = fields[0].split(";");
+    file = mapName;
     name = info[0];
     description = info[1];
     gametypes = new ArrayList();
@@ -183,6 +184,7 @@ public class NoxioMap {
     return sps;
   }
   
+  public String getFile() { return file; }
   public String getName() { return name; }
   public String getDescription() { return description; }
   public List<String> getGametypes() { return gametypes; }

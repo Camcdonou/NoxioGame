@@ -93,7 +93,7 @@ public class Captain extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = punchDirection;
-        mob.stun(PUNCH_STUN_LENGTH, Mobile.HitStun.Fire);
+        mob.stun(PUNCH_STUN_LENGTH, Mobile.HitStun.Fire, this);
         mob.knockback(normal.scale(PUNCH_IMPULSE), this);
       }
     }

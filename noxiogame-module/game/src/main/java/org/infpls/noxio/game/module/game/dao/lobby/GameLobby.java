@@ -44,6 +44,9 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Prod server bug, auto reconnect & file store oddity
   * Syncrhonize access to sessions (appears to be done but should be tested)
   - Sound rework as needed
+  - Email to SSL to fix non-deliver
+  - Map data to HTTPS
+  + Reverb
   ==== Creation of UserData ====
   + Implement statistics and credits
   + Implement unlocks (free unlocks & payed user unlocks)
