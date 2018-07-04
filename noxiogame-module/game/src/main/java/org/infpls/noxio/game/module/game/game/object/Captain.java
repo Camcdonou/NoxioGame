@@ -16,10 +16,10 @@ public class Captain extends Player {
     }
   }
   
-  private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30;
+  private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30, PUNCH_PENALTY_TIME = 3;
   private static final int KICK_COOLDOWN_LENGTH = 60, KICK_LENGTH = 7;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
-  private static final float PUNCH_IMPULSE = 1.65f, PUNCH_HITBOX_SIZE = 0.75f, PUNCH_HITBOX_OFFSET = 0.5f;
+  private static final float PUNCH_IMPULSE = 1.65f, PUNCH_HITBOX_SIZE = 0.65f, PUNCH_HITBOX_OFFSET = 0.5f, PUNCH_RECOIL=0.33f;
   private static final float KICK_MIN_IMPULSE = 0.145f, KICK_MAX_IMPULSE = 0.425f, KICK_FALL_DAMPEN = 0.25f, KICK_RADIUS = 0.55f, KICK_OFFSET = 0.05f;
   
   private Vec2 punchDirection, kickDirection;
@@ -97,6 +97,8 @@ public class Captain extends Player {
         mob.knockback(normal.scale(PUNCH_IMPULSE), this);
       }
     }
+    setVelocity(velocity.add(punchDirection.inverse().scale(PUNCH_RECOIL)));
+    channelTimer = PUNCH_PENALTY_TIME;
   }
   
   @Override   /* Kick */

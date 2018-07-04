@@ -45,7 +45,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   * Syncrhonize access to sessions (appears to be done but should be tested)
   - Sound rework as needed
   - Email to SSL to fix non-deliver
-  - Map data to HTTPS
+  + Map data to HTTPS
   + Reverb
   ==== Creation of UserData ====
   + Implement statistics and credits
