@@ -7,8 +7,14 @@ import org.infpls.noxio.game.module.game.game.*;
 public class Fox extends Player {
   public static enum Permutation {
     BOX_N(0, UserUnlocks.Key.CHAR_BOX),
-    BOX_RED(1, UserUnlocks.Key.ALT_BOXRED),
-    BOX_GLD(2, UserUnlocks.Key.ALT_BOXGOLD);
+    BOX_VO(1, UserUnlocks.Key.ALT_BOXVO),
+    BOX_RED(2, UserUnlocks.Key.ALT_BOXRED),
+    BOX_RB(3, UserUnlocks.Key.ALT_BOXRAINBOW),
+    BOX_GLD(4, UserUnlocks.Key.ALT_BOXGOLD),
+    BOX_HIT(5, UserUnlocks.Key.ALT_BOXHIT),
+    BOX_FOR(6, UserUnlocks.Key.ALT_BOXFOUR),
+    BOX_BLD(7, UserUnlocks.Key.ALT_BOXBLOOD),
+    BOX_LT(8, UserUnlocks.Key.ALT_BOXLOOT);
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

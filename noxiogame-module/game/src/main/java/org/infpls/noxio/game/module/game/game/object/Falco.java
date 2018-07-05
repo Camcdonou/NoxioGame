@@ -7,7 +7,12 @@ import org.infpls.noxio.game.module.game.game.*;
 public class Falco extends Player {
   public static enum Permutation {
     CRT_N(0, UserUnlocks.Key.CHAR_CRATE),
-    CRT_ORN(1, UserUnlocks.Key.ALT_CRATEORANGE);
+    CRT_VO(0, UserUnlocks.Key.ALT_CRATEVO),
+    CRT_ORN(0, UserUnlocks.Key.ALT_CRATEORANGE),
+    CRT_RB(0, UserUnlocks.Key.ALT_CRATERAINBOW),
+    CRT_GLD(0, UserUnlocks.Key.ALT_CRATEGOLD),
+    CRT_FIR(0, UserUnlocks.Key.ALT_CRATEFIRE),
+    CRT_LT(0, UserUnlocks.Key.ALT_CRATELOOT);
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

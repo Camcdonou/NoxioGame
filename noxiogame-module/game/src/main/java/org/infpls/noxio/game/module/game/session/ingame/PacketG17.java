@@ -6,7 +6,7 @@ import org.infpls.noxio.game.module.game.game.NoxioMap;
 public class PacketG17 extends Packet {
   private final String name, gametype;
   private final int maxPlayers, teams, objective, scoreToWin;
-  private final NoxioMap map;
+  private final String map;
   public PacketG17(final String name, final String gametype, final int maxPlayers, final int scoreToWin, final int teams, final int objective, final NoxioMap map) {
     super("g17");
     this.name = name;
@@ -17,7 +17,7 @@ public class PacketG17 extends Packet {
     this.teams = teams;
     this.objective = objective;
     
-    this.map = map;
+    this.map = map.getFile();
   }
   
   public String getName() { return name; } 
@@ -26,5 +26,5 @@ public class PacketG17 extends Packet {
   public int getScoreToWin() { return scoreToWin; }
   public int getObjective() { return objective; }
   public String getGametype() { return gametype; }
-  public NoxioMap getMap() { return map; }
+  public String getMap() { return map; }
 }

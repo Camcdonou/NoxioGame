@@ -208,12 +208,13 @@ public abstract class NoxioGame {
   protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos) { return makePlayerObject(c, id, pos, -1); }
   protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos, final int team) {
     /* @TODO: use reflection to meme this in a more efficent way? very low priority */
+    final int color = c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)?c.user.settings.game.getColor(team):0;
     
     /* BOX_x :: Fox.java */
     for(Fox.Permutation perm : Fox.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Fox po = new Fox(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }
@@ -222,7 +223,7 @@ public abstract class NoxioGame {
     for(Falco.Permutation perm : Falco.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Falco po = new Falco(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }
@@ -231,7 +232,7 @@ public abstract class NoxioGame {
     for(Marth.Permutation perm : Marth.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Marth po = new Marth(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }
@@ -240,7 +241,7 @@ public abstract class NoxioGame {
     for(Shiek.Permutation perm : Shiek.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Shiek po = new Shiek(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }
@@ -249,7 +250,7 @@ public abstract class NoxioGame {
     for(Puff.Permutation perm : Puff.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Puff po = new Puff(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }
@@ -258,7 +259,7 @@ public abstract class NoxioGame {
     for(Captain.Permutation perm : Captain.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Captain po = new Captain(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }
@@ -267,7 +268,7 @@ public abstract class NoxioGame {
     for(Inferno.Permutation perm : Inferno.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Inferno po = new Inferno(this, createOid(), pos, perm, team);
-        if(c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)) { po.setColor(c.user.settings.game.getColor(team)); }
+        po.setColor(color);
         return po;
       }
     }

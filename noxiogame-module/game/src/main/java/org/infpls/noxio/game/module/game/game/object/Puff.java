@@ -7,7 +7,12 @@ import org.infpls.noxio.game.module.game.game.*;
 public class Puff extends Player {
   public static enum Permutation {
     BLK_N(0, UserUnlocks.Key.CHAR_BLOCK),
-    BLK_RND(1, UserUnlocks.Key.ALT_BLOCKROUND);
+    BLK_VO(0, UserUnlocks.Key.ALT_BLOCKVO),
+    BLK_RND(0, UserUnlocks.Key.ALT_BLOCKROUND),
+    BLK_WIN(0, UserUnlocks.Key.ALT_BLOCKWIN),
+    BLK_FIR(0, UserUnlocks.Key.ALT_BLOCKFIRE),
+    BLK_RO(0, UserUnlocks.Key.ALT_BLOCKRO),
+    BLK_LT(0, UserUnlocks.Key.ALT_BLOCKLOOT);
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

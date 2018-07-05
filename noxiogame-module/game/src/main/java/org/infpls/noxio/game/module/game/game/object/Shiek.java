@@ -8,7 +8,12 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 public class Shiek extends Player {
   public static enum Permutation {
     VOX_N(0, UserUnlocks.Key.CHAR_VOXEL),
-    VOX_GRN(1, UserUnlocks.Key.ALT_VOXELGREEN);
+    VOX_VO(0, UserUnlocks.Key.ALT_VOXVO),
+    VOX_GRN(0, UserUnlocks.Key.ALT_VOXGREEN),
+    VOX_RB(0, UserUnlocks.Key.ALT_VOXRAINBOW),
+    VOX_GLD(0, UserUnlocks.Key.ALT_VOXGOLD),
+    VOX_BLK(0, UserUnlocks.Key.ALT_VOXBLACK),
+    VOX_LT(0, UserUnlocks.Key.ALT_VOXLOOT);
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

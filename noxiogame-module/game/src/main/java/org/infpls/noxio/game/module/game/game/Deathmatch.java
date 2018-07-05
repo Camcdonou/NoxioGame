@@ -20,7 +20,7 @@ public class Deathmatch extends SoloGame {
     if(announceKill(killer, victim)) {
       if(killer.score.getKills() >= scoreToWin) {
         if(killer.score.getDeaths() < 1) { killer.announce("pf"); killer.score.perfect(); }
-        gameOver(killer.getDisplay() + " wins!", "[CUSTOM WIN MESSAGE]", killer.getCustomSound());
+        gameOver(killer.getDisplay() + " wins!", killer.getMessageA(), killer.getCustomSound());
 
         final boolean bsort = true;
         final Controller[] cs = controllers.toArray(new Controller[0]);

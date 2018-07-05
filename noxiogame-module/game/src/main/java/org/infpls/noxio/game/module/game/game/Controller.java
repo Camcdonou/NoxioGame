@@ -183,6 +183,21 @@ final public class Controller {
     return score.getStats();
   }
   
+  /* Returns custom win message if user has one and its unlocked */
+  public String getMessageA() {
+    if(user.settings.game.customMessageA != null && !user.settings.game.customMessageA.trim().equals("") && user.unlocks.has(UserUnlocks.Key.FT_MESSAGE)) {
+      return user.settings.game.customMessageA;
+    }
+    return "";
+  }
+  
+  public String getMessageB() {
+    if(user.settings.game.customMessageB != null && !user.settings.game.customMessageB.trim().equals("") && user.unlocks.has(UserUnlocks.Key.FT_MESSAGE)) {
+      return user.settings.game.customMessageB;
+    }
+    return "Most Valueable Player: " + getDisplay();
+  }
+  
   /* Returns custom sound file name IF this user has it unlocked and has one set */
   public String getCustomSound() {
     if(user.unlocks.has(UserUnlocks.Key.FT_SOUND) && user.settings.game.useCustomSound) {
@@ -199,7 +214,7 @@ final public class Controller {
   public void announce(final String code) { update.add("anc;"+code+";"); }
   public void setClientTimer(String title, int time) { update.add("tim;" + title + ";" + time + ";"); }
   public String getUser() { return user.name; }
-  public String getDisplay() { return user.display; }
+  public String getDisplay() { return user.type.symbol + user.display; }
   public String getSid() { return sid; }
   public int getTeam() { return team; }
   public void setTeam(final int t) { team = t; if(object!=null) { object.destroyx(); } game.sendMessage(getDisplay() + " joined " + (team==0?"Red":"Blue") + " Team."); }

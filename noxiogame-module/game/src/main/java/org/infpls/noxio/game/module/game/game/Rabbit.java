@@ -58,7 +58,7 @@ public class Rabbit extends SoloGame {
     announceObjective();
     if(player.score.getObjectives() >= scoreToWin) {
       if(player.score.getDeaths() < 1) { player.announce("pf"); player.score.perfect(); }
-      gameOver(player.getDisplay() + " wins!", "[CUSTOM WIN MESSAGE]", player.getCustomSound());
+      gameOver(player.getDisplay() + " wins!", player.getMessageA(), player.getCustomSound());
       
       final boolean bsort = true;
       final Controller[] cs = controllers.toArray(new Controller[0]);

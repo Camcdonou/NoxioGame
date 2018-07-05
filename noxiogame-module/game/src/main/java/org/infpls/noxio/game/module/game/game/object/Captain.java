@@ -6,7 +6,13 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Captain extends Player {
   public static enum Permutation {
-    CRG_N(0, UserUnlocks.Key.CHAR_CARGO);
+    CRG_N(0, UserUnlocks.Key.CHAR_CARGO),
+    CRG_VO(0, UserUnlocks.Key.ALT_CARGOVO),
+    CRG_PL(0, UserUnlocks.Key.ALT_CARGOPLUS),
+    CRG_GLD(0, UserUnlocks.Key.ALT_CARGOGOLD),
+    CRG_BLK(0, UserUnlocks.Key.ALT_CARGOBLACK),
+    CRG_MC(0, UserUnlocks.Key.ALT_CARGOMINE),
+    CRG_RET(0, UserUnlocks.Key.ALT_CARGORETRO);
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

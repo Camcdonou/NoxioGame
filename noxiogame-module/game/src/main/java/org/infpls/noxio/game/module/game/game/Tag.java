@@ -93,7 +93,7 @@ public class Tag extends SoloGame {
     updateScore();
     announceObjective();
     if(player.score.getObjectives() >= scoreToWin) {
-      gameOver(player.getDisplay() + " wins!", "[CUSTOM WIN MESSAGE]", player.getCustomSound());
+      gameOver(player.getDisplay() + " wins!", player.getMessageA(), player.getCustomSound());
       
       final boolean bsort = true;
       final Controller[] cs = controllers.toArray(new Controller[0]);

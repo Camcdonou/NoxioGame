@@ -15,8 +15,8 @@ public class UserSettings {
     volume = new Volume(.9f, .5f, .75f, .75f, .75f, .75f);
     graphics = new Graphics(1f, 1f, 1f, 2048, false);
     control = new Control(false, 70, 68, 32, 84, 83, 192);
-    game = new Game(0, 0, 0, false, null);
-    toggle = new Toggle(false, false, false);
+    game = new Game(0, 0, 0, null, null, false, null, 1);
+    toggle = new Toggle(false, false, false, false, false);
   }
   
   public class Volume {
@@ -60,14 +60,19 @@ public class UserSettings {
   
   public class Game {
     public final int color, redColor, blueColor;
+    public final String customMessageA, customMessageB;
     public final boolean useCustomSound;
     public final String customSoundFile;
-    public Game(int c, int rc, int bc, boolean ucs, String csf) {
+    public final int lagComp;
+    public Game(int c, int rc, int bc, String cma, String cmb, boolean ucs, String csf, int lc) {
       color = c;
       redColor = rc;
       blueColor = bc;
+      customMessageA = cma;
+      customMessageB = cmb;
       useCustomSound = ucs;
       customSoundFile = csf;
+      lagComp = Math.min(4, Math.max(0, lc));
     }
     /* team=0 returns red team color, team=1 returns blue team color, all else returns regular color */
     public int getColor(int team) {
@@ -80,11 +85,13 @@ public class UserSettings {
   }
   
   public class Toggle {
-    public final boolean disableAlts, disableCustomSound, disableColor;
-    public Toggle(boolean da, boolean dcs, boolean dc) {
+    public final boolean disableAlts, disableCustomSound, disableColor, disableLog, disableMeter;
+    public Toggle(boolean da, boolean dcs, boolean dc, boolean dl, boolean dm) {
       disableAlts = da;
       disableCustomSound = dcs;
       disableColor = dc;
+      disableLog = dl;
+      disableMeter = dm;
     }
   }
 }

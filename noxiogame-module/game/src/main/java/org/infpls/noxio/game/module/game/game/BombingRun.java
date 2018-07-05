@@ -75,21 +75,21 @@ public class BombingRun extends TeamRoundGame {
       if(scores[0] >= scoreToWin || scores[1] >= scoreToWin || round/2 >= ROUND_LIMIT) {
         final Controller top = topPlayer();
         if(scores[0] > scores[1]) {
-          gameOver("Red Team wins!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+          gameOver("Red Team wins!", top.getMessageB(), top.getCustomSound());
           for(int i=0;i<controllers.size();i++) {
             if(controllers.get(i).getTeam() == 0) { controllers.get(i).score.win(); }
             else { controllers.get(i).score.lose(); }
           }
         }
         else if(scores[1] > scores[1]) {
-          gameOver("Blue Team wins!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+          gameOver("Blue Team wins!", top.getMessageB(), top.getCustomSound());
           for(int i=0;i<controllers.size();i++) {
             if(controllers.get(i).getTeam() == 0) { controllers.get(i).score.win(); }
             else { controllers.get(i).score.lose(); }
           }
         }
         else {
-          gameOver("Draw!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+          gameOver("Draw!", top.getMessageB(), top.getCustomSound());
           for(int i=0;i<controllers.size();i++) {
             controllers.get(i).score.neutral();
           }

@@ -7,7 +7,10 @@ import org.infpls.noxio.game.module.game.game.*;
 public class Marth extends Player {
   public static enum Permutation {
     QUA_N(0, UserUnlocks.Key.CHAR_QUAD),
-    QUA_FIR(1, UserUnlocks.Key.ALT_QUADFIRE);
+    QUA_VO(0, UserUnlocks.Key.ALT_QUADVO),
+    QUA_FIR(0, UserUnlocks.Key.ALT_QUADFIRE),
+    QUA_LGN(0, UserUnlocks.Key.ALT_QUADLEGEND),
+    QUA_RS(0, UserUnlocks.Key.ALT_QUADRUNE);
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

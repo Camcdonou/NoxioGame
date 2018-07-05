@@ -40,12 +40,12 @@ public class TeamElimination extends TeamRoundGame {
       int winner;
       if(scores[1] < 1) {
         final Controller top = topPlayer();
-        gameOver("Red Team wins!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+        gameOver("Red Team wins!", top.getMessageB(), top.getCustomSound());
         winner = 0;
       }
       else if(scores[0] < 1) {
         final Controller top = topPlayer();
-        gameOver("Blue Team wins!", "MVP -> " + top.getDisplay() + " [CUSTOM WIN MESSAGE]", top.getCustomSound());
+        gameOver("Blue Team wins!", top.getMessageB(), top.getCustomSound());
         winner = 1;
       }
       else { return; }

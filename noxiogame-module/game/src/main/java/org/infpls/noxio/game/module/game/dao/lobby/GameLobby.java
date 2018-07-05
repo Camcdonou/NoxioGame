@@ -86,38 +86,42 @@ import org.infpls.noxio.game.module.game.util.Salt;
 */
 
 /* SQL list additions -
-  - Patreon Supporter Flag
+  = Patreon Supporter Flag
   - More Gametype stats
-  - UI toggles
-  - New Volume sliders
-  - Win message and unlock
+  + UI toggles
+  + New Volume sliders
+  + Win message and unlock (validate input, check unlock)
+  + Lag comp mode 0 1 2 3 4
+  - safemode
   -------------------------- box-6 crate-5 voxel-4 cargo-4 block-4 quad-4
-  - Crate Voice 
-  - Cargo Voice 
-  - Quad Voice 
-  - Cargo Voice (InfernoPlus)
-  - Voxel Voice (Edgey Meme)
-  - Box Solid Gold
+  - Box Voice
   - Box Red
-  - Crate Orange
-  - Voxel Green
-  - Block Round
-  - Quad Fire
-  - Box Hitmarker
-  - Crate Fireshine
-  - Cargo Blackflame
-  - Crate Darkshine
-  - Box 4 Year Old
-  - Voxel Darkshine
   - Box Rainbow Shine
-  - Voxel Rainbow Shine
+  - Box Solid Gold
+  - Box Hitmarker
+  - Box 4 Year Old
+  - Box Blood Shine
+  - Crate Voice 
+  - Crate Orange
   - Crate Rainbow Shine
-  - Block Windows 98
+  - Crate Fireshine
+  - Crate Blackflame
+  - Voxel Voice (Edgey Meme)
+  - Voxel Green
+  - Voxel Rainbow Shine
+  - Voxel Darkshine
+  - Quad Voice
+  - Quad Fire
   - Quad Legend
   - Quad Runescape
+  - Block Voice
+  - Block Round
+  - Block Windows 98
   - Block Volatile (explodey)
-  - Box Blood Shine
   - Block Roblock
+  - Cargo Voice
+  - Cargo Voice (InfernoPlus)
+  - Cargo Blackflame
   - Cargo Minecraft
 */
 
