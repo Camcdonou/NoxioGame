@@ -7,19 +7,21 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Shiek extends Player {
   public static enum Permutation {
-    VOX_N(0, UserUnlocks.Key.CHAR_VOXEL),
-    VOX_VO(0, UserUnlocks.Key.ALT_VOXVO),
-    VOX_GRN(0, UserUnlocks.Key.ALT_VOXGREEN),
-    VOX_RB(0, UserUnlocks.Key.ALT_VOXRAINBOW),
-    VOX_GLD(0, UserUnlocks.Key.ALT_VOXGOLD),
-    VOX_BLK(0, UserUnlocks.Key.ALT_VOXBLACK),
-    VOX_LT(0, UserUnlocks.Key.ALT_VOXLOOT);
+    VOX_N(0, UserUnlocks.Key.CHAR_VOXEL, new Mobile.HitStun[]{Mobile.HitStun.Electric}),
+    VOX_VO(1, UserUnlocks.Key.ALT_VOXVO, new Mobile.HitStun[]{Mobile.HitStun.Electric}),
+    VOX_GRN(2, UserUnlocks.Key.ALT_VOXGREEN, new Mobile.HitStun[]{Mobile.HitStun.ElectricGreen}),
+    VOX_RB(3, UserUnlocks.Key.ALT_VOXRAINBOW, new Mobile.HitStun[]{Mobile.HitStun.ElectricRainbow}),
+    VOX_GLD(4, UserUnlocks.Key.ALT_VOXGOLD, new Mobile.HitStun[]{Mobile.HitStun.ElectricPurple}),
+    VOX_BLK(5, UserUnlocks.Key.ALT_VOXBLACK, new Mobile.HitStun[]{Mobile.HitStun.ElectricBlack}),
+    VOX_LT(6, UserUnlocks.Key.ALT_VOXLOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;
-    Permutation(int permutation, UserUnlocks.Key unlock) {
+    public final Mobile.HitStun[] hits;
+    Permutation(int permutation, UserUnlocks.Key unlock, Mobile.HitStun[] hits) {
        this.permutation = permutation;
        this.unlock = unlock;
+       this.hits = hits;
     }
   }
   
@@ -32,12 +34,14 @@ public class Shiek extends Player {
   private Vec2 mark;
   private boolean channelFlash;
   private int flashCooldown, blipCooldown, blipPower;
+  private final Permutation shiekPermutation;
   public Shiek(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
   public Shiek(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
+    shiekPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.735f;
@@ -70,7 +74,7 @@ public class Shiek extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), Mobile.HitStun.Electric, this);
+        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), shiekPermutation.hits[0], this);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
       }
       
@@ -117,7 +121,7 @@ public class Shiek extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(mark).normalize();
-      mob.stun(FLASH_STUN_LENGTH, Mobile.HitStun.Electric, this);
+      mob.stun(FLASH_STUN_LENGTH, shiekPermutation.hits[0], this);
       mob.knockback(normal.scale(FLASH_IMPULSE), this);
     }
     

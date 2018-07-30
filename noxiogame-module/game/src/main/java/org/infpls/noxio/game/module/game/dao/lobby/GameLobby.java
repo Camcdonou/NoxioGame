@@ -93,11 +93,11 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Win message and unlock (validate input, check unlock)
   + Lag comp mode 0 1 2 3 4
   - safemode
-  -------------------------- box-6 crate-5 voxel-4 cargo-4 block-4 quad-4
+  -------------------------- box-6 crate-5 voxel-4 cargo-5 block-4 quad-4
   - Box Voice
   - Box Red
   - Box Rainbow Shine
-  - Box Solid Gold
+  - Box Solid Gold +++++++++++ ADD ALL
   - Box Hitmarker
   - Box 4 Year Old
   - Box Blood Shine
@@ -111,16 +111,19 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Voxel Rainbow Shine
   - Voxel Darkshine
   - Quad Voice
+  - Quad Rainbow   +++++++++++++++++++++++++++++++
   - Quad Fire
   - Quad Legend
   - Quad Runescape
   - Block Voice
+  - Block Rainbow   +++++++++++++++++++++++++++++++
   - Block Round
   - Block Windows 98
   - Block Volatile (explodey)
   - Block Roblock
   - Cargo Voice
   - Cargo Voice (InfernoPlus)
+  - Cargo Rainbow   +++++++++++++++++++++++++++++++
   - Cargo Blackflame
   - Cargo Minecraft
 */

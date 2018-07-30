@@ -6,37 +6,42 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Falco extends Player {
   public static enum Permutation {
-    CRT_N(0, UserUnlocks.Key.CHAR_CRATE),
-    CRT_VO(0, UserUnlocks.Key.ALT_CRATEVO),
-    CRT_ORN(0, UserUnlocks.Key.ALT_CRATEORANGE),
-    CRT_RB(0, UserUnlocks.Key.ALT_CRATERAINBOW),
-    CRT_GLD(0, UserUnlocks.Key.ALT_CRATEGOLD),
-    CRT_FIR(0, UserUnlocks.Key.ALT_CRATEFIRE),
-    CRT_LT(0, UserUnlocks.Key.ALT_CRATELOOT);
+    CRT_N(0, UserUnlocks.Key.CHAR_CRATE, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire}),
+    CRT_VO(1, UserUnlocks.Key.ALT_CRATEVO, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire}),
+    CRT_ORN(2, UserUnlocks.Key.ALT_CRATEORANGE, new Mobile.HitStun[]{Mobile.HitStun.ElectricOrange, Mobile.HitStun.Fire}),
+    CRT_RB(3, UserUnlocks.Key.ALT_CRATERAINBOW, new Mobile.HitStun[]{Mobile.HitStun.ElectricRainbow, Mobile.HitStun.FireRainbow}),
+    CRT_GLD(4, UserUnlocks.Key.ALT_CRATEGOLD, new Mobile.HitStun[]{Mobile.HitStun.ElectricPurple, Mobile.HitStun.FirePurple}),
+    CRT_FIR(5, UserUnlocks.Key.ALT_CRATEFIRE, new Mobile.HitStun[]{Mobile.HitStun.Fire, Mobile.HitStun.Fire}),
+    CRT_BLK(6, UserUnlocks.Key.ALT_CRATEBLACK, new Mobile.HitStun[]{Mobile.HitStun.ElectricBlack, Mobile.HitStun.FireBlack}),
+    CRT_LT(7, UserUnlocks.Key.ALT_CRATELOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;
-    Permutation(int permutation, UserUnlocks.Key unlock) {
+    public final Mobile.HitStun[] hits;
+    Permutation(int permutation, UserUnlocks.Key unlock, Mobile.HitStun[] hits) {
        this.permutation = permutation;
        this.unlock = unlock;
+       this.hits = hits;
     }
   }
   
-  private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 35;
+  private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 35, BLAST_STUN_TIME = 25;
   private static final int DASH_COOLDOWN_LENGTH = 45, CHARGE_TIME_LENGTH = 20;
   private static final int TAUNT_COOLDOWN_LENGTH = 10;
-  private static final float BLIP_IMPULSE = 0.45f, BLIP_POPUP_IMPULSE = 0.225f, DASH_IMPULSE = 0.425f, DASH_POPOUP_IMPULSE = 0.225f, BLIP_RADIUS = 0.6f, DASH_FALL_DAMPEN_MULT = 0.15f;
+  private static final float BLIP_IMPULSE = 0.45f, BLIP_POPUP_IMPULSE = 0.225f, DASH_IMPULSE = 0.425f, DASH_POPOUP_IMPULSE = 0.225f, BLIP_RADIUS = 0.6f, BLAST_RADIUS = 0.75f, BLAST_IMPULSE = 0.6f, DASH_FALL_DAMPEN_MULT = 0.15f;
   private static final float CRITICAL_MULT = 1.75f;
   private static final int CRITICAL_WINDOW_LENGTH = 20;
   
   private boolean channelDash;
   private int blipCooldown, dashCooldown, blipPower, dashPower, criticalTimer;
+  private final Permutation falcoPermutation;
   public Falco(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
   public Falco(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
+    falcoPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.1f; friction = 0.725f;
@@ -72,7 +77,7 @@ public class Falco extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), Mobile.HitStun.Electric, this);
+        mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), falcoPermutation.hits[0], this);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)*(isCrit?CRITICAL_MULT:1.0f)), this);
         mob.popup(BLIP_POPUP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f), this);
         if(isCrit) { effects.add("crt"); }
@@ -99,6 +104,15 @@ public class Falco extends Player {
     drop();
     setVelocity(velocity.add(look.scale(DASH_IMPULSE)));
     setVSpeed(DASH_POPOUP_IMPULSE);
+    
+    final List<Mobile> hits = hitTest(position, BLAST_RADIUS);
+    for(int i=0;i<hits.size();i++) {
+      final Mobile mob = hits.get(i);
+      final Vec2 normal = mob.getPosition().subtract(position).normalize();
+      mob.stun(BLAST_STUN_TIME, falcoPermutation.hits[1], this);
+      mob.knockback(normal.scale(BLAST_IMPULSE), this);
+    }
+    
     effects.add("mov");
   }
   
