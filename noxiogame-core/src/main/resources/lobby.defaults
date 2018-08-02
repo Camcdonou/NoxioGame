@@ -217,5 +217,17 @@ lobbies: [
         respawn_time: "90",
       }
     ]
+  },
+  {
+    game_name: "Gen Test #1",
+    max_players: "8",
+    rotation: [
+      {
+        gametype: "deathmatch",
+        map_name: "dig",
+        score_to_win: "15",
+        respawn_time: "30",
+      }
+    ]
   }
 ]

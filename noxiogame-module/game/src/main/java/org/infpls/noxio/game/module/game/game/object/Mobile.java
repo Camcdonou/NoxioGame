@@ -9,7 +9,7 @@ import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 public abstract class Mobile extends GameObject {
   public enum HitStun {
     Generic("hg"),
-    Slash("hs"),
+    Slash("hs"), SlashPurple("hsxp"), SlashFire("hsxf"), SlashRainbow("hsxrb"),
     Electric("he"), ElectricRed("hexr"), ElectricOrange("hexo"), ElectricGreen("hexg"), ElectricPurple("hexp"), ElectricBlack("hexb"), ElectricRainbow("hexrb"),
     Fire("hf"), FirePurple("hfxp"), FireBlack("hfxb"), FireRainbow("hfxrb"), FireRetro("hfxrt");
     

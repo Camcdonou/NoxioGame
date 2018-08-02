@@ -93,11 +93,13 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Win message and unlock (validate input, check unlock)
   + Lag comp mode 0 1 2 3 4
   - safemode
++ unlock lobby creation
   -------------------------- box-6 crate-5 voxel-4 cargo-5 block-4 quad-4
   - Box Voice
   - Box Red
   - Box Rainbow Shine
   - Box Solid Gold +++++++++++ ADD ALL
+  - NEBULA ++++++++++++ ADD ALL
   - Box Hitmarker
   - Box 4 Year Old
   - Box Blood Shine

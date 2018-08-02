@@ -11,9 +11,10 @@ public class Falco extends Player {
     CRT_ORN(2, UserUnlocks.Key.ALT_CRATEORANGE, new Mobile.HitStun[]{Mobile.HitStun.ElectricOrange, Mobile.HitStun.Fire}),
     CRT_RB(3, UserUnlocks.Key.ALT_CRATERAINBOW, new Mobile.HitStun[]{Mobile.HitStun.ElectricRainbow, Mobile.HitStun.FireRainbow}),
     CRT_GLD(4, UserUnlocks.Key.ALT_CRATEGOLD, new Mobile.HitStun[]{Mobile.HitStun.ElectricPurple, Mobile.HitStun.FirePurple}),
-    CRT_FIR(5, UserUnlocks.Key.ALT_CRATEFIRE, new Mobile.HitStun[]{Mobile.HitStun.Fire, Mobile.HitStun.Fire}),
-    CRT_BLK(6, UserUnlocks.Key.ALT_CRATEBLACK, new Mobile.HitStun[]{Mobile.HitStun.ElectricBlack, Mobile.HitStun.FireBlack}),
-    CRT_LT(7, UserUnlocks.Key.ALT_CRATELOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire});
+    CRT_DEL(5, UserUnlocks.Key.ALT_CRATEDELTA, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire}),
+    CRT_FIR(6, UserUnlocks.Key.ALT_CRATEFIRE, new Mobile.HitStun[]{Mobile.HitStun.Fire, Mobile.HitStun.Fire}),
+    CRT_BLK(7, UserUnlocks.Key.ALT_CRATEBLACK, new Mobile.HitStun[]{Mobile.HitStun.ElectricBlack, Mobile.HitStun.FireBlack}),
+    CRT_LT(8, UserUnlocks.Key.ALT_CRATELOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

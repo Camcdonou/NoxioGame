@@ -6,17 +6,22 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Marth extends Player {
   public static enum Permutation {
-    QUA_N(0, UserUnlocks.Key.CHAR_QUAD),
-    QUA_VO(0, UserUnlocks.Key.ALT_QUADVO),
-    QUA_FIR(0, UserUnlocks.Key.ALT_QUADFIRE),
-    QUA_LGN(0, UserUnlocks.Key.ALT_QUADLEGEND),
-    QUA_RS(0, UserUnlocks.Key.ALT_QUADRUNE);
+    QUA_N(0, UserUnlocks.Key.CHAR_QUAD, new Mobile.HitStun[]{Mobile.HitStun.Slash}),
+    QUA_VO(1, UserUnlocks.Key.ALT_QUADVO, new Mobile.HitStun[]{Mobile.HitStun.Slash}),
+    QUA_RB(2, UserUnlocks.Key.ALT_QUADRAINBOW, new Mobile.HitStun[]{Mobile.HitStun.SlashRainbow}),
+    QUA_GLD(3, UserUnlocks.Key.ALT_QUADGOLD, new Mobile.HitStun[]{Mobile.HitStun.SlashPurple}),
+    QUA_DEL(4, UserUnlocks.Key.ALT_QUADDELTA, new Mobile.HitStun[]{Mobile.HitStun.Slash}),
+    QUA_FIR(5, UserUnlocks.Key.ALT_QUADFIRE, new Mobile.HitStun[]{Mobile.HitStun.SlashFire}),
+    QUA_LGN(6, UserUnlocks.Key.ALT_QUADLEGEND, new Mobile.HitStun[]{Mobile.HitStun.Slash}),
+    QUA_RS(7, UserUnlocks.Key.ALT_QUADRUNE, new Mobile.HitStun[]{Mobile.HitStun.Slash});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;
-    Permutation(int permutation, UserUnlocks.Key unlock) {
+    public final Mobile.HitStun[] hits;
+    Permutation(int permutation, UserUnlocks.Key unlock, Mobile.HitStun[] hits) {
        this.permutation = permutation;
        this.unlock = unlock;
+       this.hits = hits;
     }
   }
   
@@ -32,12 +37,14 @@ public class Marth extends Player {
   private Vec2 counterDirection;
   private int combo;
   private int slashCooldown, counterCooldown, comboTimer;
+  private final Permutation marthPermutation;
   public Marth(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
   public Marth(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
+    marthPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 0.9f; friction = 0.705f;
@@ -114,7 +121,7 @@ public class Marth extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, Mobile.HitStun.Slash, this);
+        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, marthPermutation.hits[0], this);
         mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
         combo++; comboTimer = SLASH_COMBO_DEGEN;
         effects.add(isCombo?"cht":"sht");
@@ -156,7 +163,7 @@ public class Marth extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), Mobile.HitStun.Slash, this); }
+      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), marthPermutation.hits[0], this); }
       if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
       if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER, this); }
       combo++; comboTimer = SLASH_COMBO_DEGEN;

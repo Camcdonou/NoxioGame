@@ -11,10 +11,11 @@ public class Fox extends Player {
     BOX_RED(2, UserUnlocks.Key.ALT_BOXRED, new Mobile.HitStun[]{Mobile.HitStun.ElectricRed, Mobile.HitStun.Generic}),
     BOX_RB(3, UserUnlocks.Key.ALT_BOXRAINBOW, new Mobile.HitStun[]{Mobile.HitStun.ElectricRainbow, Mobile.HitStun.Generic}),
     BOX_GLD(4, UserUnlocks.Key.ALT_BOXGOLD, new Mobile.HitStun[]{Mobile.HitStun.ElectricPurple, Mobile.HitStun.Generic}),
-    BOX_HIT(5, UserUnlocks.Key.ALT_BOXHIT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
-    BOX_FOR(6, UserUnlocks.Key.ALT_BOXFOUR, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
-    BOX_BLD(7, UserUnlocks.Key.ALT_BOXBLOOD, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
-    BOX_LT(8, UserUnlocks.Key.ALT_BOXLOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic});
+    BOX_DEL(5, UserUnlocks.Key.ALT_BOXDELTA, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
+    BOX_HIT(6, UserUnlocks.Key.ALT_BOXHIT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
+    BOX_FOR(7, UserUnlocks.Key.ALT_BOXFOUR, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
+    BOX_BLD(8, UserUnlocks.Key.ALT_BOXBLOOD, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic}),
+    BOX_LT(9, UserUnlocks.Key.ALT_BOXLOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Generic});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;

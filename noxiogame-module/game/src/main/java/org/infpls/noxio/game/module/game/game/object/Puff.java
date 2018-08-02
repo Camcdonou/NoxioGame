@@ -6,19 +6,24 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Puff extends Player {
   public static enum Permutation {
-    BLK_N(0, UserUnlocks.Key.CHAR_BLOCK),
-    BLK_VO(0, UserUnlocks.Key.ALT_BLOCKVO),
-    BLK_RND(0, UserUnlocks.Key.ALT_BLOCKROUND),
-    BLK_WIN(0, UserUnlocks.Key.ALT_BLOCKWIN),
-    BLK_FIR(0, UserUnlocks.Key.ALT_BLOCKFIRE),
-    BLK_RO(0, UserUnlocks.Key.ALT_BLOCKRO),
-    BLK_LT(0, UserUnlocks.Key.ALT_BLOCKLOOT);
+    BLK_N(0, UserUnlocks.Key.CHAR_BLOCK, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_VO(1, UserUnlocks.Key.ALT_BLOCKVO, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_RB(2, UserUnlocks.Key.ALT_BLOCKRAINBOW, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_GLD(3, UserUnlocks.Key.ALT_BLOCKGOLD, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_DEL(4, UserUnlocks.Key.ALT_BLOCKDELTA, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_RND(5, UserUnlocks.Key.ALT_BLOCKROUND, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_WIN(6, UserUnlocks.Key.ALT_BLOCKWIN, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_FIR(7, UserUnlocks.Key.ALT_BLOCKFIRE, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_RO(8, UserUnlocks.Key.ALT_BLOCKRO, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
+    BLK_LT(9, UserUnlocks.Key.ALT_BLOCKLOOT, new Mobile.HitStun[]{Mobile.HitStun.Generic});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;
-    Permutation(int permutation, UserUnlocks.Key unlock) {
+    public final Mobile.HitStun[] hits;
+    Permutation(int permutation, UserUnlocks.Key unlock, Mobile.HitStun[] hits) {
        this.permutation = permutation;
        this.unlock = unlock;
+       this.hits = hits;
     }
   }
   
@@ -30,12 +35,14 @@ public class Puff extends Player {
   private Vec2 poundDirection;
   private boolean channelSleep, channelPound, delayPound;
   private int restCooldown, poundCooldown, delayTimer;
+  private final Permutation puffPermutation;
   public Puff(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
   public Puff(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
+    puffPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -73,7 +80,7 @@ public class Puff extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(REST_STUN_LENGTH, Mobile.HitStun.Generic, this);
+        mob.stun(REST_STUN_LENGTH, puffPermutation.hits[0], this);
         mob.knockback(normal.scale(REST_IMPULSE), this);
         effects.add("crt");
       }
@@ -113,7 +120,7 @@ public class Puff extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      mob.stun(POUND_STUN_LENGTH, Mobile.HitStun.Generic, this);
+      mob.stun(POUND_STUN_LENGTH, puffPermutation.hits[0], this);
       mob.knockback(normal.scale(POUND_IMPULSE), this);
       mob.popup(POUND_POPUP, this);
       effects.add("slp");

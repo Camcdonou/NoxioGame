@@ -6,19 +6,23 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Captain extends Player {
   public static enum Permutation {
-    CRG_N(0, UserUnlocks.Key.CHAR_CARGO),
-    CRG_VO(0, UserUnlocks.Key.ALT_CARGOVO),
-    CRG_PL(0, UserUnlocks.Key.ALT_CARGOPLUS),
-    CRG_GLD(0, UserUnlocks.Key.ALT_CARGOGOLD),
-    CRG_BLK(0, UserUnlocks.Key.ALT_CARGOBLACK),
-    CRG_MC(0, UserUnlocks.Key.ALT_CARGOMINE),
-    CRG_RET(0, UserUnlocks.Key.ALT_CARGORETRO);
+    CRG_N(0, UserUnlocks.Key.CHAR_CARGO, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
+    CRG_VO(1, UserUnlocks.Key.ALT_CARGOVO, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
+    CRG_PL(2, UserUnlocks.Key.ALT_CARGOPLUS, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
+    CRG_RB(3, UserUnlocks.Key.ALT_CARGORAINBOW, new Mobile.HitStun[]{Mobile.HitStun.FireRainbow}),
+    CRG_GLD(4, UserUnlocks.Key.ALT_CARGOGOLD, new Mobile.HitStun[]{Mobile.HitStun.FirePurple}),
+    CRG_DEL(5, UserUnlocks.Key.ALT_CARGODELTA, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
+    CRG_BLK(6, UserUnlocks.Key.ALT_CARGOBLACK, new Mobile.HitStun[]{Mobile.HitStun.FireBlack}),
+    CRG_MC(7, UserUnlocks.Key.ALT_CARGOMINE, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
+    CRG_RET(8, UserUnlocks.Key.ALT_CARGORETRO, new Mobile.HitStun[]{Mobile.HitStun.Fire});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;
-    Permutation(int permutation, UserUnlocks.Key unlock) {
+    public final Mobile.HitStun[] hits;
+    Permutation(int permutation, UserUnlocks.Key unlock, Mobile.HitStun[] hits) {
        this.permutation = permutation;
        this.unlock = unlock;
+       this.hits = hits;
     }
   }
   
@@ -31,12 +35,14 @@ public class Captain extends Player {
   private Vec2 punchDirection, kickDirection;
   private boolean chargePunch;
   private int punchCooldown, kickCooldown, chargeTimer, kickTimer;
+  private final Permutation captainPermutation;
   public Captain(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
   public Captain(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
+    captainPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -99,7 +105,7 @@ public class Captain extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = punchDirection;
-        mob.stun(PUNCH_STUN_LENGTH, Mobile.HitStun.Fire, this);
+        mob.stun(PUNCH_STUN_LENGTH, captainPermutation.hits[0], this);
         mob.knockback(normal.scale(PUNCH_IMPULSE), this);
       }
     }

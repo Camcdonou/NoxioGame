@@ -12,8 +12,9 @@ public class Shiek extends Player {
     VOX_GRN(2, UserUnlocks.Key.ALT_VOXGREEN, new Mobile.HitStun[]{Mobile.HitStun.ElectricGreen}),
     VOX_RB(3, UserUnlocks.Key.ALT_VOXRAINBOW, new Mobile.HitStun[]{Mobile.HitStun.ElectricRainbow}),
     VOX_GLD(4, UserUnlocks.Key.ALT_VOXGOLD, new Mobile.HitStun[]{Mobile.HitStun.ElectricPurple}),
-    VOX_BLK(5, UserUnlocks.Key.ALT_VOXBLACK, new Mobile.HitStun[]{Mobile.HitStun.ElectricBlack}),
-    VOX_LT(6, UserUnlocks.Key.ALT_VOXLOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric});
+    VOX_DEL(5, UserUnlocks.Key.ALT_VOXDELTA, new Mobile.HitStun[]{Mobile.HitStun.Electric}),
+    VOX_BLK(6, UserUnlocks.Key.ALT_VOXBLACK, new Mobile.HitStun[]{Mobile.HitStun.ElectricBlack}),
+    VOX_LT(7, UserUnlocks.Key.ALT_VOXLOOT, new Mobile.HitStun[]{Mobile.HitStun.Electric});
     
     public final int permutation;
     public final UserUnlocks.Key unlock;
