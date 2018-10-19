@@ -23,10 +23,14 @@ import org.infpls.noxio.game.module.game.util.Salt;
    14 - SKY
 */
 
+/* Release Cleanup 
+  - Change passwords (mail, etc)
+*/
+
 /* Finalizing list ::
   ==== Core Functions ====
-  + MERGE ALL CHANGES TO HTTPS, SETUP PAYPAL PROPERTIES
-  - CONFIRM SECURITY OF SQL?
+  / MERGE ALL CHANGES TO HTTPS, SETUP PAYPAL PROPERTIES
+  / CONFIRM SECURITY OF SQL?
   + HTTPS + WSS Support
   + Database setup
   + Patch hash salting + using bcrypt for password storage
@@ -41,7 +45,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + 20xx logging/Oak to a seperate file
   - Look into registering next frame draw at start of draw instead of end. (unlikely to have any effect)
   - look into frame skipping because of 33 / 30
-  - Prod server bug, auto reconnect & file store oddity
+  + Prod server bug, auto reconnect & file store oddity (seems fixed)
   * Syncrhonize access to sessions (appears to be done but should be tested)
   - Sound rework as needed
   - Email to SSL to fix non-deliver
@@ -56,21 +60,22 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Custom colors, win sounds
   + Togglescape 2007 ( disable custom colors/sounds/skins/ui/etc )
   ==== Required Features. Will add ====
-  ~ Create custom game menus
+  ~ Create custom game menus (horrible implementation, rework)
   + Gametype expansion ( Assault, VIP, Bomber, Murder Mystery, Juggernaut, Rabbit, Elimination, Death Race, Tag, Mobile CTF, Payloadish, tug of war? )
-  - Name display limits
   * Cache fixes
   * Map and Tileset Expansion ... ( 1 more tile set, 6~ new maps ) ( more maps, tile sets could use some improvements )
-  - Improve existing sky
-  - Create a handful of alt skins for unlocks
+  / Replace illegal textures
+  + Improve existing sky
+  / Create a handful of alt skins for unlocks
   - Optimize decals, very very bad performance with them
   ==== Extra Features. Unlikely to add before release ====
+  - Name display bugs and settings
   - Color Blind Mode
   - Display name
   - Improve chat log, it's very bad performance wise and lacks features
   - Move all javascript constants into the actual function instead of the constructor. Small performance change.
   - Spectator mode
-  - 3D Skyboxes
+  - More Skyboxes
   - Low graphics mode    ( Diffuse render only, very low end computer support )
   - Support for mobile controls
   - Support for controller

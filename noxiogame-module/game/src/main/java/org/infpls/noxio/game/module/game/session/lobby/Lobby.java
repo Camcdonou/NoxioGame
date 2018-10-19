@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
+import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.util.*;
 
 
@@ -54,6 +55,10 @@ public class Lobby extends SessionState {
   }
   
   private void createLobby(PacketB03 p) throws IOException {
+    /* Make sure user has permission to make a lobby */
+    if(!session.getUserData().unlocks.has(UserUnlocks.Key.FT_LOBBY)) {
+      sendPacket(new PacketB05("You do not have the ability to create custom lobbies.")); return;
+    }
     /* Make sure data is valid */
     final LobbySettings ls = LobbySettings.parseSettings(p.getSettings());
     if(ls == null) {
