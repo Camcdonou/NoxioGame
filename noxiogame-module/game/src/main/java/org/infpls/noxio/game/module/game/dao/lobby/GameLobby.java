@@ -25,6 +25,10 @@ import org.infpls.noxio.game.module.game.util.Salt;
 
 /* Release Cleanup 
   - Change passwords (mail, etc)
+  - Audio Balance
+  - Announcer VO
+  - Safemode
+  - Override back button
 */
 
 /* Finalizing list ::
@@ -48,7 +52,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   + Prod server bug, auto reconnect & file store oddity (seems fixed)
   * Syncrhonize access to sessions (appears to be done but should be tested)
   - Sound rework as needed
-  - Email to SSL to fix non-deliver
+  / Email to SSL to fix non-deliver
   + Map data to HTTPS
   + Reverb
   ==== Creation of UserData ====
@@ -67,7 +71,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   / Replace illegal textures
   + Improve existing sky
   / Create a handful of alt skins for unlocks
-  - Optimize decals, very very bad performance with them
+  + Optimize decals, very very bad performance with them (mostly done)
+  - Mobile Controls
   ==== Extra Features. Unlikely to add before release ====
   - Name display bugs and settings
   - Color Blind Mode
