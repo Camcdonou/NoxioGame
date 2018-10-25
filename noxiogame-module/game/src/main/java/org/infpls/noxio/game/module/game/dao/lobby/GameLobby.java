@@ -26,9 +26,12 @@ import org.infpls.noxio.game.module.game.util.Salt;
 /* Release Cleanup 
   - Change passwords (mail, etc)
   - Audio Balance
+  - File Compression
   - Announcer VO
   - Safemode
   - Override back button
+  - Mobile app container (?)
+  - Backspace in chat causes browser back sometimes
 */
 
 /* Finalizing list ::
