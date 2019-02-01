@@ -23,12 +23,16 @@ import org.infpls.noxio.game.module.game.util.Salt;
    14 - SKY
 */
 
-/* Release Cleanup 
+/* Release Cleanup
   - Change passwords (mail, etc)
   - Audio Balance
   - File Compression
   - Announcer VO
-  - Safemode
+  - Firefox bug (framerate/refresh rate??/double connection issue?)
+  - Double connection issue
+  - Hung SQL connector issue
+  - Iphone issue? (safari is AudioContext webkit thing. Iphone uknown so far )
+  - Controls lock out when phone is slept for a while. (debug but... my guess is websocket is hung and I just need to look at the time between game steps on a frame draw and if its been to long, termiante)
   - Override back button
   - Mobile app container (?)
   - Backspace in chat causes browser back sometimes
@@ -84,7 +88,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Move all javascript constants into the actual function instead of the constructor. Small performance change.
   - Spectator mode
   - More Skyboxes
-  - Low graphics mode    ( Diffuse render only, very low end computer support )
+  - Low graphics mode    ( Diffuse render only, very low end computer support ) (SAFEMODE)
   - Support for mobile controls
   - Support for controller
   - Twitch integration (very unlikely)
@@ -92,6 +96,8 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Patterns
   - Delete fallback mode as we abandonded that system ages ago. (and ban emily)
   - Forgot username email
+  - Ambidex touch control
+  - Controller support on PC an phone
   ==== Commission Work ====
   - Voice work for ... Announcer, Fox, Shiek, Puff
   - Sound effect work for ... ( All SFX from melee need to be replaced )

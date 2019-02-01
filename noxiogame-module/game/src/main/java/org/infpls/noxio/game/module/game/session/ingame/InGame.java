@@ -58,6 +58,7 @@ public class InGame extends SessionState {
         case "g03" : { leaveGame(gson.fromJson(data, PacketG03.class)); break; }
         case "g07" : { loadDone(gson.fromJson(data, PacketG07.class)); break; }
         case "g09" : { session.leaveGame(); break; }
+        case "g21" : { ping(gson.fromJson(data, PacketG21.class)); break; }
         
         /* Ingame Type Packets gxx */
         
@@ -81,6 +82,7 @@ public class InGame extends SessionState {
   private void clientReady(PacketG00 p) throws IOException { lobby.pushEvent(new SessionE00(session)); }
   private void loadDone(PacketG07 p) throws IOException { lobby.pushEvent(new SessionE01(session)); }
   private void leaveGame(PacketG03 p) throws IOException { lobby.pushEvent(new SessionE02(session)); }
+  private void ping(PacketG21 p) throws IOException { session.sendPacket(p); }
   
   @Override
   public void destroy() throws IOException { lobby.pushEvent(new SessionE03(session)); }

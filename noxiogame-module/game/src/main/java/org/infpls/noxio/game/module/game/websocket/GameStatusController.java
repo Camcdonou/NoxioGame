@@ -30,13 +30,28 @@ public class GameStatusController {
   @RequestMapping(value = "/info", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody ResponseEntity getInfo() {
       Gson gson = new GsonBuilder().create();
+      Settable.ServerInfo si = Settable.getServerInfo();
+      final Info info = new Info(si.name, si.description, si.location, si.port, dao.getUserDao().getOnlineUserCount(), si.max);
 
-      return new ResponseEntity(gson.toJson(Settable.getServerInfo()), HttpStatus.OK);
+      return new ResponseEntity(gson.toJson(info), HttpStatus.OK);
   }
 
   @RequestMapping(value = "/status", method = RequestMethod.GET, produces = "application/json")
   public @ResponseBody ResponseEntity getStatus() {
       return new ResponseEntity("{\"status\":\"OK\"}", HttpStatus.OK);
+  }
+  
+  public class Info {
+    public final String name, description, location;
+    public final int port, users, max;
+    public Info(String name, String description, String location, int port, int users, int max) {
+      this.name = name;
+      this.description = description;
+      this.location = location;
+      this.port = port;
+      this.users = users;
+      this.max = max;
+    }
   }
   
   public class AdvInfo {

@@ -54,4 +54,8 @@ public class UserDao {
     }
     return users;
   }
+  
+  public int getOnlineUserCount() {
+    return sessions.size();
+  }
 }

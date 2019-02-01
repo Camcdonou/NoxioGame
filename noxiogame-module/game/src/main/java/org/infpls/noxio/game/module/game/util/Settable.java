@@ -36,7 +36,8 @@ public class Settable {
       final String location = server.get("location").getAsString();
       final String description = server.get("description").getAsString();
       final int port = server.get("port").getAsInt();
-      SERVER_INFO = new ServerInfo(name, description, location, port);
+      final int max = server.get("max").getAsInt();
+      SERVER_INFO = new ServerInfo(name, description, location, port, max);
       
       AUTH_DOMAIN = auth.get("domain").getAsString();
       AUTH_ADDRESS = auth.get("address").getAsString();
@@ -56,9 +57,9 @@ public class Settable {
   
   public static class ServerInfo {
     public final String name, description, location;
-    public final int port;
-    ServerInfo(String name, String description, String location, int port) {
-      this.name = name; this.description = description; this.location = location; this.port = port;
+    public final int port, max;
+    ServerInfo(String name, String description, String location, int port, int max) {
+      this.name = name; this.description = description; this.location = location; this.port = port; this.max = max;
     }
   }
   
