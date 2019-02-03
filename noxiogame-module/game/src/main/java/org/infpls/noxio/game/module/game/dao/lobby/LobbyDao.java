@@ -52,6 +52,17 @@ public class LobbyDao {
     }
     return null;
   }
+  
+  public GameLobby getLobbyAuto() {
+    cleanUp();
+    GameLobby best = null;
+    for(int i=0;i<lobbies.size();i++) {
+      GameLobby gl = lobbies.get(i);
+      if(best == null) { best = gl; continue; }
+      if(gl.players.size() > best.players.size() && gl.players.size() < gl.maxPlayers) { best = gl; }
+    }
+    return best;
+  }
  
   /* This method deletes any user created lobbies that are flagged as closed. */
   public void cleanUp() { 

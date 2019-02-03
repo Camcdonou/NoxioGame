@@ -29,6 +29,7 @@ public class Lobby extends SessionState {
      > b03 create lobby
      > b04 join lobby
      < b05 failed to join/craete lobby
+     > b11 request quickmatch
   */
   
   @Override
@@ -42,6 +43,7 @@ public class Lobby extends SessionState {
         case "b02" : { close(); break; }
         case "b03" : { createLobby(gson.fromJson(data, PacketB03.class)); break; }
         case "b04" : { joinLobby(gson.fromJson(data, PacketB04.class)); break; }
+        case "b11" : { joinLobbyAuto(gson.fromJson(data, PacketB11.class)); break; }
         default : { /*close("Invalid data: " + p.getType()); */ break; }   /* @TODO: commented out to prevent game kick -> i00 packet error */
       }
     } catch(IOException | NullPointerException | JsonParseException ex) {
@@ -89,6 +91,16 @@ public class Lobby extends SessionState {
   
   private void joinLobby(PacketB04 p) throws IOException {
     GameLobby gl = lobbyDao.getLobby(p.getLid());
+    if(gl != null) {
+      session.joinGame(gl);
+    }
+    else {
+      sendPacket(new PacketB05("Failed to join lobby."));
+    }
+  }
+  
+  private void joinLobbyAuto(PacketB11 p) throws IOException {
+    GameLobby gl = lobbyDao.getLobbyAuto();
     if(gl != null) {
       session.joinGame(gl);
     }
