@@ -8,10 +8,14 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class Rabbit extends SoloGame {
 
+  private final int flagCount;
+  
   private final FlagRabbit flag;
   
   public Rabbit(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
+    
+    flagCount = settings.get("flag_count", 1, 1, 3);
     
     flag = spawnFlag();
   }

@@ -8,7 +8,9 @@ import org.infpls.noxio.game.module.game.game.object.GameObject;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public abstract class TeamRoundGame extends TeamGame {
-  public static final int MIN_PLAYERS = 4, ROUND_START_TIMER = 300, ROUND_GRACE_PERIOD = 150;
+  public static final int ROUND_GRACE_PERIOD = 150;
+  
+  private final int minPlayers, roundStartTime;
   
   private boolean timerStarted;
   protected boolean roundStarted, graceOver;
@@ -17,6 +19,9 @@ public abstract class TeamRoundGame extends TeamGame {
   
   public TeamRoundGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw, boolean ar) throws IOException {
     super(lobby, map, settings, stw);
+    
+    minPlayers = settings.get("min_players", 4, 2, lobby.getInfo().getMaxPlayers());
+    roundStartTime = settings.get("round_start_time", 300, 90, 900);
     
     allowRespawn = ar;
     newRound();
@@ -53,7 +58,7 @@ public abstract class TeamRoundGame extends TeamGame {
   
   protected final void newRound() {
     roundStarted = false; timerStarted = false; graceOver = false;
-    roundStartTimer = ROUND_START_TIMER; graceTimer = ROUND_GRACE_PERIOD;
+    roundStartTimer = roundStartTime; graceTimer = ROUND_GRACE_PERIOD;
     for(int i=0;i<objects.size();i++) {
       final GameObject obj = objects.get(i);
       if(obj.is(GameObject.Types.PLAYER)) {
@@ -64,9 +69,9 @@ public abstract class TeamRoundGame extends TeamGame {
   
   protected void roundCountdown() {
     if(!timerStarted) {
-      if(MIN_PLAYERS-controllers.size() > 0) {
+      if(minPlayers-controllers.size() > 0) {
         for(int i=0;i<controllers.size();i++) {
-          controllers.get(i).setRound("Waiting for players... (" + (MIN_PLAYERS-controllers.size()) + ")");
+          controllers.get(i).setRound("Waiting for players... (" + (minPlayers-controllers.size()) + ")");
         }
       }
       else {

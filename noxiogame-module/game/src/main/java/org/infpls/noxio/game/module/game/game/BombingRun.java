@@ -7,9 +7,10 @@ import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public class BombingRun extends TeamRoundGame {
-  public static final int ROUND_TIME_LIMIT =120*30, ROUND_END_TIME_LIMIT = 150;
-  public static final int ROUND_LIMIT = 3;
+  public static final int ROUND_END_TIME_LIMIT = 150;
 
+  private final int roundTimeLimit, roundLimit;
+  
   private final Vec2[] spawns;
   private Bomb bomb;
   private BombZone zone;
@@ -18,6 +19,9 @@ public class BombingRun extends TeamRoundGame {
   private int round, roundTimer, roundEndTimer;
   public BombingRun(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 3, 1, 25), true);
+    
+    roundTimeLimit = settings.get("round_time_limit", 120*30, 30*30, 300*30);
+    roundLimit = settings.get("round_limit", 3, 1, 15);
     
     side = false;
     roundTimer = 0; round = 0;
@@ -72,7 +76,7 @@ public class BombingRun extends TeamRoundGame {
     roundOver = true;
     
     if((round & 1) == 0) { // Only end game on even round so both teams get equal number of rounds
-      if(scores[0] >= scoreToWin || scores[1] >= scoreToWin || round/2 >= ROUND_LIMIT) {
+      if(scores[0] >= scoreToWin || scores[1] >= scoreToWin || round/2 >= roundLimit) {
         final Controller top = topPlayer();
         if(scores[0] > scores[1]) {
           gameOver("Red Team wins!", top.getMessageB(), top.getCustomSound());
@@ -105,7 +109,7 @@ public class BombingRun extends TeamRoundGame {
   private void switchSides() {
     side = !side;
     int offense = side?0:1; int defense = side?1:0;
-    roundTimer = ROUND_TIME_LIMIT;
+    roundTimer = roundTimeLimit;
     roundOver = false; roundEndTimer = 0;
     round++;
     

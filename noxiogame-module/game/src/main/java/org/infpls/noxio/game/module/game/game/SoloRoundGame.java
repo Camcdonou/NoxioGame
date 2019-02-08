@@ -7,7 +7,9 @@ import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 
 public abstract class SoloRoundGame extends SoloGame {
-  public static final int MIN_PLAYERS = 4, ROUND_START_TIMER = 300, ROUND_GRACE_PERIOD = 150;
+  public static final int ROUND_GRACE_PERIOD = 150;
+  
+  private final int minPlayers, roundStartTime;
   
   private boolean roundStarted, timerStarted;
   protected boolean graceOver;
@@ -16,8 +18,11 @@ public abstract class SoloRoundGame extends SoloGame {
   public SoloRoundGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
     super(lobby, map, settings, stw);
     
+    minPlayers = settings.get("min_players", 4, 2, lobby.getInfo().getMaxPlayers());
+    roundStartTime = settings.get("round_start_time", 300, 90, 900);
+    
     roundStarted = false; timerStarted = false; graceOver = false;
-    roundStartTimer = ROUND_START_TIMER; graceTimer = ROUND_GRACE_PERIOD;
+    roundStartTimer = roundStartTime; graceTimer = ROUND_GRACE_PERIOD;
   }
   
   @Override
@@ -44,9 +49,9 @@ public abstract class SoloRoundGame extends SoloGame {
   
   protected void roundCountdown() {
     if(!timerStarted) {
-      if(MIN_PLAYERS-controllers.size() > 0) {
+      if(minPlayers-controllers.size() > 0) {
         for(int i=0;i<controllers.size();i++) {
-          controllers.get(i).setRound("Waiting for players... (" + (MIN_PLAYERS-controllers.size()) + ")");
+          controllers.get(i).setRound("Waiting for players... (" + (minPlayers-controllers.size()) + ")");
         }
       }
       else {

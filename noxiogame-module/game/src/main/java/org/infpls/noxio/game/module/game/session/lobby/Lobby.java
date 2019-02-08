@@ -72,8 +72,8 @@ public class Lobby extends SessionState {
       sendPacket(new PacketB05("Lobby name must be alpha-numeric characters only.")); return;
     }
     
-    if(gameName.length() < 3 || gameName.length() > 18) {
-      sendPacket(new PacketB05("Lobby name must be between 3 and 18 characters.")); return;
+    if(gameName.trim().length() < 3 || gameName.length() > 24) {
+      sendPacket(new PacketB05("Lobby name must be between 3 and 24 characters.")); return;
     }
     
     if(!Validation.isAlphaNumericWithSpaces(ls.getRotation(0).get("map_name", "final"))) {
