@@ -42,7 +42,7 @@ public class HttpThread extends Thread {
     final String content = gson.toJson(p);
     HttpURLConnection connection = null;
     try {
-      final URL to = new URL("http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/noxioauth/report");
+      final URL to = new URL("http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/report");
 
       //Create connection
       connection = (HttpURLConnection)to.openConnection();
@@ -84,7 +84,7 @@ public class HttpThread extends Thread {
       }
       
     } catch(MalformedURLException ex) {
-      Oak.log(Oak.Level.ERR, "Invalid URL : " + "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/noxioauth/report", ex);
+      Oak.log(Oak.Level.ERR, "Invalid URL : " + "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/report", ex);
     } catch (IOException e) {
       Oak.log(Oak.Level.ERR, "IOException during HTTP POST.", e);
     } finally {

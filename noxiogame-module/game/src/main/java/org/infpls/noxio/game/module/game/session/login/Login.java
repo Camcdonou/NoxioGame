@@ -45,7 +45,7 @@ public class Login extends SessionState {
     /* @TODO: this is blocking but it's probably okay. research and decide. */
     /* @TODO: move this type of get to a static class? */
     /* @FIXME also the app name is hardcoded here, make that a prop later. */
-    final String address = "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/noxioauth/validate/" + p.getUser() + "/" + p.getSid();
+    final String address = "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/validate/" + p.getUser() + "/" + p.getSid();
     StringBuilder result = new StringBuilder();
     URL url = new URL(address);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();

@@ -21,7 +21,7 @@ var error = function() {
 
 var getInfo = function() {
   $.ajax({
-    url: "/noxiogame/advinfo",
+    url: "/nxg/advinfo",
     type: 'GET',
     timeout: 3000,
     success: function(data) { showInfo(data); },
