@@ -154,7 +154,7 @@ public abstract class GameLobby {
   
   protected final String name;
   
-  protected final int maxPlayers;
+  public final int maxPlayers;
   protected final List<NoxioSession> players, loading;
   
   private final GameLoop loop; /* Seperate timer thread to trigger game steps */
@@ -223,7 +223,6 @@ public abstract class GameLobby {
       if(game.isResetReady()) {
         newGame();
         inputs.pop();
-        GameLobbyInfo info = getInfo();
         for(int i=0;i<players.size();i++) {
           final NoxioSession player = players.get(i);
           player.sendPacket(new PacketG17(name, game.gametypeName(), maxPlayers, game.scoreToWin, game.isTeamGame(), game.objectiveBaseId(), game.map)); /* This is one of the few packets we dont send in a blob because it has an odd state. */

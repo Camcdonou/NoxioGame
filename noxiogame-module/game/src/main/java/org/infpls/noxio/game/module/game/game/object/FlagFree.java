@@ -18,8 +18,8 @@ public class FlagFree extends Flag {
           final Flag f = (Flag)(obj);
           if(f.team != team && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) {
             f.score(held);
-            if(held.team != f.team) { f.reset(); }
-            if(held.team != team) { reset(); }
+            if(held.team != f.team) { f.reset(); reset(); }
+            if(held.team != team) { reset(); f.reset(); }
           }
         }
       }

@@ -18,7 +18,7 @@ public abstract class SoloRoundGame extends SoloGame {
   public SoloRoundGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
     super(lobby, map, settings, stw);
     
-    minPlayers = settings.get("min_players", 4, 2, lobby.getInfo().getMaxPlayers());
+    minPlayers = settings.get("min_players", 4, 2, lobby.maxPlayers);
     roundStartTime = settings.get("round_start_time", 300, 90, 900);
     
     roundStarted = false; timerStarted = false; graceOver = false;

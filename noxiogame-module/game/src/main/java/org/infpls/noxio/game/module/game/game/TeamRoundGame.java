@@ -20,7 +20,7 @@ public abstract class TeamRoundGame extends TeamGame {
   public TeamRoundGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw, boolean ar) throws IOException {
     super(lobby, map, settings, stw);
     
-    minPlayers = settings.get("min_players", 4, 2, lobby.getInfo().getMaxPlayers());
+    minPlayers = settings.get("min_players", 4, 2, lobby.maxPlayers);
     roundStartTime = settings.get("round_start_time", 300, 90, 900);
     
     allowRespawn = ar;

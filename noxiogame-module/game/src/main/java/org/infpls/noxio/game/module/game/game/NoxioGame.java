@@ -43,7 +43,7 @@ public abstract class NoxioGame {
     update = new ArrayList();
     
     scoreToWin = stw;
-    respawnTime = settings.get("respawn_time", 30, 0, 300);
+    respawnTime = settings.get("respawn_time", 45, 0, 300);
     penaltyTime = settings.get("penalty_time", 90, 0, 300);
     
     frame = 0;

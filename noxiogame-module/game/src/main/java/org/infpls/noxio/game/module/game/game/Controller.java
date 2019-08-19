@@ -60,6 +60,7 @@ final public class Controller {
       PLY::CONTROL  - ctl;<int oid>;
       PLY::RSPWNTMR - rst;<int time>;
       PLY::RNDINFO  - rnd;<string message>; // Message can be blank string to signal game is in normal play
+      GAM::FORCERSP - frc;                  // Tells client to force respawn. This could be ignored by cheating but would be rather pointless.
       SYS::WHISPER  - wsp;<string txt>;
       SYS::ANNOUNCE - anc;<string code>;
       SYS::ADDCREDS - crd;<int credits>;<int level>;    // -1=none, 0=minor, 1=kill, 2=big-kill, 3=objective, 4=global-objective(silent)
@@ -208,6 +209,8 @@ final public class Controller {
   
   public void penalize() { penalized = true; respawnPenalty++; }
   public boolean respawnReady() { return respawnTimer<=0 && !roundLock; }
+  public void forceSpawn() { update.add("frc;"); }
+  public void extendRespawn(int time) { if(!respawnReady()) { respawnTimer+=time; update.add("rst;"+respawnTimer+";"); } }
   public void setRound(final String info) { update.add("rnd;"+info+";"); roundLock = true; }
   public void clearRound() { update.add("rnd;;"); roundLock = false; }
   public void whisper(final String msg) { update.add("wsp;"+msg+";"); }

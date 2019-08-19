@@ -9,7 +9,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 public class Tag extends SoloGame {
   public static final int TAG_COOLDOWN_TIME = 30;
 
-  private GameObject it;
+  private Controller it;
   private final int scoreTimeAdjust;
   private int tagCooldown;
   private final Map<Controller, Integer> scoreTimers;
@@ -29,17 +29,29 @@ public class Tag extends SoloGame {
     for(int i=0;i<controllers.size();i++) {
       final GameObject obj = controllers.get(i).getControlled();
       if(obj != null && obj.alive()) {
-        makeIt(controllers.get(i), obj);
+        makeIt(controllers.get(i));
         return;
       }
     }
   }
   
+  /* If the player who was it died we attempt to make them it again asap */
+  private void remakeIt() {
+    
+  }
+  
   /* Specific player */
-  private void makeIt(final Controller player, final GameObject obj) {
-    if(controllers.size() < 2) { return; } /* Don't make an Ultimate Lifeform until there is more than 1 player in the game. */
+  private void makeIt(final Controller player) {
+    if(controllers.size() < 2) { return; }
     player.announce("hc");
-    it = obj;
+    
+    if(it != null) {
+      final GameObject obj = it.getControlled();
+      if(obj != null && obj.is(GameObject.Types.PLAYER)) {
+        ((Player)obj).dejective();
+      }
+    }
+    it = player;
   }
   
   @Override
@@ -47,17 +59,22 @@ public class Tag extends SoloGame {
     super.step();
     if(controllers.size() < 2) { return; }
     
-    if(it != null && it.alive()) {
-      if(it.is(GameObject.Types.PLAYER)) {
-        ((Player)it).objective();
+    final GameObject obj;
+    if(it != null) {
+      obj = it.getControlled();
+      if(obj != null && obj.is(GameObject.Types.PLAYER)) {
+        ((Player)obj).objective();
       }
+      else { // Force 'it' player to respawn
+        if(it.respawnReady()) { it.forceSpawn(); }
+      }      
     }
-    else { makeIt(); }
+    else { makeIt(); obj = null; }
     
     for(int i=0;i<controllers.size();i++) {
       final Controller c = controllers.get(i);
       int sc = scoreTimers.get(c);
-      if(c.getControlled() == null || !c.getControlled().alive() || c.getControlled() == it) {
+      if(c.getControlled() == null || !c.getControlled().alive() || c.getControlled() == obj) {
         sc = Math.max(0, sc-1);
       }
       else { sc++; }
@@ -78,9 +95,8 @@ public class Tag extends SoloGame {
     
     if(announceKill(killer, victim)) {
       final GameObject obj = killer.getControlled();
-      if(killed == it) {
-        if(obj != null && obj.alive()) { makeIt(killer, obj); }
-      }
+      if(victim == it) { reportObjective(killer, killer.getControlled()); }
+      if(killer == it) { reportObjective(killer, killer.getControlled()); makeIt(victim); }
     }
     
     updateScore();
@@ -124,14 +140,14 @@ public class Tag extends SoloGame {
     final Controller cb = getControllerByObject(b);
     if(ca == null || cb == null) { return; }
     
-    if(a == it) {
-      makeIt(cb, b);
+    if(ca == it) {
+      makeIt(cb);
       b.stun(TAG_COOLDOWN_TIME, Mobile.HitStun.Generic);
       tagCooldown = TAG_COOLDOWN_TIME;
       if(a.is(GameObject.Types.PLAYER)) { ((Player)a).dejective(); }
     }
-    else if(b == it) {
-      makeIt(ca, a);
+    else if(cb == it) {
+      makeIt(ca);
       a.stun(TAG_COOLDOWN_TIME, Mobile.HitStun.Generic);
       tagCooldown = TAG_COOLDOWN_TIME;
       if(b.is(GameObject.Types.PLAYER)) { ((Player)b).dejective(); }
@@ -168,6 +184,7 @@ public class Tag extends SoloGame {
     super.leave(player);
     final Controller con = getController(player.getSessionId());
     if(con != null) { scoreTimers.remove(con); }
+    if(con == it) { it = null; }
   }
   
   @Override

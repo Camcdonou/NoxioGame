@@ -36,5 +36,5 @@ public class CustomLobby extends GameLobby {
   public NoxioSession getHost() { return hostPlayer; }
   
   @Override
-  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, game.gametypeName(), hostPlayer == null ? "N/A" : getHost().getDisplay(), players.size(), maxPlayers); }
+  public GameLobbyInfo getInfo() { return new GameLobbyInfo(lid, name, game.gametypeName(), getHost() == null ? "N/A" : getHost().getDisplay(), players.size(), maxPlayers); }
 }
