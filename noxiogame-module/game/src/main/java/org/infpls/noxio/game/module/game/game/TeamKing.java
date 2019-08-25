@@ -15,7 +15,7 @@ public class TeamKing extends TeamGame {
   public TeamKing(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
 
-    staticHill = settings.get("static_hill", 1, 0, 1)==1;
+    staticHill = settings.get("static_hill", 0, 0, 1)==0;
     scoreToMove = settings.get("score_to_move", 10, 1, 99);
     
     moveTimer = 0;

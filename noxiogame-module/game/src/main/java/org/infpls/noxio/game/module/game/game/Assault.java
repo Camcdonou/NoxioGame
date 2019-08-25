@@ -21,10 +21,15 @@ public class Assault extends TeamGame {
     rsl = rs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)+1f, map.getBounds()[1]*0.5f):rs.get(0).getPos();
     bsl = bs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)-1f, map.getBounds()[1]*0.5f):bs.get(0).getPos();
     final FlagAssault rf, bf;
+    final FlagZone rz, bz;
     rf = new FlagAssault(this, createOid(), rsl, 0);
     bf = new FlagAssault(this, createOid(), bsl, 1);
+    rz = new FlagZone(this, createOid(), rsl, 0, new Vec2(1f, 1f));
+    bz = new FlagZone(this, createOid(), bsl, 1, new Vec2(1f, 1f));
     addObject(rf);
     addObject(bf);
+    addObject(rz);
+    addObject(bz);
   }
 
   @Override

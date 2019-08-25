@@ -18,14 +18,12 @@ public class FlagFree extends Flag {
           final Flag f = (Flag)(obj);
           if(f.team != team && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) {
             f.score(held);
-            if(held.team != f.team) { f.reset(); reset(); }
-            if(held.team != team) { reset(); f.reset(); }
+            f.reset(); reset();
           }
         }
       }
     }
     
-    if(!isHeld() && !onBase()) { resetCooldown++; }
     else { resetCooldown = 0; }
     if(resetCooldown >= RESET_COOLDOWN_TIME) { kill(); }
   }
