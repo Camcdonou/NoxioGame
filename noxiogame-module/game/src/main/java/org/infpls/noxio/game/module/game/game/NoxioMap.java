@@ -9,6 +9,8 @@ public class NoxioMap {
   private final String file, name, description;
   private final List<String> gametypes;
   
+  private final String sky;
+  
   private final List<Tile> tileSet;
   private final List<Tile> doodadSet;
   
@@ -23,7 +25,7 @@ public class NoxioMap {
   private final String cache;         // Asset cache for client
   
   public NoxioMap(final String mapName) throws IOException {
-    final String data = Scung.readFile("map/" + mapName + ".map");
+    final String data = Scung.readFile("map/" + mapName + ".map").replaceAll("\\n", "");
     final String[] fields = data.split("\\|");
     
     /* Field#0 - Info */
@@ -37,8 +39,11 @@ public class NoxioMap {
       gametypes.add(gts[i]);
     }
     
-    /* Field#1 - Tile Set */
-    final String[] ts = fields[1].split(";");
+    /* Field#1 - Sky */
+    sky = fields[1];
+    
+    /* Field#2 - Tile Set */
+    final String[] ts = fields[2].split(";");
     tileSet = new ArrayList();
     for(int i=0;i<ts.length;i++) {
       final String[] t = ts[i].split(",");
@@ -46,15 +51,15 @@ public class NoxioMap {
       tileSet.add(new Tile(t[0], t[1]));
     }
     
-    /* Field#2 - Map Bounds */
-    final String[] bnds = fields[2].split(",");
+    /* Field#3 - Map Bounds */
+    final String[] bnds = fields[3].split(",");
     bounds = new int[2];
     for(int i=0;i<bounds.length;i++) {
       bounds[i] = Integer.parseInt(bnds[i]);
     }
     
-    /* Field#3 - Map Data */
-    final String[] m = fields[3].split(",");
+    /* Field#4 - Map Data */
+    final String[] m = fields[4].split(",");
     int kk = 0;
     map = new TilInst[bounds[1]][bounds[0]];
     final int[][] mapind = new int[bounds[1]][bounds[0]];
@@ -69,8 +74,8 @@ public class NoxioMap {
       }
     }
     
-    /* Field#4 - Doodad Pallete */
-    final String[] dp = fields[4].split(";");
+    /* Field#5 - Doodad Pallete */
+    final String[] dp = fields[5].split(";");
     doodadSet = new ArrayList();
     for(int i=0;i<dp.length;i++) {
       final String[] d = dp[i].split(",");
@@ -78,8 +83,8 @@ public class NoxioMap {
       doodadSet.add(new Tile(d[0], d[1]));
     }
     
-    /* Field#5 - Doodads */
-    final String[] dds = fields[5].split(";");
+    /* Field#6 - Doodads */
+    final String[] dds = fields[6].split(";");
     doodads = new ArrayList();
     for(int i=0;i<dds.length;i++) {
       final String[] d = dds[i].split(",");
@@ -87,8 +92,8 @@ public class NoxioMap {
       doodads.add(new Doodad(Integer.parseInt(d[0]), new Vec3(Float.parseFloat(d[1]), Float.parseFloat(d[2]), Float.parseFloat(d[3])), Float.parseFloat(d[4]), Float.parseFloat(d[5])));
     }
     
-    /* Field#6 - Collision Floor */
-    final String[] cf = fields[6].split(";");
+    /* Field#7 - Collision Floor */
+    final String[] cf = fields[7].split(";");
     floor = new ArrayList();
     for(int i=0;i<cf.length;i++) {
       final String[] f = cf[i].split(",");
@@ -100,8 +105,8 @@ public class NoxioMap {
       floor.add(new Polygon(p));
     }
     
-    /* Field#7 - Collision Wall */
-    final String[] cw = fields[7].split(";");
+    /* Field#8 - Collision Wall */
+    final String[] cw = fields[8].split(";");
     wall = new ArrayList();
     for(int i=0;i<cw.length;i++) {
       final String[] w = cw[i].split(",");
@@ -113,8 +118,8 @@ public class NoxioMap {
       wall.add(new Polygon(p));
     }
     
-    /* Field#8 - Spawns */
-    final String[] sps = fields[8].split(";");
+    /* Field#9 - Spawns */
+    final String[] sps = fields[9].split(";");
     spawns = new ArrayList();
     for(int i=0;i<sps.length;i++) {
       final String[] spwn = sps[i].split(",");
@@ -126,8 +131,8 @@ public class NoxioMap {
       spawns.add(new Spawn(spwn[0], Integer.parseInt(spwn[1]), new Vec2(Float.parseFloat(spwn[2])-0.5f, Float.parseFloat(spwn[3])-0.5f), sgts));
     }
     
-    /* Field#9 - Cache */
-    cache = fields[9];
+    /* Field#10 - Cache */
+    cache = fields[10];
   }
   
   /* Return a list of all floors that are within range of potential interaction with the given position and radius */

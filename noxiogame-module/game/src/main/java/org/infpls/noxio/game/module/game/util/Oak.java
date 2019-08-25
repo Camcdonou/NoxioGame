@@ -8,7 +8,7 @@ public class Oak {
   
   private static final String FILE = "NXG-";
   private static final String EXTEN = ".html";
-  private static final String CSS = "<style>.l1 { color: #FFFFFF; background-color: #000000; font-family: \"Calibri\", monospace; }.l2 { color: #FFFF00; background-color: #000000; font-family: \"Calibri\", monospace; }.l3 { color: #FF0000; background-color: #000000; font-family: \"Calibri\", monospace; }.l4 { color: #000000; background-color: #FF0000; font-family: \"Calibri\", monospace; }.ex { style='background-color: #888888; color: #000000; font-family: \"Calibri\", monospace;' }</style>\n";
+  private static final String CSS = "<style>.l1 { color: #FFFFFF; background-color: #000000; font-family: \"Calibri\", monospace; }.l2 { color: #FFFF00; background-color: #000000; font-family: \"Calibri\", monospace; }.l3 { color: #FF0000; background-color: #000000; font-family: \"Calibri\", monospace; }.l4 { color: #000000; background-color: #FF0000; font-family: \"Calibri\", monospace; }.ex { background-color: #888888; color: #000000; font-family: \"Calibri\", monospace; }</style>\n";
   private static final String FORMAT = "HH:mm yy-MM-dd";
   private static final SimpleDateFormat DATE = new SimpleDateFormat(FORMAT);
   
