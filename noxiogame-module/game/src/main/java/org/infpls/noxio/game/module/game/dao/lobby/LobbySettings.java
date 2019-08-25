@@ -28,8 +28,8 @@ public class LobbySettings extends GameSettings {
       return lss;
     }
     catch(IndexOutOfBoundsException | NullPointerException ex) {
-      Oak.log(Oak.Level.ERR, "Error parsing game settings data.");
-      Oak.log(Oak.Level.INFO, "Raw settings data: " + raw, ex);
+      Oak.log(Oak.Type.GAME, Oak.Level.ERR, "Error parsing game settings data.");
+      Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Raw settings data: " + raw, ex);
       return null;
     }
   }
@@ -40,8 +40,8 @@ public class LobbySettings extends GameSettings {
       return convertFromMap((Map)map.get("lobby"));
     }
     catch(IndexOutOfBoundsException | NullPointerException ex) {
-      Oak.log(Oak.Level.ERR, "Error parsing game settings data.");
-      Oak.log(Oak.Level.INFO, "Raw settings data: " + raw, ex);
+      Oak.log(Oak.Type.GAME, Oak.Level.ERR, "Error parsing game settings data.");
+      Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Raw settings data: " + raw, ex);
       return null;
     }
   }

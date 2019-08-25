@@ -23,7 +23,7 @@ public class LobbyDao {
       }
     }
     catch(NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException | IOException ex) {
-      Oak.log(Oak.Level.CRIT, "Error during setup of default lobbies.", ex);
+      Oak.log(Oak.Type.GAME, Oak.Level.CRIT, "Error during setup of default lobbies.", ex);
     }
   }
   
@@ -98,7 +98,7 @@ public class LobbyDao {
       httpToAuth.close();
     }
     catch(IOException ex) {
-      Oak.log(Oak.Level.ERR, "Error during server shutdown.", ex);
+      Oak.log(Oak.Type.GAME, Oak.Level.ERR, "Error during server shutdown.", ex);
     }
   }
 }

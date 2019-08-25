@@ -6,6 +6,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.dao.DaoContainer;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 /* UserDao handles both user info and logged in user NoxioSessions.
    This is because theres is an overlap in data here
@@ -19,34 +20,36 @@ public class UserDao {
     sessions = Collections.synchronizedList(new ArrayList());
   }
   
-  public NoxioSession createSession(final WebSocketSession webSocket, DaoContainer dao) throws IOException {
+  public synchronized NoxioSession createSession(final WebSocketSession webSocket, DaoContainer dao) throws IOException {
     NoxioSession session = new NoxioSession(webSocket, dao);
     sessions.add(session);
     return session;
   }
   
-  public void destroySession(final WebSocketSession webSocket) throws IOException {
+  public synchronized void destroySession(final WebSocketSession webSocket) throws IOException {
     for(int i=0;i<sessions.size();i++) {
-      if(sessions.get(i).getWebSocketId().equals(webSocket.getId())) {
-        sessions.get(i).destroy();
-        sessions.remove(i);
+      final NoxioSession s = sessions.get(i);
+      if(s.getWebSocketId().equals(webSocket.getId())) {
+        try { s.destroy(); sessions.remove(i); }
+        catch(Exception ex) { Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Failed to remove session.", ex); }
         return;
       }
     }
   }
   
-  public NoxioSession getSessionByUser(final String user) {
+  public synchronized NoxioSession getSessionByUser(final String user) {
     for(int i=0;i<sessions.size();i++) {
-      if(sessions.get(i).loggedIn()) {
-        if(sessions.get(i).getUser().equals(user)) {
-          return sessions.get(i);
+      final NoxioSession s = sessions.get(i);
+      if(s.loggedIn()) {
+        if(s.getUser().equals(user)) {
+          return s;
         }
       }
     }
     return null;
   }
 
-  public List<String> getOnlineUserList() {
+  public synchronized List<String> getOnlineUserList() {
     final List<String> users = new ArrayList();
     for(int i=0;i<sessions.size();i++) {
       final NoxioSession session = sessions.get(i);

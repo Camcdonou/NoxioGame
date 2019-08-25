@@ -239,15 +239,15 @@ public abstract class GameLobby {
       
     }
     catch(Exception ex) {
-      Oak.log(Oak.Level.CRIT, "Game step exception ??? lobbyName=" + name + " ... gameOver=" + game.isGameOver(), ex);
-      Oak.log(Oak.Level.ERR,"Attempting to close lobby nicely!");
-      try { close("The Game Lobby encoutered an error and had to close. Sorry!"); Oak.log(Oak.Level.INFO, "Lobby closed correctly."); }
+      Oak.log(Oak.Type.GAME, Oak.Level.CRIT, "Game step exception ??? lobbyName=" + name + " ... gameOver=" + game.isGameOver(), ex);
+      Oak.log(Oak.Type.GAME, Oak.Level.ERR,"Attempting to close lobby nicely!");
+      try { close("The Game Lobby encoutered an error and had to close. Sorry!"); Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Lobby closed correctly."); }
       catch(IOException ioex) {
-        Oak.log(Oak.Level.ERR, "Failed to close lobby correctly! Ejecting players manually!", ioex);
+        Oak.log(Oak.Type.GAME, Oak.Level.ERR, "Failed to close lobby correctly! Ejecting players manually!", ioex);
         closed = true;
         for(int i=0;i<players.size();i++) {
           try { players.get(i).close(ex); }
-          catch(Exception pioex) { Oak.log(Oak.Level.CRIT, "Very bad! Better start praying!", pioex); }
+          catch(Exception pioex) { Oak.log(Oak.Type.GAME, Oak.Level.CRIT, "Very bad! Better start praying!", pioex); }
         }
       }
     }
@@ -356,7 +356,7 @@ public abstract class GameLobby {
         return;
       }
     }
-    Oak.log(Oak.Level.WARN, "Invalid User SID: '" + sid + "'");
+    Oak.log(Oak.Type.GAME, Oak.Level.WARN, "Invalid User SID: '" + sid + "'");
   }
   
   /* Send a packet to a specific player */
@@ -402,7 +402,7 @@ public abstract class GameLobby {
           sleep(t > GameLoop.TICK_RATE ? GameLoop.TICK_RATE : (t < 1 ? 1 : t));
         }
         catch(InterruptedException ex) {
-          Oak.log(Oak.Level.CRIT, "Game loop thread interupted by exception!", ex);
+          Oak.log(Oak.Type.GAME, Oak.Level.CRIT, "Game loop thread interupted by exception!", ex);
           /* DO something about this... Not sure if this is a real problem or not, might report it in debug. */
         }
       }

@@ -8,7 +8,7 @@ import org.infpls.noxio.game.module.game.dao.DaoContainer;
 import org.infpls.noxio.game.module.game.session.NoxioSession;
 import org.infpls.noxio.game.module.game.util.Oak;
 
-/* Apparently GSON will explode if you send bad data to a float/int/long. 
+/* @TODO: Apparently GSON will explode if you send bad data to a float/int/long. 
    NaN in particular caused me to notice this. 
    Please put in handlers. */
 
@@ -25,7 +25,7 @@ public class GameWebSocket extends TextWebSocketHandler {
         webSocket.getAttributes().put("session", session);
       }
       catch(Exception ex) {
-        Oak.log(Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
+        Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
       }
     }
 
@@ -36,7 +36,7 @@ public class GameWebSocket extends TextWebSocketHandler {
         session.handlePacket(data.getPayload());
       }
       catch(Exception ex) {
-        Oak.log(Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
+        Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
       }
     }
   
@@ -46,7 +46,7 @@ public class GameWebSocket extends TextWebSocketHandler {
         dao.getUserDao().destroySession(webSocket);
       }
       catch(Exception ex) {
-        Oak.log(Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
+        Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
       }
     }
 

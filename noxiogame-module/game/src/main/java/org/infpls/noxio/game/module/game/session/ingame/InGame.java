@@ -67,7 +67,7 @@ public class InGame extends SessionState {
         default : { close("Invalid data: " + p.getType()); break; }
       }
     } catch(Exception ex) { /* IOException | NullPointerException | JsonParseException */
-      Oak.log(Oak.Level.WARN, "User: '" + session.getUser() + "' threw Unknown Exception", ex);
+      Oak.log(Oak.Type.SESSION, Oak.Level.WARN, "User: '" + session.getUser() + "' threw Unknown Exception", ex);
       close(ex);
     }
   }

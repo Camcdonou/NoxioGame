@@ -1,4 +1,4 @@
-package org.infpls.noxio.game.module.game.websocket;
+package org.infpls.noxio.game.module.game.controller;
 
 import com.google.gson.*;
 import java.io.IOException;
@@ -8,9 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.infpls.noxio.game.module.game.game.NoxioMap;
 import org.infpls.noxio.game.module.game.util.Oak;
-
-
-/* @TODO: this package/folder is called 'websocket' but should be renamed to 'controller' as that is more accurate */
 
 @Controller
 public class MapController {
@@ -33,7 +30,7 @@ public class MapController {
           cache.add(m);
         }
         catch(IOException ex) {
-          Oak.log(Oak.Level.ERR, "Error parsing map file: " + map + " FIELD_1", ex);
+          Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Error parsing map file: " + map + " FIELD_1", ex);
           return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
       }      

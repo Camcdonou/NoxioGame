@@ -80,13 +80,13 @@ public class HttpThread extends Thread {
       /* Return type of h09 is "error message" so we write that to logs */
       if(p.getType().equals("h09")) {
         final PacketH09 pkth = gson.fromJson(response.toString(), PacketH09.class);
-        Oak.log(Oak.Level.ERR, "Request returned error: " + pkth.getMessage());
+        Oak.log(Oak.Type.HTTPS, Oak.Level.ERR, "Request returned error: " + pkth.getMessage());
       }
       
     } catch(MalformedURLException ex) {
-      Oak.log(Oak.Level.ERR, "Invalid URL : " + "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/report", ex);
+      Oak.log(Oak.Type.HTTPS,Oak.Level.ERR, "Invalid URL : " + "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/report", ex);
     } catch (IOException e) {
-      Oak.log(Oak.Level.ERR, "IOException during HTTP POST.", e);
+      Oak.log(Oak.Type.HTTPS,Oak.Level.ERR, "IOException during HTTP POST.", e);
     } finally {
       if(connection != null) {
         connection.disconnect(); 
@@ -94,7 +94,7 @@ public class HttpThread extends Thread {
     }
   }
   
-  private synchronized void doWait() { try { wait(); } catch(InterruptedException ex) { Oak.log(Oak.Level.ERR, "Interrupt Exception.", ex); } }
+  private synchronized void doWait() { try { wait(); } catch(InterruptedException ex) { Oak.log(Oak.Type.SYSTEM, Oak.Level.ERR, "Interrupt Exception.", ex); } }
   private synchronized void doNotify() { notify(); }
   
   public void push(final Packet p) { if(closed) { return; } syncPacketAccess(false, p); doNotify(); }

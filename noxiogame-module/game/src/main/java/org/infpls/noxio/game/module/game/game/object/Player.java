@@ -79,7 +79,7 @@ public abstract class Player extends Mobile {
         case "tnt" : { taunt(); break; }
         case "tos" : { toss(); break; }
         case "jmp" : { jump(); break; }
-        default : { Oak.log(Oak.Level.WARN, "Invalid action input: '"  + action.get(i) + "' Object: '" + type() + "'"); break; }
+        default : { Oak.log(Oak.Type.GAME, Oak.Level.WARN, "Invalid action input: '"  + action.get(i) + "' Object: '" + type() + "'"); break; }
       }
     }
     action.clear();

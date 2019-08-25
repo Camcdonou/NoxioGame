@@ -1,4 +1,4 @@
-package org.infpls.noxio.game.module.game.websocket;
+package org.infpls.noxio.game.module.game.controller;
 
 
 import com.google.gson.*;

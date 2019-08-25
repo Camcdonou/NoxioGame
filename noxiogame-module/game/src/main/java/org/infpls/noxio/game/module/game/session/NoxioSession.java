@@ -119,7 +119,7 @@ public final class NoxioSession {
   
   /* Error connection close */
   public void close(final String message) throws IOException {
-    Oak.log(Oak.Level.WARN, "Connection closed for user: '" + (loggedIn()?getUser():"Not Logged In") + "' with message: " + message);
+    Oak.log(Oak.Type.SESSION, Oak.Level.WARN, "Connection closed for user: '" + (loggedIn()?getUser():"Not Logged In") + "' with message: " + message);
     sessionThread.close();
     if(sessionThread.blockingWaitForClose()) { sendImmiediate(new PacketX00(message)); }
     webSocket.close(CloseStatus.NOT_ACCEPTABLE);
@@ -127,7 +127,7 @@ public final class NoxioSession {
   
   /* Exception connection close */
   public void close(final Exception ex) throws IOException {
-    Oak.log(Oak.Level.WARN, "Connection closed for user: '" + (loggedIn()?getUser():"Not Logged In") + "' with Exception: ", ex);
+    Oak.log(Oak.Type.SESSION, Oak.Level.WARN, "Connection closed for user: '" + (loggedIn()?getUser():"Not Logged In") + "' with Exception: ", ex);
     sessionThread.close();
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw);
