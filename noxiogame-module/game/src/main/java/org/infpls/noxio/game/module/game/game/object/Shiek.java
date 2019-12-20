@@ -159,8 +159,8 @@ public class Shiek extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type) {
-    super.stun(time, type);
+  public void stun(int time, Mobile.HitStun type, int impact) {
+    super.stun(time, type, impact);
     channelFlash = false;
     channelTimer = 0;
     flashCooldown = 0;

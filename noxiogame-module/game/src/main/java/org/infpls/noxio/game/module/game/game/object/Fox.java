@@ -89,7 +89,7 @@ public class Fox extends Player {
       dashPower += DASH_POWER_ADD;
       setVelocity(velocity.add(look.scale(DASH_IMPULSE)));
       effects.add("mov");
-      if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME, foxPermutation.hits[1]); }
+      if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME, foxPermutation.hits[1], 0); }
     }
   }
 

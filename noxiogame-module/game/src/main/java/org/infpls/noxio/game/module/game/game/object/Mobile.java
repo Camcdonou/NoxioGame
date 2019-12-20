@@ -20,7 +20,7 @@ public abstract class Mobile extends GameObject {
   }
   
   protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
-  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f, KILL_PLANE = -6f, DESTROY_PLANE = -120f;
+  protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f, KILL_PLANE = -6f, DESTROY_PLANE = -120f, VELOCITY_SOFTCAP = 3.25f;
   
   protected Controller tagged;
   protected int tagTime;
@@ -29,7 +29,7 @@ public abstract class Mobile extends GameObject {
   
   public float height;
   private float vspeed;
-  protected boolean intangible, immune, grounded;
+  protected boolean intangible, immune, grounded, invulnerable;
   
   protected final List<String> effects;  // List of actions performed that will be sent to the client on the next update
     
@@ -47,7 +47,7 @@ public abstract class Mobile extends GameObject {
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
     
     /* States */
-    height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false; immune = false;
+    height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false; immune = false; invulnerable = false;
   }
   
   protected void physics() {
@@ -129,7 +129,7 @@ public abstract class Mobile extends GameObject {
 
     /* Final */
 
-    if(!destroyed() && fatalImpact) {
+    if(!destroyed() && fatalImpact && !invulnerable) {
       destroyx();
     }
     else if(!destroyed() && height < DESTROY_PLANE) {
@@ -141,7 +141,10 @@ public abstract class Mobile extends GameObject {
     }
     
     if(grounded) { setVelocity(velocity.scale(friction)); } // No ice skating on the lawn!
-    else { setVelocity(velocity.scale(AIR_DRAG)); }         // No friction while moving airborne, but air drag is accounted.
+    else {                                                  // No friction while moving airborne, but air drag is accounted.
+      float ratio = Math.max(Math.min(velocity.magnitude()/VELOCITY_SOFTCAP, 1.f), 0.f);
+      setVelocity(velocity.scale((friction*ratio)+(AIR_DRAG*(1.f-ratio))));
+    }
   }
   
   private float rayWalls(final Vec2[] mov, final List<Polygon> walls) {
@@ -219,8 +222,9 @@ public abstract class Mobile extends GameObject {
     return false;
   }
   
-  public void stun(final int time, final Mobile.HitStun type, final Player p) { stun(time, type); tag(p); }
-  public void stun(int time, final Mobile.HitStun type) { effects.add(type.id); }
+  public void stun(final int time, final Mobile.HitStun type, final Player p, int impact) { stun(time, type, impact); tag(p); }
+  public void stun(int time, final Mobile.HitStun type, int impact) { effects.add(type.id); }
+  public void stun(final int time, final Mobile.HitStun type, final Player p) { stun(time, type, 0); tag(p); }
   public void knockback(final Vec2 impulse, final Player p) { knockback(impulse); tag(p); }
   public void knockback(final Vec2 impulse) { setVelocity(velocity.add(impulse)); }
   public void popup(float power, final Player p) { popup(power); tag(p); }

@@ -115,7 +115,7 @@ public class Bomb extends Pickup {
         final Mobile mob = (Mobile)obj;
         if(getPosition().distance(mob.getPosition()) <= DETONATION_RADIUS+mob.getRadius()) {
           final Vec2 normal = mob.getPosition().subtract(getPosition()).normalize();
-          mob.stun(DETONATION_STUN, Mobile.HitStun.Fire);
+          mob.stun(DETONATION_STUN, Mobile.HitStun.Fire, 0);
           mob.knockback(normal.scale(DETONATION_FORCE));
           mob.popup(DETONATION_POPUP);
         }

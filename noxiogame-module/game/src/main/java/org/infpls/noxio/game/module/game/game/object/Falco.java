@@ -126,8 +126,8 @@ public class Falco extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type) {
-    super.stun(time, type);
+  public void stun(int time, Mobile.HitStun type, int impact) {
+    super.stun(time, type, impact);
     channelDash = false;
     channelTimer = 0;
     dashCooldown = 0;

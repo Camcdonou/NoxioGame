@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
+import java.util.ArrayList;
 import java.util.List;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
@@ -27,14 +28,15 @@ public class Puff extends Player {
     }
   }
   
-  private static final int REST_COOLDOWN_LENGTH = 15, REST_STUN_LENGTH = 45, REST_SLEEP_LENGTH = 99;
-  private static final int POUND_COOLDOWN_LENGTH = 30, POUND_STUN_LENGTH = 25, POUND_CHANNEL_TIME = 9, POUND_HIT_DELAY = 4;
+  private static final int REST_COOLDOWN_LENGTH = 15, REST_STUN_LENGTH = 45, REST_SLEEP_LENGTH = 99, REST_IMPACT = 3;
+  private static final int POUND_COOLDOWN_LENGTH = 38, POUND_STUN_LENGTH = 25, POUND_CHANNEL_TIME = 11, POUND_HIT_DELAY = 4, POUND_HITBOX_TIME = 2;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
-  private static final float REST_IMPULSE = 2.55f, POUND_DASH_IMPULSE = 0.5f, POUND_IMPULSE = 0.225f, POUND_POPUP = 0.175f, POUND_RADIUS = 0.45f, POUND_OFFSET = 0.33f;
+  private static final float REST_IMPULSE = 2.55f, POUND_DASH_IMPULSE = 0.5f, POUND_IMPULSE = 0.225f, POUND_POPUP = 0.175f, POUND_RADIUS = 0.425f, POUND_OFFSET = 0.33f;
   
+  private List<Mobile> activeHit; // Objects hit by active pound hitbox
   private Vec2 poundDirection;
   private boolean channelSleep, channelPound, delayPound;
-  private int restCooldown, poundCooldown, delayTimer;
+  private int restCooldown, poundCooldown, hitboxTimer, delayTimer;
   private final Permutation puffPermutation;
   public Puff(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
@@ -48,12 +50,16 @@ public class Puff extends Player {
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
     moveSpeed = 0.0375f; jumpHeight = 0.175f;
     
+    /* Special */
+    activeHit = new ArrayList();
+    
     /* Timers */
     poundDirection = new Vec2(1, 0);
     channelSleep = false;
     channelPound = false;
     restCooldown = 0;
     poundCooldown = 0;
+    hitboxTimer = 0;
     delayTimer = 0;
   }
   
@@ -61,6 +67,7 @@ public class Puff extends Player {
   @Override
   public void timers() {
     super.timers();
+    if(hitboxTimer > 0) { hitboxTimer--; pounding(); }
     if(channelSleep && channelTimer <= 0) { wake(); }
     if(channelPound && channelTimer <= 0) { poundDash(); }
     if(delayTimer > 0) { delayTimer--; }
@@ -80,7 +87,8 @@ public class Puff extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(REST_STUN_LENGTH, puffPermutation.hits[0], this);
+        mob.stun(REST_STUN_LENGTH, puffPermutation.hits[0], this, REST_IMPACT);
+        impact(REST_IMPACT);
         mob.knockback(normal.scale(REST_IMPULSE), this);
         effects.add("crt");
       }
@@ -115,15 +123,26 @@ public class Puff extends Player {
     effects.add("pnh");
     delayPound = false;
     final Vec2 poundPos = position.add(poundDirection.scale(POUND_OFFSET));
+    hitboxTimer = POUND_HITBOX_TIME;
+    activeHit.clear();
+    pounding(); // First frame of hitbox
+  }
+  
+  /* Active pound hitbox */
+  public void pounding() {
+    final Vec2 poundPos = position.add(poundDirection.scale(POUND_OFFSET));
 
     final List<Mobile> hits = hitTest(poundPos, getRadius());
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
+      if(activeHit.contains(mob)) { continue; }
+      
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
       mob.stun(POUND_STUN_LENGTH, puffPermutation.hits[0], this);
       mob.knockback(normal.scale(POUND_IMPULSE), this);
       mob.popup(POUND_POPUP, this);
       effects.add("slp");
+      activeHit.add(mob);
     }
   }
   
@@ -147,8 +166,8 @@ public class Puff extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type) {
-    super.stun(time, type);
+  public void stun(int time, Mobile.HitStun type, int impact) {
+    super.stun(time, type, impact);
     if(channelSleep) {
       channelSleep = false;
       channelTimer = 0;

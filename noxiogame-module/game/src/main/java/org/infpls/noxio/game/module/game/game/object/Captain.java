@@ -1,5 +1,6 @@
 package org.infpls.noxio.game.module.game.game.object; 
 
+import java.util.ArrayList;
 import java.util.List;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
@@ -26,15 +27,16 @@ public class Captain extends Player {
     }
   }
   
-  private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30, PUNCH_PENALTY_TIME = 3;
+  private static final int PUNCH_COOLDOWN_LENGTH = 45, PUNCH_CHARGE_LENGTH = 35, PUNCH_STUN_LENGTH = 30, PUNCH_PENALTY_TIME = 3, PUNCH_HITBOX_TIME = 3;
   private static final int KICK_COOLDOWN_LENGTH = 60, KICK_LENGTH = 7;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float PUNCH_IMPULSE = 1.65f, PUNCH_HITBOX_SIZE = 0.65f, PUNCH_HITBOX_OFFSET = 0.5f, PUNCH_RECOIL=0.33f;
   private static final float KICK_MIN_IMPULSE = 0.145f, KICK_MAX_IMPULSE = 0.425f, KICK_FALL_DAMPEN = 0.25f, KICK_RADIUS = 0.55f, KICK_OFFSET = 0.05f;
   
+  private final List<Mobile> activeHit;     // Objects hit by active punch
   private Vec2 punchDirection, kickDirection;
   private boolean chargePunch;
-  private int punchCooldown, kickCooldown, chargeTimer, kickTimer;
+  private int punchCooldown, kickCooldown, chargeTimer, kickTimer, hitboxTimer;
   private final Permutation captainPermutation;
   public Captain(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
@@ -48,6 +50,9 @@ public class Captain extends Player {
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
     moveSpeed = 0.0375f; jumpHeight = 0.175f;
     
+    /* Special */
+    activeHit = new ArrayList();
+    
     /* Timers */
     punchCooldown = 0;
     kickCooldown = 0;
@@ -55,6 +60,7 @@ public class Captain extends Player {
     punchDirection = new Vec2(1, 0);
     chargePunch = false;
     chargeTimer = 0;
+    hitboxTimer = 0;
     
     kickDirection = new Vec2(1, 0);
     kickTimer = 0;
@@ -70,6 +76,7 @@ public class Captain extends Player {
   @Override
   public void timers() {
     super.timers();
+    if(hitboxTimer > 0) { hitboxTimer--; punching(); }
     if(chargeTimer > 0) { chargeTimer--; }
     if(chargePunch && chargeTimer <= 0) { punch(); }
     if(punchCooldown > 0) { punchCooldown--; }
@@ -93,6 +100,17 @@ public class Captain extends Player {
   private void punch() {
     effects.add("pun");
     chargePunch = false;
+    activeHit.clear();   
+    hitboxTimer = PUNCH_HITBOX_TIME;
+    
+    punching(); // Hitbox test for first frame
+    
+    setVelocity(velocity.add(punchDirection.inverse().scale(PUNCH_RECOIL)));
+    channelTimer = PUNCH_PENALTY_TIME;
+  }
+  
+  /* Hitbox active for punch */
+  private void punching() {
     if(getHeight() > -0.5) {
       final float rad = (float)(Math.PI/180.0);
       final Polygon hitbox = new Polygon(new Vec2[] {
@@ -104,13 +122,14 @@ public class Captain extends Player {
       final List<Mobile> hits = hitTest(hitbox);
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
+        if(activeHit.contains(mob)) { continue; }
+       
         final Vec2 normal = punchDirection;
         mob.stun(PUNCH_STUN_LENGTH, captainPermutation.hits[0], this);
         mob.knockback(normal.scale(PUNCH_IMPULSE), this);
+        activeHit.add(mob);
       }
     }
-    setVelocity(velocity.add(punchDirection.inverse().scale(PUNCH_RECOIL)));
-    channelTimer = PUNCH_PENALTY_TIME;
   }
   
   @Override   /* Kick */
@@ -159,8 +178,8 @@ public class Captain extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type) {
-    super.stun(time, type);
+  public void stun(int time, Mobile.HitStun type, int impact) {
+    super.stun(time, type, impact);
     chargePunch = false;
     chargeTimer = 0;
     punchCooldown = 0;

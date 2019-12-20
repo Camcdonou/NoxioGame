@@ -22,7 +22,7 @@ public abstract class Player extends Mobile {
   
   protected Pickup holding;
   
-  protected int channelTimer, tauntCooldown, stunTimer;
+  protected int channelTimer, tauntCooldown, stunTimer, impactTimer;
   public Player(final NoxioGame game, final int oid, final Vec2 position, final int permutation, final int team) {
     super(game, oid, position, permutation, team);
     /* Bitmask Type */
@@ -45,6 +45,7 @@ public abstract class Player extends Mobile {
     
     /* Timers */
     stunTimer = 0;
+    impactTimer = 0;
     channelTimer = 0;
     tauntCooldown =  0;
   }
@@ -96,6 +97,7 @@ public abstract class Player extends Mobile {
   
   @Override
   public void step() {
+    if(impactTimer > 0) { impactTimer--; return; }
     if(alive()){ movement(); }   // Apply player movement input
     physics();                   // Object physics and collision
     if(alive()){ actions(); }    // Perform action
@@ -112,6 +114,10 @@ public abstract class Player extends Mobile {
         if(pickup.getPosition().distance(position) > pickup.getRadius()+getRadius()) { continue; }
         if(pickup.touch(this)) { holding = pickup; }
       }
+    }
+    if(holding != null) {
+      holding.position = position;
+      holding.height = height;
     }
   }
   
@@ -227,9 +233,14 @@ public abstract class Player extends Mobile {
   public boolean isGlobal() { return objective; }
   
   @Override
-  public void stun(int time, final Mobile.HitStun type) {
-    super.stun(time, type);
+  public void stun(int time, final Mobile.HitStun type, int impact) {
+    super.stun(time, type, impact);
+    impact(impact);
     stunTimer = time;
+  }
+  
+  public void impact(int time) {
+    impactTimer = time;
   }
   
   @Override

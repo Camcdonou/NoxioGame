@@ -218,8 +218,8 @@ public class Marth extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type) {
-    super.stun(time, type);
+  public void stun(int time, Mobile.HitStun type, int impact) {
+    super.stun(time, type, impact);
     channelCounter = false;
     channelTimer = 0;
     counterCooldown = 0;

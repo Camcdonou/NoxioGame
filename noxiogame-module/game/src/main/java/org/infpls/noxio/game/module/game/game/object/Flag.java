@@ -14,7 +14,7 @@ public class Flag extends Pickup {
     base = position;
     
     /* Settings */
-    radius = 0.1f; weight = 0.5f; friction = 0.725f;
+    radius = 0.1f; weight = 0.5f; friction = 0.725f; invulnerable = true;
 
     /* Timers */
   }
@@ -66,6 +66,9 @@ public class Flag extends Pickup {
   protected boolean pickup(Player p) {
     if(super.pickup(p)) {
       if(onBase()) { game.announce(team==0?"rft":"bft"); }
+      setVelocity(new Vec2());
+      setHeight(0f);
+      setVSpeed(0f);
       return true;
     }
     return false;
