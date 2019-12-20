@@ -50,6 +50,7 @@ public class FlagRabbit extends Flag {
   
   @Override
   public void kill() {
-    reset();
+    dead = true;
+    destroyed = true;
   }
 }

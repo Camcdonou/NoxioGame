@@ -276,27 +276,57 @@ public abstract class NoxioGame {
     return new Fox(this, createOid(), pos, Fox.Permutation.BOX_N, team); /* Default */
   }
   
-  private final static float SAFE_SPAWN_RADIUS = 2.5f;
+  private final static float SPAWN_SAFE = 5.0f, SPAWN_MIN_SAFE = 3.f;
   protected final Vec2 findSafeSpawn(final List<NoxioMap.Spawn> spawns) {
     if(spawns.isEmpty()) { return new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f); } // Fallback
     
-    final List<NoxioMap.Spawn> sss = new ArrayList();
+    final List<NoxioMap.Spawn> safe = new ArrayList(), minSafe = new ArrayList();
     
+    /* Strategy #1 - Max safe distance + random choice */
     for(int i=0;i<spawns.size();i++) {
       final NoxioMap.Spawn sp = spawns.get(i);
-      boolean safe = true;
+      boolean isSafe = true;
+      boolean isMinSafe = true;
       for(int j=0;j<controllers.size();j++) {
         final GameObject obj = controllers.get(j).getControlled();
         if(obj != null) {
-          float k = obj.getPosition().distance(sp.getPos());
-          if(k < SAFE_SPAWN_RADIUS) { safe = false; break; }
+          float dist = obj.getPosition().distance(sp.getPos());
+          if(dist < SPAWN_SAFE) { isSafe = false; }
+          if(dist < SPAWN_MIN_SAFE) { isMinSafe = false; }
         }
       }
-      if(safe) { sss.add(sp); }
+      if(isSafe) { safe.add(sp); }
+      if(isMinSafe) { minSafe.add(sp); }
     }
     
-    if(sss.isEmpty()) { return spawns.get((int)(Math.random()*spawns.size())).getPos(); }
-    else              { return sss.get((int)(Math.random()*sss.size())).getPos(); }
+    /* Strategy #2 - Add min safe distance spawns */
+    if(safe.size() < 3) {
+      for(int i=0;i<minSafe.size();i++) {
+        safe.add(minSafe.get(i));
+      }
+    }
+    
+    /* Strategy #3 - Find spawn point with the most clearance */
+    if(safe.isEmpty()) {
+      NoxioMap.Spawn safest = spawns.get(0);
+      float clearance = 0.f;
+      for(int i=0;i<spawns.size();i++) {
+        final NoxioMap.Spawn sp = spawns.get(i);
+        float nearest = SPAWN_SAFE;
+        
+        for(int j=0;j<controllers.size();j++) {
+          final GameObject obj = controllers.get(j).getControlled();
+          if(obj != null) {
+            float dist = obj.getPosition().distance(sp.getPos());
+            if(dist < nearest) { nearest = dist; }
+          }
+        }
+        if(nearest > clearance) { safest = sp; clearance = nearest; }
+      }
+      safe.add(safest);
+    }
+    
+    return safe.get((int)(Math.random()*safe.size())).getPos();
   }
   
   public void join(final NoxioSession player) throws IOException {

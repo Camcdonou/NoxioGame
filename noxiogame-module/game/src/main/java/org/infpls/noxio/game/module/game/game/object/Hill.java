@@ -5,7 +5,7 @@ import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Hill extends GameObject {
-  private static final int TIMER_SCORE_ADJUST = 90;
+  private static final int TIMER_SCORE_ADJUST = 120;
   
   protected Vec2 size;
   private Polygon hitbox;

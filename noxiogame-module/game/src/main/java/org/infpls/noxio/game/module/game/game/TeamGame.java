@@ -18,13 +18,72 @@ public abstract class TeamGame extends NoxioGame {
     autoBalanceTeams = settings.get("auto_balance_teams", 1, 0, 1)==1;
   }
   
+  private final static float SPAWN_SAFE = 5.0f, SPAWN_MIN_SAFE = 3.f, SPAWN_MIN_TEAM_SAFE = .75f;
+  protected final Vec2 findSafeTeamSpawn(Controller controller, List<NoxioMap.Spawn> spawns) {
+    if(spawns.isEmpty()) { return new Vec2(map.getBounds()[0]*0.5f, map.getBounds()[1]*0.5f); } // Fallback
+    
+    final List<NoxioMap.Spawn> safe = new ArrayList(), minSafe = new ArrayList();
+    
+    /* Strategy #1 - Max safe distance + random choice */
+    for(int i=0;i<spawns.size();i++) {
+      final NoxioMap.Spawn sp = spawns.get(i);
+      boolean isSafe = true;
+      boolean isMinSafe = true;
+      for(int j=0;j<controllers.size();j++) {
+        final Controller con = controllers.get(j);
+        final GameObject obj = con.getControlled();
+        if(obj != null && con.getTeam() != controller.getTeam()) {
+          float k = obj.getPosition().distance(sp.getPos());
+          if(k < SPAWN_SAFE) { isSafe = false; }
+          if(k < SPAWN_MIN_SAFE) { isMinSafe = false; }
+        }
+        else if(obj != null && con.getTeam() == controller.getTeam()) {
+          float k = obj.getPosition().distance(sp.getPos());
+          if(k < SPAWN_MIN_TEAM_SAFE) { isSafe = false; isMinSafe = false; break; }
+        }
+      }
+      if(isSafe) { safe.add(sp); }
+      if(isMinSafe) { minSafe.add(sp); }
+    }
+    
+    /* Strategy #2 - Add min safe distance spawns */
+    if(safe.size() < 3) {
+      for(int i=0;i<minSafe.size();i++) {
+        safe.add(minSafe.get(i));
+      }
+    }
+    
+    /* Strategy #3 - Find spawn point with the most clearance */
+    if(safe.size() < 1) {
+      NoxioMap.Spawn safest = spawns.get(0);
+      float clearance = 0.f;
+      for(int i=0;i<spawns.size();i++) {
+        final NoxioMap.Spawn sp = spawns.get(i);
+        float ck = SPAWN_SAFE;
+        
+        for(int j=0;j<controllers.size();j++) {
+          final GameObject obj = controllers.get(j).getControlled();
+          if(obj != null) {
+            float k = obj.getPosition().distance(sp.getPos());
+            if(k < ck) { ck = k; }
+          }
+        }
+        if(ck > clearance) { safest = sp; clearance = ck; }
+      }
+      safe.add(safest);
+    }
+    
+    if(safe.isEmpty()) { return spawns.get((int)(Math.random()*spawns.size())).getPos(); }
+    else               { return safe.get((int)(Math.random()*safe.size())).getPos(); }
+  }
+  
   @Override
   protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
     final String charSel = q.remove();
     if(c.getControlled() != null || !c.respawnReady()) { return false; } /* Already controlling an object */
 
     final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeId(), c.getTeam());
-    final Vec2 sp = findSafeSpawn(spawns);
+    final Vec2 sp = findSafeTeamSpawn(c, spawns);
     
     Player player = makePlayerObject(c, charSel, sp, c.getTeam());
     addObject(player);

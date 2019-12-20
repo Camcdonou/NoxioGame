@@ -143,7 +143,8 @@ final public class Controller {
   
   private void chatMessage(final Queue<String> q) {
     final String msg = q.remove();
-    game.sendMessage(getDisplay() + " > " + msg);
+    if(msg.length() > 256) { game.sendMessage(getDisplay() + " > " + msg.substring(0,255)); }
+    else { game.sendMessage(getDisplay() + " > " + msg); }
   }
   
   public void step() {

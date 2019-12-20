@@ -61,6 +61,7 @@ public class Shiek extends Player {
   public void timers() { 
     super.timers();
     if(channelFlash && channelTimer <= 0) { flash(); }
+    else if(channelFlash && channelTimer == 1) { pre(); }
     if(flashCooldown > 0) { flashCooldown--; }
     if(blipCooldown > 0) { blipCooldown--; }
     if(blipPower < BLIP_POWER_MAX) { blipPower++; }
@@ -108,6 +109,10 @@ public class Shiek extends Player {
         effects.add("chr");
       }
     }
+  }
+  
+  public void pre() {
+    effects.add("pre");
   }
   
   public void flash() {

@@ -11,7 +11,7 @@ public class Rabbit extends SoloGame {
   private final int flagCount, rabbitPenalty;
   
   private Controller rabbit;         // Last player to score a point as the rabbit
-  private final FlagRabbit flag;
+  private FlagRabbit flag;
   
   public Rabbit(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
     super(lobby, map, settings, settings.get("score_to_win", 25, 1, 99));
@@ -19,17 +19,17 @@ public class Rabbit extends SoloGame {
     flagCount = settings.get("flag_count", 1, 1, 3);
     rabbitPenalty = 90;
     
-    flag = spawnFlag();
+    spawnFlag();
   }
   
-  private FlagRabbit spawnFlag() {
+  private void spawnFlag() {
     List<NoxioMap.Spawn> fs = map.getSpawns("flag", gametypeId());
     final Vec2 fsl;
     fsl = fs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)+1f, map.getBounds()[1]*0.5f):fs.get((int)(fs.size()*Math.random())).getPos();
     final FlagRabbit f;
     f = new FlagRabbit(this, createOid(), fsl, -1);
     addObject(f);
-    return f;
+    flag = f;
   }
   
   @Override
@@ -40,6 +40,8 @@ public class Rabbit extends SoloGame {
       rabbit.extendRespawn(rabbitPenalty);
       rabbit = null;
     }
+    
+    if(flag.destroyed()) { spawnFlag(); }
   }
 
   @Override
