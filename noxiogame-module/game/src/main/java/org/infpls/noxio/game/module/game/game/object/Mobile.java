@@ -91,7 +91,7 @@ public abstract class Mobile extends GameObject {
       }
       
       setPosition(mov[0]);
-      setVelocity(mov[1]);
+      if(!fatalImpact || invulnerable) { setVelocity(mov[1]); } // Preserve velocity of fatal impacts so particles created by death inherit it.
     }
     
     /* Height */
