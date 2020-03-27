@@ -31,7 +31,7 @@ public class UserDao {
       final NoxioSession s = sessions.get(i);
       if(s.getWebSocketId().equals(webSocket.getId())) {
         try { s.destroy(); sessions.remove(i); }
-        catch(Exception ex) { Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Failed to remove session.", ex); }
+        catch(Exception ex) { Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Failed to remove session: " + (s.loggedIn() ? s.getUser() : "S##"+s.getSessionId()), ex); }
         return;
       }
     }
@@ -53,7 +53,7 @@ public class UserDao {
     final List<String> users = new ArrayList();
     for(int i=0;i<sessions.size();i++) {
       final NoxioSession session = sessions.get(i);
-      users.add(session.loggedIn() ? session.getUser() : "Session##"+session.getSessionId());
+      users.add((session.loggedIn() ? session.getUser() : "S##"+session.getSessionId()) + "  |  " + (session.isOpen() ? "(OKAY)" : "(INVALID)"));
     }
     return users;
   }
