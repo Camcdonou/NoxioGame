@@ -35,5 +35,26 @@ public class FlagFree extends Flag {
   }
   
   @Override
+  protected boolean pickup(Player p) {
+    if(super.pickup(p)) {
+      if(p.team != team) {
+        ((TeamGame)game).announceTeam(team, "fs");
+        ((TeamGame)game).announceTeam(team==0?1:0, "ft");
+      }
+      setVelocity(new Vec2());
+      setHeight(0f);
+      setVSpeed(0f);
+      return true;
+    }
+    return false;
+  }
+    
+  @Override
+  public void kill() {
+    reset();
+    ((TeamGame)game).announceTeam(team, "ff");
+  }
+  
+  @Override
   public boolean onBase() { return false; }
 }

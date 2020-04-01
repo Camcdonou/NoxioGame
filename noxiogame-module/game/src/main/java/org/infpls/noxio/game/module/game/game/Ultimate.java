@@ -35,7 +35,8 @@ public class Ultimate extends SoloGame {
   /* Specific player */
   private void makeUltimate(final Controller player, final GameObject obj) {
     if(controllers.size() < 2) { return; } /* Don't make an Ultimate Lifeform until there is more than 1 player in the game. */
-    player.announce("hc");
+    player.announce("pow");
+    announceExcluding(player, "nu");
     scoreTimer = 0;
     ultimate = obj;
   }
@@ -139,7 +140,7 @@ public class Ultimate extends SoloGame {
   public void join(final NoxioSession player) throws IOException {
     super.join(player);
     final Controller con = getController(player.getSessionId());
-    if(con != null) { con.announce("ulf"); }
+    if(con != null) { con.announce("ult"); }
   }
   
   @Override

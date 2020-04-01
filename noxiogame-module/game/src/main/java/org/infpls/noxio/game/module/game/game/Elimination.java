@@ -98,7 +98,7 @@ public class Elimination extends SoloRoundGame {
   @Override
   public void join(final NoxioSession player) throws IOException {
     super.join(player);
-    getController(player.getSessionId()).announce("dm");
+    getController(player.getSessionId()).announce("em");
   }
   
   @Override

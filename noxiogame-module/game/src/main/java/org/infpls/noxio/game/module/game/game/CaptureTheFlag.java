@@ -48,8 +48,11 @@ public class CaptureTheFlag extends TeamGame {
   @Override
   public void reportObjective(final Controller player, final GameObject objective) {
     if(isGameOver()) { return; }
-    if(player.getTeam()==0) { scores[0]++; announce("rs"); }
-    else { scores[1]++; announce("bs"); }
+    
+    scores[player.getTeam()]++;
+    announceTeam(player.getTeam(), "fc");
+    announceTeam(player.getTeam()==0?1:0, "fl");
+
     player.score.flagCapture();
     updateScore();
     announceObjective();

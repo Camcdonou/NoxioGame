@@ -112,7 +112,7 @@ public abstract class Player extends Mobile {
       if(obj.is(Types.PICKUP)) {
         final Pickup pickup = (Pickup)(obj);
         if(pickup.getPosition().distance(position) > pickup.getRadius()+getRadius()) { continue; }
-        if(pickup.touch(this)) { holding = pickup; }
+        if(pickup.touch(this)) { holding = pickup; effects.add("pik"); }
       }
     }
     if(holding != null) {
@@ -128,6 +128,7 @@ public abstract class Player extends Mobile {
     p.setVelocity(velocity.scale(0.5f));
     p.setVelocity(velocity.scale(0.5f).add(look.scale(TOSS_IMPULSE)));
     p.popup(TOSS_POPUP);
+    effects.add("tos");
   }
   
   public void drop() {

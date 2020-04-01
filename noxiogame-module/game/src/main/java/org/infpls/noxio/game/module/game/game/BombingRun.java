@@ -42,7 +42,7 @@ public class BombingRun extends TeamRoundGame {
     final Controller c = getController(player.getSessionId());
     if(c != null && roundStarted) {
       c.setClientTimer((side?0:1)==c.getTeam()?"Offense":"Defense", roundTimer);
-      c.announce("ctf");
+      c.announce("cst");
     }
   }
   

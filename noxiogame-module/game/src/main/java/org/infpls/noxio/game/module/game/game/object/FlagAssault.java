@@ -32,4 +32,21 @@ public class FlagAssault extends Flag {
     if(p.team == team) { return pickup(p); }
     else { return flagReturn(p); }
   }
+  
+  @Override
+  protected boolean pickup(Player p) {
+    if(super.pickup(p)) {
+      setVelocity(new Vec2());
+      setHeight(0f);
+      setVSpeed(0f);
+      return true;
+    }
+    return false;
+  }
+  
+  @Override
+  public void kill() {
+    reset();
+    ((TeamGame)game).announceTeam(team, "ff");
+  }
 }

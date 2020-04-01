@@ -377,36 +377,29 @@ public abstract class NoxioGame {
     }
     killer.score.kill(frame);
     if(!firstBlood) { announce("fb," + killer.getDisplay()); killer.score.firstBlood(); firstBlood = true; }
-    if(kjc >= 5 && kjc < 10) { killer.announce("kj"); killer.score.killJoy(); }
-    else if(kjc >= 10) { announce("er," + killer.getDisplay() + "," + killed.getDisplay()); sendMessage("Killjoy (" + killer.getDisplay() + ")"); killer.score.endedReign(); }
+    if(kjc >= 5 && kjc < 15) { killer.announce("kj"); killer.score.killJoy(); }
+    else if(kjc >= 15) { announce("er," + killer.getDisplay() + "," + killed.getDisplay()); sendMessage("Killjoy (" + killer.getDisplay() + ")"); killer.score.endedReign(); }
     final int m = killer.score.getMulti();
-    if(m > 1) {
-      switch(m) {
-        case 2  : { killer.announce("mk,2"); break; }
-        case 3  : { killer.announce("mk,3"); break; }
-        case 4  : { killer.announce("mk,4"); sendMessage("Multikill X4 (" + killer.getDisplay() + ")"); break; }
-        case 5  : { killer.announce("mk,5"); sendMessage("Multikill X5 (" + killer.getDisplay() + ")"); break; }
-        case 6  : { killer.announce("mk,6"); sendMessage("Multikill X6 (" + killer.getDisplay() + ")"); break; }
-        case 7  : { killer.announce("mk,7"); sendMessage("Multikill X7 (" + killer.getDisplay() + ")"); break; }
-        case 8  : { killer.announce("mk,8"); sendMessage("Multikill X8 (" + killer.getDisplay() + ")"); break; }
-        default : { killer.announce("mk,9"); sendMessage("Multikill X" + m + " (" + killer.getDisplay() + ")"); break; }
-      }
+    if(m > 1 && m <= 18) {
+      killer.announce("mk," + m);
+      if(m > 4) { sendMessage("Multikill X" + m + " (" + killer.getDisplay() + ")"); }
     }
     final int s = killer.score.getSpree();
     switch(s) {
       case 5  : { killer.announce("sp,5"); break; }
-      case 10 : { killer.announce("sp,10"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X10 (" + killer.getDisplay() + ")"); break; }
-      case 15 : { killer.announce("sp,15"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X15 (" + killer.getDisplay() + ")"); break; }
-      case 20 : { killer.announce("sp,20"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X20 (" + killer.getDisplay() + ")"); break; }
-      case 25 : { killer.announce("sp,25"); announce("oc,"+killer.getDisplay()); sendMessage("Killing Spree X25 (" + killer.getDisplay() + ")"); break; }
+      case 10 : { killer.announce("sp,10"); break; }
+      case 15 : { killer.announce("sp,15"); announceExcluding(killer, "oc,"+killer.getDisplay()); sendMessage(killer.getDisplay() + " is unkillable!"); break; }
+      case 20 : { killer.announce("sp,20"); announceExcluding(killer, "oc,"+killer.getDisplay()); sendMessage(killer.getDisplay() + " is invincible!"); break; }
+      case 25 : { killer.announce("sp,25"); announceExcluding(killer, "oc,"+killer.getDisplay()); sendMessage(killer.getDisplay() + " is inconceivable!"); break; }
+      case 30 : { killer.announce("sp,30"); announceExcluding(killer, "oc,"+killer.getDisplay()); sendMessage(killer.getDisplay() + " is godlike!"); break; }
       default : { break; }
     }
     return true;
   }
   
   /* Annouce Codes;
-    mk,# :: Multikill <# 0 to 9>
-    sp,# :: Spree     <# 5, 10, 15, 20, 25>
+    mk,# :: Multikill <# 2 to 18>
+    sp,# :: Spree     <# 5, 10, 15, 20, 25, 30>
     oc,@ :: Out of control <@ name of killer> 
     kj   :: Killjoy
     er,@,&  :: Ended Reign  <@ name of player> <& name of killed>
@@ -416,20 +409,34 @@ public abstract class NoxioGame {
     btd  :: Betrayed   
     btl  :: Betrayl
     dm   :: Deathmatch
+    em   :: Elimination
     kh   :: King
+    rab  :: Rabbit
+    tag  :: Tag
     tkh  :: Team King
-    ulf  :: Ultimate Lifeform
+    ult  :: Ultimate Lifeform
     tdm  :: Team Deathmatch
+    tem  :: Team Elimination
     ctf  :: Capture the Flag
+    fsf  :: Freestyle Flag
+    ass  :: Assault
+    cst  :: Custom Game
     khm  :: Hill Moved
-    hc   :: New Ultimate Lifeform
-    bs   :: Blue Team Score
-    rs   :: Red Team Score
-    bft  :: Blue Team Flag Taken
-    bfr  :: Blue Team Flag Return
-    rft  :: Red Team Flag Taken
-    rfr  :: Red Team Flag Return
-    1m   :: 1 Minute Remaining
+    nu   :: New Ultimate Lifeform
+    pow  :: Your Power Is Maximum
+    it   :: You Are It
+    fc   :: Flag Captured
+    fl   :: Flag Lost
+    ff   :: Flag Reset
+    fr   :: Flag Return
+    fs   :: Flag Stolen
+    ft   :: Flag Taken
+    off  :: Offense
+    def  :: Defense
+    rnd  :: Round Over
+    t60  :: 1 Minute Remaining
+    t30  :: 30 Seconds Reamining
+    t10  :: 10 Seconds Remaining
     pf   :: Perfect
     hu   :: Humiliation
     go   :: Game Over

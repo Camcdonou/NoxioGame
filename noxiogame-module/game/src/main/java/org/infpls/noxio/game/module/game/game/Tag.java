@@ -43,7 +43,7 @@ public class Tag extends SoloGame {
   /* Specific player */
   private void makeIt(final Controller player) {
     if(controllers.size() < 2) { return; }
-    player.announce("hc");
+    player.announce("it");
     
     if(it != null) {
       final GameObject obj = it.getControlled();
@@ -174,7 +174,7 @@ public class Tag extends SoloGame {
     super.join(player);
     final Controller con = getController(player.getSessionId());
     if(con != null) {
-      con.announce("ulf");
+      con.announce("tag");
       scoreTimers.put(con, 0);
     }
   }

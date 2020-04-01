@@ -65,7 +65,10 @@ public class Flag extends Pickup {
   @Override
   protected boolean pickup(Player p) {
     if(super.pickup(p)) {
-      if(onBase()) { game.announce(team==0?"rft":"bft"); }
+      if(onBase()) {
+        ((TeamGame)game).announceTeam(team, "fs");
+        ((TeamGame)game).announceTeam(team==0?1:0, "ft");
+      }
       setVelocity(new Vec2());
       setHeight(0f);
       setVSpeed(0f);
@@ -87,7 +90,7 @@ public class Flag extends Pickup {
   @Override
   public void kill() {
     reset();
-    game.announce(team==0?"rfr":"bfr");
+    ((TeamGame)game).announceTeam(team, "fr");
   }
   
   @Override

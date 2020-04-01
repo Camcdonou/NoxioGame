@@ -4,7 +4,7 @@
 lobbies: [
   {
     game_name: "FFA Rotation #1",
-    max_players: "4",
+    max_players: "8",
     rotation: [
       {
         gametype: "deathmatch",
@@ -20,55 +20,43 @@ lobbies: [
       },
       {
         gametype: "rabbit",
-        map_name: "pre",
+        map_name: "point",
         score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "ultimate",
-        map_name: "final",
-        score_to_win: "15",
-        respawn_time: "90",
-      },
-      {
-        gametype: "tag",
-        map_name: "pre",
-        score_to_win: "15",
-        respawn_time: "90",
-      }
-    ]
-  },
-  {
-    game_name: "FFA Rotation #2",
-    max_players: "8",
-    rotation: [
-      {
-        gametype: "deathmatch",
-        map_name: "war",
-        score_to_win: "15",
-        respawn_time: "30",
-      },
-      {
-        gametype: "king",
         map_name: "area",
         score_to_win: "15",
         respawn_time: "90",
       },
       {
-        gametype: "rabbit",
-        map_name: "pre",
-        score_to_win: "15",
-        respawn_time: "90",
-      },
-      {
-        gametype: "ultimate",
-        map_name: "combat",
-        score_to_win: "15",
-        respawn_time: "90",
-      },
-      {
         gametype: "tag",
-        map_name: "war",
+        map_name: "dig",
+        score_to_win: "15",
+        respawn_time: "90",
+      },
+      {
+        gametype: "elimination",
+        map_name: "vector",
+        score_to_win: "15",
+        respawn_time: "90",
+      },
+      {
+        gametype: "king",
+        map_name: "unearth",
+        score_to_win: "15",
+        respawn_time: "90",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "area",
+        score_to_win: "15",
+        respawn_time: "90",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "position",
         score_to_win: "15",
         respawn_time: "90",
       }
@@ -76,35 +64,35 @@ lobbies: [
   },
   {
     game_name: "Team Rotation #1",
-    max_players: "8",
+    max_players: "12",
     rotation: [
       {
-        gametype: "teamdeathmatch",
-        map_name: "war",
-        score_to_win: "25",
-        respawn_time: "30",
-      },
-      {
         gametype: "capturetheflag",
-        map_name: "area",
+        map_name: "position",
         score_to_win: "3",
         respawn_time: "90",
       },
       {
         gametype: "teamking",
-        map_name: "pre",
+        map_name: "last",
         score_to_win: "25",
         respawn_time: "90",
       },
       {
+        gametype: "teamelimination",
+        map_name: "vector",
+        score_to_win: "15",
+        respawn_time: "90",
+      },
+      {
         gametype: "assault",
-        map_name: "war",
+        map_name: "platform",
         score_to_win: "3",
         respawn_time: "90",
       },
       {
         gametype: "freestyleflag",
-        map_name: "pre",
+        map_name: "battle",
         score_to_win: "3",
         respawn_time: "90",
       }
@@ -122,7 +110,7 @@ lobbies: [
       },
       {
         gametype: "capturetheflag",
-        map_name: "pen",
+        map_name: "platform",
         score_to_win: "3",
         respawn_time: "90",
       },
@@ -143,90 +131,6 @@ lobbies: [
         map_name: "last",
         score_to_win: "3",
         respawn_time: "90",
-      }
-    ]
-  },
-  {
-    game_name: "Big Team Rotation #2",
-    max_players: "32",
-    rotation: [
-      {
-        gametype: "teamelimination",
-        map_name: "last",
-        score_to_win: "32",
-        respawn_time: "30",
-      },
-      {
-        gametype: "capturetheflag",
-        map_name: "battle",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "assault",
-        map_name: "big",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "bomb",
-        map_name: "pen",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "freestyleflag",
-        map_name: "big",
-        score_to_win: "3",
-        respawn_time: "90",
-      }
-    ]
-  },
-  {
-    game_name: "Big Team Rotation #3",
-    max_players: "64",
-    rotation: [
-      {
-        gametype: "teamelimination",
-        map_name: "big",
-        score_to_win: "64",
-        respawn_time: "30",
-      },
-      {
-        gametype: "capturetheflag",
-        map_name: "last",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "assault",
-        map_name: "battle",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "bomb",
-        map_name: "big",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "freestyleflag",
-        map_name: "pen",
-        score_to_win: "3",
-        respawn_time: "90",
-      }
-    ]
-  },
-  {
-    game_name: "Gen Test #1",
-    max_players: "8",
-    rotation: [
-      {
-        gametype: "deathmatch",
-        map_name: "dig",
-        score_to_win: "15",
-        respawn_time: "30",
       }
     ]
   }

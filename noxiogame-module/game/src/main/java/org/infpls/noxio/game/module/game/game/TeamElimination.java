@@ -34,6 +34,8 @@ public class TeamElimination extends TeamRoundGame {
   }
   
   /* Checks to see if the game is over: 'when the round is started, spawning is over, and only 1 or 0 players remain */
+  /* Also checks if a team has 1 player remaining for Last Man Standing announcement */
+  private boolean lmsBlu = false, lmsRed = false;
   private void gameState() {
     if(isGameOver()) { return; }
     if(graceOver) {
@@ -53,6 +55,17 @@ public class TeamElimination extends TeamRoundGame {
       for(int i=0;i<controllers.size();i++) {
         if(controllers.get(i).getTeam() == winner) { controllers.get(i).score.win(); }
         else { controllers.get(i).score.lose(); }
+      }
+      if(controllers.size() >= 4) {
+        Controller lblu = null, lred = null;
+        int blu = 0, red = 0;
+        for(int i=0;i<controllers.size();i++) {
+          final Controller c = controllers.get(i);
+          if(c.getTeam() == 0) { red++; lred = c; }
+          else { blu++; lblu = c; }
+        }
+        if(!lmsBlu && blu == 1 && lblu != null) { lblu.announce("lms"); lmsBlu = true; }
+        if(!lmsRed && red == 1 && lred != null) { lred.announce("lms"); lmsRed = true; }
       }
     }
     if(scores[0] < 1 && scores[1] < 1 && graceOver) {
@@ -101,7 +114,7 @@ public class TeamElimination extends TeamRoundGame {
   @Override
   public void join(final NoxioSession player) throws IOException {
     super.join(player);
-    getController(player.getSessionId()).announce("tdm");
+    getController(player.getSessionId()).announce("tem");
   }
   
   @Override

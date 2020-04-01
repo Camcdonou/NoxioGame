@@ -114,7 +114,7 @@ public class Rabbit extends SoloGame {
   public void join(final NoxioSession player) throws IOException {
     super.join(player);
     final Controller con = getController(player.getSessionId());
-    if(con != null) { con.announce("ulf"); }
+    if(con != null) { con.announce("rab"); }
   }
   
   @Override

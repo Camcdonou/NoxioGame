@@ -5,6 +5,7 @@ import org.infpls.noxio.game.module.game.util.Kalide;
 
 public class FlagRabbit extends Flag {
   private static final int SCORE_TIME_ADJUST = 90;
+  private static final int RABBIT_RESET_COOLDOWN_TIME = 450;
   
   private int scoreTimer;
   public FlagRabbit(final NoxioGame game, final int oid, final Vec2 position, final int team) {
@@ -40,7 +41,18 @@ public class FlagRabbit extends Flag {
   }
   
   @Override
-  public boolean onBase() { return false; }
+  protected boolean pickup(Player p) {
+    if(super.pickup(p)) {
+      if(onBase()) {
+        game.announce("ft");
+      }
+      setVelocity(new Vec2());
+      setHeight(0f);
+      setVSpeed(0f);
+      return true;
+    }
+    return false;
+  }
   
   @Override
   public void dropped() {
@@ -52,5 +64,6 @@ public class FlagRabbit extends Flag {
   public void kill() {
     dead = true;
     destroyed = true;
+    if(!onBase()) { game.announce("ff"); }
   }
 }
