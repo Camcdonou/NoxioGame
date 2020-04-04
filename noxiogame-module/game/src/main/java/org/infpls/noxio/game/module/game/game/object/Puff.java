@@ -87,10 +87,11 @@ public class Puff extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(REST_STUN_LENGTH, puffPermutation.hits[0], this, REST_IMPACT);
+        mob.stun(REST_STUN_LENGTH, puffPermutation.hits[0], this, REST_IMPACT, Mobile.CameraShake.CRITICAL);
         impact(REST_IMPACT);
         mob.knockback(normal.scale(REST_IMPULSE), this);
         effects.add("crt");
+        cameraShake(Mobile.CameraShake.HEAVY);
       }
       
       sleep();
@@ -138,7 +139,7 @@ public class Puff extends Player {
       if(activeHit.contains(mob)) { continue; }
       
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      mob.stun(POUND_STUN_LENGTH, puffPermutation.hits[0], this);
+      mob.stun(POUND_STUN_LENGTH, puffPermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
       mob.knockback(normal.scale(POUND_IMPULSE), this);
       mob.popup(POUND_POPUP, this);
       effects.add("slp");
@@ -166,8 +167,8 @@ public class Puff extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type, int impact) {
-    super.stun(time, type, impact);
+  public void stun(int time, Mobile.HitStun type, int impact, Mobile.CameraShake shake) {
+    super.stun(time, type, impact, shake);
     if(channelSleep) {
       channelSleep = false;
       channelTimer = 0;

@@ -234,14 +234,19 @@ public abstract class Player extends Mobile {
   public boolean isGlobal() { return objective; }
   
   @Override
-  public void stun(int time, final Mobile.HitStun type, int impact) {
-    super.stun(time, type, impact);
+  public void stun(int time, final Mobile.HitStun type, int impact, Mobile.CameraShake shake) {
+    super.stun(time, type, impact, shake);
     impact(impact);
+    cameraShake(shake);
     stunTimer = time;
   }
   
   public void impact(int time) {
     impactTimer = time;
+  }
+  
+  public void cameraShake(Mobile.CameraShake shake) {
+    effects.add(shake.id);
   }
   
   @Override

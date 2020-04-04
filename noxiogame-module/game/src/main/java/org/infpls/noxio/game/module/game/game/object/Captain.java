@@ -99,6 +99,7 @@ public class Captain extends Player {
   /* Do Punch */
   private void punch() {
     effects.add("pun");
+    cameraShake(Mobile.CameraShake.MEDIUM);
     chargePunch = false;
     activeHit.clear();   
     hitboxTimer = PUNCH_HITBOX_TIME;
@@ -125,7 +126,7 @@ public class Captain extends Player {
         if(activeHit.contains(mob)) { continue; }
        
         final Vec2 normal = punchDirection;
-        mob.stun(PUNCH_STUN_LENGTH, captainPermutation.hits[0], this);
+        mob.stun(PUNCH_STUN_LENGTH, captainPermutation.hits[0], this, Mobile.CameraShake.HEAVY);
         mob.knockback(normal.scale(PUNCH_IMPULSE), this);
         activeHit.add(mob);
       }
@@ -178,8 +179,8 @@ public class Captain extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type, int impact) {
-    super.stun(time, type, impact);
+  public void stun(int time, Mobile.HitStun type, int impact, Mobile.CameraShake shake) {
+    super.stun(time, type, impact, shake);
     chargePunch = false;
     chargeTimer = 0;
     punchCooldown = 0;

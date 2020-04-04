@@ -78,7 +78,7 @@ public class Falco extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), falcoPermutation.hits[0], this);
+        mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), falcoPermutation.hits[0], this, isCrit?Mobile.CameraShake.HEAVY:Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)*(isCrit?CRITICAL_MULT:1.0f)), this);
         mob.popup(BLIP_POPUP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f), this);
         if(isCrit) { effects.add("crt"); }
@@ -110,7 +110,7 @@ public class Falco extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      mob.stun(BLAST_STUN_TIME, falcoPermutation.hits[1], this);
+      mob.stun(BLAST_STUN_TIME, falcoPermutation.hits[1], this, Mobile.CameraShake.LIGHT);
       mob.knockback(normal.scale(BLAST_IMPULSE), this);
     }
     
@@ -126,8 +126,8 @@ public class Falco extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type, int impact) {
-    super.stun(time, type, impact);
+  public void stun(int time, Mobile.HitStun type, int impact, Mobile.CameraShake shake) {
+    super.stun(time, type, impact, shake);
     channelDash = false;
     channelTimer = 0;
     dashCooldown = 0;

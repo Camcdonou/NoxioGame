@@ -103,7 +103,7 @@ public abstract class Pickup extends Mobile {
   @Override
   public void knockback(final Vec2 impulse, final Player p) { if(p.team != team) { super.knockback(impulse.scale(KNOCKBACK_REDUCTION_MULT), p); } }
   @Override
-  public void stun(final int time, Mobile.HitStun type, final Player p) { if(p.team != team) { super.stun(time, type, p); } }
+  public void stun(final int time, Mobile.HitStun type, final Player p, Mobile.CameraShake shake) { if(p.team != team) { super.stun(time, type, p, shake); } }
   @Override
   public void popup(final float power, final Player p) { if(p.team != team) { super.popup(power*KNOCKBACK_REDUCTION_MULT, p); } }
 }

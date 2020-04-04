@@ -19,6 +19,15 @@ public abstract class Mobile extends GameObject {
     }
   }
   
+  public enum CameraShake {
+    LIGHT("csa"), MEDIUM("csb"), HEAVY("csc"), CRITICAL("csd");
+    
+    public final String id;
+    CameraShake(String id) {
+      this.id = id;
+    }
+  }
+  
   protected final float GROUNDED_BIAS_POS = 0.0001f, GROUNDED_BIAS_NEG = -0.4f;
   protected static final float AIR_DRAG = 0.98f, FATAL_IMPACT_SPEED = 0.335f, KILL_PLANE = -6f, DESTROY_PLANE = -120f, VELOCITY_SOFTCAP = 3.25f;
   
@@ -222,9 +231,9 @@ public abstract class Mobile extends GameObject {
     return false;
   }
   
-  public void stun(final int time, final Mobile.HitStun type, final Player p, int impact) { stun(time, type, impact); tag(p); }
-  public void stun(int time, final Mobile.HitStun type, int impact) { effects.add(type.id); }
-  public void stun(final int time, final Mobile.HitStun type, final Player p) { stun(time, type, 0); tag(p); }
+  public void stun(final int time, final Mobile.HitStun type, final Player p, int impact, Mobile.CameraShake shake) { stun(time, type, impact, shake); tag(p); }
+  public void stun(int time, final Mobile.HitStun type, int impact, Mobile.CameraShake shake) { effects.add(type.id); }
+  public void stun(final int time, final Mobile.HitStun type, final Player p, Mobile.CameraShake shake) { stun(time, type, 0, shake); tag(p); }
   public void knockback(final Vec2 impulse, final Player p) { knockback(impulse); tag(p); }
   public void knockback(final Vec2 impulse) { setVelocity(velocity.add(impulse)); }
   public void popup(float power, final Player p) { popup(power); tag(p); }

@@ -121,7 +121,7 @@ public class Marth extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, marthPermutation.hits[0], this);
+        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, marthPermutation.hits[0], this, isCombo?Mobile.CameraShake.MEDIUM:Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
         combo++; comboTimer = SLASH_COMBO_DEGEN;
         effects.add(isCombo?"cht":"sht");
@@ -163,7 +163,7 @@ public class Marth extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), marthPermutation.hits[0], this); }
+      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), marthPermutation.hits[0], this, Mobile.CameraShake.HEAVY); }
       if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
       if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER, this); }
       combo++; comboTimer = SLASH_COMBO_DEGEN;
@@ -209,17 +209,17 @@ public class Marth extends Player {
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type, final Player player) {
+  public void stun(int time, Mobile.HitStun type, final Player player, Mobile.CameraShake shake) {
     if(channelCounter && COUNTER_LAG_LENGTH-channelTimer < COUNTER_ACTIVE_LENGTH) {
       counterHit = true; counterStun = time; counterDirection = player.getPosition().subtract(position).normalize();
       return; // Immune to stun/popup/knockback during counters active frames
     } 
-    super.stun(time, type, player);
+    super.stun(time, type, player, shake);
   }
   
   @Override
-  public void stun(int time, Mobile.HitStun type, int impact) {
-    super.stun(time, type, impact);
+  public void stun(int time, Mobile.HitStun type, int impact, Mobile.CameraShake shake) {
+    super.stun(time, type, impact, shake);
     channelCounter = false;
     channelTimer = 0;
     counterCooldown = 0;

@@ -72,7 +72,7 @@ public class Fox extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), foxPermutation.hits[0], this);
+        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), foxPermutation.hits[0], this, Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
       }
       
@@ -89,7 +89,7 @@ public class Fox extends Player {
       dashPower += DASH_POWER_ADD;
       setVelocity(velocity.add(look.scale(DASH_IMPULSE)));
       effects.add("mov");
-      if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME, foxPermutation.hits[1], 0); }
+      if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME, foxPermutation.hits[1], 0, Mobile.CameraShake.LIGHT); }
     }
   }
 

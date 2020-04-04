@@ -142,13 +142,13 @@ public class Tag extends SoloGame {
     
     if(ca == it) {
       makeIt(cb);
-      b.stun(TAG_COOLDOWN_TIME, Mobile.HitStun.Generic, 0);
+      b.stun(TAG_COOLDOWN_TIME, Mobile.HitStun.Generic, 0, Mobile.CameraShake.LIGHT);
       tagCooldown = TAG_COOLDOWN_TIME;
       if(a.is(GameObject.Types.PLAYER)) { ((Player)a).dejective(); }
     }
     else if(cb == it) {
       makeIt(ca);
-      a.stun(TAG_COOLDOWN_TIME, Mobile.HitStun.Generic, 0);
+      a.stun(TAG_COOLDOWN_TIME, Mobile.HitStun.Generic, 0, Mobile.CameraShake.LIGHT);
       tagCooldown = TAG_COOLDOWN_TIME;
       if(b.is(GameObject.Types.PLAYER)) { ((Player)b).dejective(); }
     }
