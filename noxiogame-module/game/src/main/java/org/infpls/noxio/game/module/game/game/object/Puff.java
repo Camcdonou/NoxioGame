@@ -91,6 +91,7 @@ public class Puff extends Player {
         impact(REST_IMPACT);
         mob.knockback(normal.scale(REST_IMPULSE), this);
         effects.add("crt");
+        effects.add("rht");
         cameraShake(Mobile.CameraShake.HEAVY);
       }
       
