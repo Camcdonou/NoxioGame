@@ -4,7 +4,7 @@ import java.util.List;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
-public class Falco extends Player {
+public class Crate extends Player {
   public static enum Permutation {
     CRT_N(0, UserUnlocks.Key.CHAR_CRATE, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire}),
     CRT_VO(1, UserUnlocks.Key.ALT_CRATEVO, new Mobile.HitStun[]{Mobile.HitStun.Electric, Mobile.HitStun.Fire}),
@@ -35,14 +35,14 @@ public class Falco extends Player {
   
   private boolean channelDash;
   private int blipCooldown, dashCooldown, blipPower, dashPower, criticalTimer;
-  private final Permutation falcoPermutation;
-  public Falco(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+  private final Permutation cratePermutation;
+  public Crate(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
-  public Falco(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+  public Crate(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
-    falcoPermutation = perm;
+    cratePermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.1f; friction = 0.725f;
@@ -78,7 +78,7 @@ public class Falco extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), falcoPermutation.hits[0], this, isCrit?Mobile.CameraShake.HEAVY:Mobile.CameraShake.LIGHT);
+        mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), cratePermutation.hits[0], this, isCrit?Mobile.CameraShake.HEAVY:Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)*(isCrit?CRITICAL_MULT:1.0f)), this);
         mob.popup(BLIP_POPUP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f), this);
         if(isCrit) { effects.add("crt"); }
@@ -110,7 +110,7 @@ public class Falco extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      mob.stun(BLAST_STUN_TIME, falcoPermutation.hits[1], this, Mobile.CameraShake.LIGHT);
+      mob.stun(BLAST_STUN_TIME, cratePermutation.hits[1], this, Mobile.CameraShake.LIGHT);
       mob.knockback(normal.scale(BLAST_IMPULSE), this);
     }
     

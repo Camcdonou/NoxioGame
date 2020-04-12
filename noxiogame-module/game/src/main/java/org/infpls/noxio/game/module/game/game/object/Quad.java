@@ -4,7 +4,7 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
-public class Marth extends Player {
+public class Quad extends Player {
   public static enum Permutation {
     QUA_N(0, UserUnlocks.Key.CHAR_QUAD, new Mobile.HitStun[]{Mobile.HitStun.Slash}),
     QUA_VO(1, UserUnlocks.Key.ALT_QUADVO, new Mobile.HitStun[]{Mobile.HitStun.Slash}),
@@ -37,14 +37,14 @@ public class Marth extends Player {
   private Vec2 counterDirection;
   private int combo;
   private int slashCooldown, counterCooldown, comboTimer;
-  private final Permutation marthPermutation;
-  public Marth(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+  private final Permutation quadPermutation;
+  public Quad(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
-  public Marth(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+  public Quad(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
-    marthPermutation = perm;
+    quadPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 0.9f; friction = 0.705f;
@@ -121,7 +121,7 @@ public class Marth extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, marthPermutation.hits[0], this, isCombo?Mobile.CameraShake.MEDIUM:Mobile.CameraShake.LIGHT);
+        mob.stun(isCombo?SLASH_COMBO_STUN_LENGTH:SLASH_STUN_LENGTH, quadPermutation.hits[0], this, isCombo?Mobile.CameraShake.MEDIUM:Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
         combo++; comboTimer = SLASH_COMBO_DEGEN;
         effects.add(isCombo?"cht":"sht");
@@ -163,7 +163,7 @@ public class Marth extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), marthPermutation.hits[0], this, Mobile.CameraShake.HEAVY); }
+      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), quadPermutation.hits[0], this, Mobile.CameraShake.HEAVY); }
       if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
       if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER, this); }
       combo++; comboTimer = SLASH_COMBO_DEGEN;

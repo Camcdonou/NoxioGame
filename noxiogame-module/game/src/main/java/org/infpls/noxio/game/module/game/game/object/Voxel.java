@@ -5,7 +5,7 @@ import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 import org.infpls.noxio.game.module.game.util.Intersection;
 
-public class Shiek extends Player {
+public class Voxel extends Player {
   public static enum Permutation {
     VOX_N(0, UserUnlocks.Key.CHAR_VOXEL, new Mobile.HitStun[]{Mobile.HitStun.Electric}),
     VOX_VO(1, UserUnlocks.Key.ALT_VOXVO, new Mobile.HitStun[]{Mobile.HitStun.Electric}),
@@ -35,14 +35,14 @@ public class Shiek extends Player {
   private Vec2 mark;
   private boolean channelFlash;
   private int flashCooldown, blipCooldown, blipPower;
-  private final Permutation shiekPermutation;
-  public Shiek(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+  private final Permutation voxelPermutation;
+  public Voxel(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
-  public Shiek(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+  public Voxel(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
-    shiekPermutation = perm;
+    voxelPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.735f;
@@ -76,7 +76,7 @@ public class Shiek extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), shiekPermutation.hits[0], this, Mobile.CameraShake.LIGHT);
+        mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), voxelPermutation.hits[0], this, Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
       }
       
@@ -127,7 +127,7 @@ public class Shiek extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(mark).normalize();
-      mob.stun(FLASH_STUN_LENGTH, shiekPermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
+      mob.stun(FLASH_STUN_LENGTH, voxelPermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
       mob.knockback(normal.scale(FLASH_IMPULSE), this);
     }
     

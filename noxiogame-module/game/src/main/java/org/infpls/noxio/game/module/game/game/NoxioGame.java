@@ -210,55 +210,55 @@ public abstract class NoxioGame {
     /* @TODO: use reflection to meme this in a more efficent way? very low priority */
     final int color = c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)?c.user.settings.game.getColor(team):0;
     
-    /* BOX_x :: Fox.java */
-    for(Fox.Permutation perm : Fox.Permutation.values()) {
+    /* BOX_x :: Box.java */
+    for(Box.Permutation perm : Box.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
-        final Fox po = new Fox(this, createOid(), pos, perm, team);
+        final Box po = new Box(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }
     }
       
-    /* CRT_x :: Falco.java */
-    for(Falco.Permutation perm : Falco.Permutation.values()) {
+    /* CRT_x :: Crate.java */
+    for(Crate.Permutation perm : Crate.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
-        final Falco po = new Falco(this, createOid(), pos, perm, team);
+        final Crate po = new Crate(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }
     }
       
-    /* QUA_x :: Marth.java */
-    for(Marth.Permutation perm : Marth.Permutation.values()) {
+    /* QUA_x :: Quad.java */
+    for(Quad.Permutation perm : Quad.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
-        final Marth po = new Marth(this, createOid(), pos, perm, team);
+        final Quad po = new Quad(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }
     }
       
-    /* VOX_x :: Shiek.java */
-    for(Shiek.Permutation perm : Shiek.Permutation.values()) {
+    /* VOX_x :: Voxel.java */
+    for(Voxel.Permutation perm : Voxel.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
-        final Shiek po = new Shiek(this, createOid(), pos, perm, team);
+        final Voxel po = new Voxel(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }
     }
       
-    /* BLK_x :: Puff.java */
-    for(Puff.Permutation perm : Puff.Permutation.values()) {
+    /* BLK_x :: Block.java */
+    for(Block.Permutation perm : Block.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
-        final Puff po = new Puff(this, createOid(), pos, perm, team);
+        final Block po = new Block(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }
     }
       
-    /* CRG_x :: Captain.java */
-    for(Captain.Permutation perm : Captain.Permutation.values()) {
+    /* CRG_x :: Cargo.java */
+    for(Cargo.Permutation perm : Cargo.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
-        final Captain po = new Captain(this, createOid(), pos, perm, team);
+        final Cargo po = new Cargo(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }
@@ -273,7 +273,7 @@ public abstract class NoxioGame {
       }
     }
     
-    return new Fox(this, createOid(), pos, Fox.Permutation.BOX_N, team); /* Default */
+    return new Box(this, createOid(), pos, Box.Permutation.BOX_N, team); /* Default */
   }
   
   private final static float SPAWN_SAFE = 5.0f, SPAWN_MIN_SAFE = 3.f;

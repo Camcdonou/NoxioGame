@@ -28,7 +28,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Audio Balance
   - File Compression
   - Announcer VO
-  - Firefox bug (framerate/refresh rate??/double connection issue?)
+  - Firebox bug (framerate/refresh rate??/double connection issue?)
   - Double connection issue
   - Hung SQL connector issue
   - Iphone issue? (safari is AudioContext webkit thing. Iphone uknown so far )
@@ -99,7 +99,7 @@ import org.infpls.noxio.game.module.game.util.Salt;
   - Ambidex touch control
   - Controller support on PC an phone
   ==== Commission Work ====
-  - Voice work for ... Announcer, Fox, Shiek, Puff
+  - Voice work for ... Announcer, Box, Voxel, Block
   - Sound effect work for ... ( All SFX from melee need to be replaced )
   - Game Music ... (This is not likely to happen but possibly chiptune/synthwave music ? )
 */

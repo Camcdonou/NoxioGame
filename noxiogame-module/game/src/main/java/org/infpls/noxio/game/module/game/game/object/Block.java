@@ -5,7 +5,7 @@ import java.util.List;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
 
-public class Puff extends Player {
+public class Block extends Player {
   public static enum Permutation {
     BLK_N(0, UserUnlocks.Key.CHAR_BLOCK, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
     BLK_VO(1, UserUnlocks.Key.ALT_BLOCKVO, new Mobile.HitStun[]{Mobile.HitStun.Generic}),
@@ -37,14 +37,14 @@ public class Puff extends Player {
   private Vec2 poundDirection;
   private boolean channelSleep, channelPound, delayPound;
   private int restCooldown, poundCooldown, hitboxTimer, delayTimer;
-  private final Permutation puffPermutation;
-  public Puff(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
+  private final Permutation blockPermutation;
+  public Block(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
     this(game, oid, position, perm, -1);
   }
   
-  public Puff(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
+  public Block(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm, final int team) {
     super(game, oid, position, perm.permutation, team);
-    puffPermutation = perm;
+    blockPermutation = perm;
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
@@ -87,7 +87,7 @@ public class Puff extends Player {
       for(int i=0;i<hits.size();i++) {
         final Mobile mob = hits.get(i);
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
-        mob.stun(REST_STUN_LENGTH, puffPermutation.hits[0], this, REST_IMPACT, Mobile.CameraShake.CRITICAL);
+        mob.stun(REST_STUN_LENGTH, blockPermutation.hits[0], this, REST_IMPACT, Mobile.CameraShake.CRITICAL);
         impact(REST_IMPACT);
         mob.knockback(normal.scale(REST_IMPULSE), this);
         effects.add("crt");
@@ -140,7 +140,7 @@ public class Puff extends Player {
       if(activeHit.contains(mob)) { continue; }
       
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      mob.stun(POUND_STUN_LENGTH, puffPermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
+      mob.stun(POUND_STUN_LENGTH, blockPermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
       mob.knockback(normal.scale(POUND_IMPULSE), this);
       mob.popup(POUND_POPUP, this);
       effects.add("slp");
