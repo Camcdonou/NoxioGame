@@ -27,8 +27,8 @@ public class Quad extends Player {
   
   private static final int SLASH_COOLDOWN_LENGTH = 20, SLASH_COMBO_LENGTH = 3, SLASH_COMBO_DEGEN = 90, SLASH_STUN_LENGTH = 15, SLASH_COMBO_STUN_LENGTH = 25;
   private static final float SLASH_RANGE = 1.0f, SLASH_ANGLE = 120f, SLASH_SEGMENT_DISTANCE=5f, SLASH_IMPULSE = 0.55f, SLASH_COMBO_IMPULSE = 1.05f;
-  private static final int COUNTER_COOLDOWN_LENGTH = 45, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 30;
-  private static final float COUNTER_MULTIPLIER = 1.5f, COUNTER_ANGLE = 45f, COUNTER_SEGMENT_DISTANCE=5f, COUNTER_RANGE = 1.25f;
+  private static final int COUNTER_COOLDOWN_LENGTH = 45, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 30, COUNTER_IMPACT = 2, COUNTER_MIN_STUN = 5;
+  private static final float COUNTER_MULTIPLIER = 1.5f, COUNTER_ANGLE = 45f, COUNTER_SEGMENT_DISTANCE=5f, COUNTER_RANGE = 1.25f, COUNTER_MIN_KNOCK = 0.55f;
   private static final int TAUNT_COOLDOWN_LENGTH = 60;
   
   private boolean channelCounter, counterHit;
@@ -163,11 +163,14 @@ public class Quad extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(position).normalize();
-      if(counterStun > 0) { mob.stun((int)(counterStun * COUNTER_MULTIPLIER), quadPermutation.hits[0], this, Mobile.CameraShake.HEAVY); }
-      if(counterKnock > 0) { mob.knockback(normal.scale(counterKnock * COUNTER_MULTIPLIER), this); }
+      
+      mob.stun((int)(Math.max(COUNTER_MIN_STUN, counterStun) * COUNTER_MULTIPLIER), quadPermutation.hits[0], this, COUNTER_IMPACT, Mobile.CameraShake.HEAVY);
+      mob.knockback(normal.scale(Math.max(COUNTER_MIN_KNOCK, counterKnock) * COUNTER_MULTIPLIER), this);
       if(counterPop > 0) { mob.popup(counterPop * COUNTER_MULTIPLIER, this); }
       combo++; comboTimer = SLASH_COMBO_DEGEN;
       effects.add("cht");
+      effects.add("rht");
+      cameraShake(Mobile.CameraShake.MEDIUM);
     }
 
     if(combo > SLASH_COMBO_LENGTH) { combo = SLASH_COMBO_LENGTH; }

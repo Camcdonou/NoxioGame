@@ -11,7 +11,7 @@ public abstract class Mobile extends GameObject {
     Generic("hg"),
     Slash("hs"), SlashPurple("hsxp"), SlashFire("hsxf"), SlashRainbow("hsxrb"),
     Electric("he"), ElectricRed("hexr"), ElectricOrange("hexo"), ElectricGreen("hexg"), ElectricPurple("hexp"), ElectricBlack("hexb"), ElectricRainbow("hexrb"),
-    Fire("hf"), FirePurple("hfxp"), FireBlack("hfxb"), FireRainbow("hfxrb"), FireRetro("hfxrt");
+    Fire("hf"), FirePurple("hfxp"), FireBlue("hfxu"), FireBlack("hfxb"), FireRainbow("hfxrb"), FireRetro("hfxrt");
     
     public final String id;
     HitStun(String id) {

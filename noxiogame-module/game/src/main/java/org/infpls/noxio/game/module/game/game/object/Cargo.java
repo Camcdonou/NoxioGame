@@ -12,7 +12,7 @@ public class Cargo extends Player {
     CRG_PL(2, UserUnlocks.Key.ALT_CARGOPLUS, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
     CRG_RB(3, UserUnlocks.Key.ALT_CARGORAINBOW, new Mobile.HitStun[]{Mobile.HitStun.FireRainbow}),
     CRG_GLD(4, UserUnlocks.Key.ALT_CARGOGOLD, new Mobile.HitStun[]{Mobile.HitStun.FirePurple}),
-    CRG_DEL(5, UserUnlocks.Key.ALT_CARGODELTA, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
+    CRG_DEL(5, UserUnlocks.Key.ALT_CARGODELTA, new Mobile.HitStun[]{Mobile.HitStun.FireBlue}),
     CRG_BLK(6, UserUnlocks.Key.ALT_CARGOBLACK, new Mobile.HitStun[]{Mobile.HitStun.FireBlack}),
     CRG_MC(7, UserUnlocks.Key.ALT_CARGOMINE, new Mobile.HitStun[]{Mobile.HitStun.Fire}),
     CRG_RET(8, UserUnlocks.Key.ALT_CARGORETRO, new Mobile.HitStun[]{Mobile.HitStun.Fire});
