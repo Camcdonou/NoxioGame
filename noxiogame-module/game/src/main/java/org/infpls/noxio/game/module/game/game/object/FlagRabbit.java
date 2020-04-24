@@ -42,14 +42,18 @@ public class FlagRabbit extends Flag {
   
   @Override
   protected boolean pickup(Player p) {
-    if(super.pickup(p)) {
-      if(onBase()) {
-        game.announce("ft");
+    if(p.getHolding() != null) {
+      if(dropCooldown > 0 && lastHeld == p.getOid()) {
+        held = p;
+        lastHeld = held.getOid();
+        if(onBase()) {
+          game.announce("ft");
+        }
+        setVelocity(new Vec2());
+        setHeight(0f);
+        setVSpeed(0f);
+        return true;
       }
-      setVelocity(new Vec2());
-      setHeight(0f);
-      setVSpeed(0f);
-      return true;
     }
     return false;
   }

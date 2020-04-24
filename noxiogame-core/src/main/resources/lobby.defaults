@@ -121,7 +121,7 @@ lobbies: [
         respawn_time: "90",
       },
       {
-        gametype: "bomb",
+        gametype: "teamdeathmatch",
         map_name: "big",
         score_to_win: "3",
         respawn_time: "90",
