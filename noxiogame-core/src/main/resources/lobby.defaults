@@ -74,7 +74,7 @@ lobbies: [
       },
       {
         gametype: "teamking",
-        map_name: "last",
+        map_name: "location",
         score_to_win: "25",
         respawn_time: "90",
       },
@@ -128,7 +128,7 @@ lobbies: [
       },
       {
         gametype: "freestyleflag",
-        map_name: "last",
+        map_name: "location",
         score_to_win: "3",
         respawn_time: "90",
       }
