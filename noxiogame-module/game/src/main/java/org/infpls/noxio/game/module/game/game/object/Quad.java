@@ -78,7 +78,7 @@ public class Quad extends Player {
   
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<vec2 counterDirection>;<string[] effects>
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<vec2 counterDirection>;<int objFlag>;<string[] effects>
   */
   public void generateUpdateData(final StringBuilder sb) {
     final Controller c = game.getControllerByObject(this);
@@ -95,6 +95,7 @@ public class Quad extends Player {
     sb.append(name); sb.append(";");
     if(counterDirection!=null) { counterDirection.toString(sb); }
     else { sb.append("1,0"); } sb.append(";");
+    sb.append(objective?1:0); sb.append(";");
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }

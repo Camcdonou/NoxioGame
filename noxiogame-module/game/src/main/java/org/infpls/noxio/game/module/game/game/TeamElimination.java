@@ -39,6 +39,20 @@ public class TeamElimination extends TeamRoundGame {
   private void gameState() {
     if(isGameOver()) { return; }
     if(graceOver) {
+      /* Check for last man standing */
+      if(controllers.size() >= 4) {
+        Controller lblu = null, lred = null;
+        int blu = 0, red = 0;
+        for(int i=0;i<controllers.size();i++) {
+          final Controller c = controllers.get(i);
+          if(c.getTeam() == 0) { red++; lred = c; }
+          else { blu++; lblu = c; }
+        }
+        if(!lmsBlu && blu == 1 && lblu != null) { lblu.announce("lms"); lmsBlu = true; }
+        if(!lmsRed && red == 1 && lred != null) { lred.announce("lms"); lmsRed = true; }
+      }
+      
+      /* Check for game over */
       int winner;
       if(scores[1] < 1) {
         final Controller top = topPlayer();
@@ -56,22 +70,12 @@ public class TeamElimination extends TeamRoundGame {
         if(controllers.get(i).getTeam() == winner) { controllers.get(i).score.win(); }
         else { controllers.get(i).score.lose(); }
       }
-      if(controllers.size() >= 4) {
-        Controller lblu = null, lred = null;
-        int blu = 0, red = 0;
-        for(int i=0;i<controllers.size();i++) {
-          final Controller c = controllers.get(i);
-          if(c.getTeam() == 0) { red++; lred = c; }
-          else { blu++; lblu = c; }
-        }
-        if(!lmsBlu && blu == 1 && lblu != null) { lblu.announce("lms"); lmsBlu = true; }
-        if(!lmsRed && red == 1 && lred != null) { lred.announce("lms"); lmsRed = true; }
-      }
     }
     if(scores[0] < 1 && scores[1] < 1 && graceOver) {
       gameOver("Draw!", "You done goofed.", "");
     }
   }
+  /* @TODO: implement perfection for team elim */
 
   @Override
   public void reportKill(final Controller killer, final GameObject killed) {

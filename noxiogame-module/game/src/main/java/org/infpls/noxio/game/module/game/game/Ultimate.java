@@ -17,6 +17,8 @@ public class Ultimate extends SoloGame {
     
     scoreTimeAdjust = settings.get("score_time_adjust", 120, 30, 300);
     
+    disableCustomColor = true;
+    
     scoreTimer = 0;
     ultimate = null;
   }

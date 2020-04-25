@@ -5,12 +5,13 @@ import org.infpls.noxio.game.module.game.game.*;
 public class FlagAssault extends Flag {
   public FlagAssault(final NoxioGame game, final int oid, final Vec2 position, final int team) {
     super(game, oid, position, team);
+    
+    /* Settings */
+    teamAttack = true; enemyAttack = false;
   }
   
   @Override
-  public void step() {
-    super.step();
-    
+  public void step() {    
     if(isHeld()) {
       for(int i=0;i<game.objects.size();i++) {
         final GameObject obj = game.objects.get(i);
@@ -21,9 +22,7 @@ public class FlagAssault extends Flag {
       }
     }
     
-    if(!isHeld() && !onBase()) { resetCooldown++; }
-    else { resetCooldown = 0; }
-    if(resetCooldown >= RESET_COOLDOWN_TIME) { kill(); }
+    super.step();
   }
   
   @Override
@@ -34,19 +33,19 @@ public class FlagAssault extends Flag {
   }
   
   @Override
-  protected boolean pickup(Player p) {
-    if(super.pickup(p)) {
-      setVelocity(new Vec2());
-      setHeight(0f);
-      setVSpeed(0f);
-      return true;
-    }
-    return false;
+  public void announceTaken(int team) {
+    ((TeamGame)game).announceTeam(team, "fs");
+    ((TeamGame)game).announceTeam(team==0?1:0, "ft");
   }
   
   @Override
-  public void kill() {
-    reset();
+  public void announceReset() {
     ((TeamGame)game).announceTeam(team, "ff");
   }
+  
+  @Override
+  public void announceReturn() {
+    ((TeamGame)game).announceTeam(team, "ff"); 
+  }
+  
 }

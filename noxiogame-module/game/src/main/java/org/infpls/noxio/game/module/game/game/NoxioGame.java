@@ -20,6 +20,8 @@ public abstract class NoxioGame {
   public final int respawnTime;       // Number of frames that a respawn takes
   public final int penaltyTime;       // Number of extra frames you wait if penalized for team kill or w/e
   
+  public boolean disableCustomColor;    // Disables use of custom colors for this gamemode. Used for gamemodes like Ulitmate and Tag.
+  
   protected int frame;
   private boolean gameOver;
   private int resetTimer;
@@ -45,6 +47,8 @@ public abstract class NoxioGame {
     scoreToWin = stw;
     respawnTime = settings.get("respawn_time", 45, 0, 300);
     penaltyTime = settings.get("penalty_time", 90, 0, 300);
+    
+    disableCustomColor = false;
     
     frame = 0;
     gameOver = false;
@@ -208,7 +212,7 @@ public abstract class NoxioGame {
   protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos) { return makePlayerObject(c, id, pos, -1); }
   protected final Player makePlayerObject(final Controller c, final String id, final Vec2 pos, final int team) {
     /* @TODO: use reflection to meme this in a more efficent way? very low priority */
-    final int color = c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)?c.user.settings.game.getColor(team):0;
+    final int color = c.user.unlocks.has(UserUnlocks.Key.FT_COLOR)&&!disableCustomColor?c.user.settings.game.getColor(team):0;
     
     /* BOX_x :: Box.java */
     for(Box.Permutation perm : Box.Permutation.values()) {

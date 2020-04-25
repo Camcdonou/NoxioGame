@@ -34,7 +34,7 @@ public class Elimination extends SoloRoundGame {
     if(isGameOver()) { return; }
     if(alive.size() == 1 && (graceOver || dead.size() >= controllers.size()-1)) {
       final Controller winner = getControllerByObject(alive.get(0));
-      if(winner.score.getKills() >= dead.size()) { winner.announce("pf"); winner.score.perfect(); }
+      if(winner.score.getKills() >= dead.size() && winner.score.getKills() >= 5) { winner.announce("pf"); winner.score.perfect(); }
       gameOver(winner.getDisplay() + " wins!", winner.getMessageA(), winner.getCustomSound());
       final List<Controller> ordered = new ArrayList();
       ordered.add(winner);

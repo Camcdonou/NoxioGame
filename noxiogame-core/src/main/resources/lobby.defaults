@@ -3,134 +3,291 @@
 
 lobbies: [
   {
-    game_name: "FFA Rotation #1",
-    max_players: "8",
+    game_name: "Free For All #1",
+    max_players: "4",
+    randomize: "1",
     rotation: [
       {
         gametype: "deathmatch",
-        map_name: "final",
+        map_name: "attack,final,combat,dig,point",
         score_to_win: "15",
         respawn_time: "30",
       },
       {
         gametype: "king",
-        map_name: "combat",
+        map_name: "attack,combat",
         score_to_win: "15",
+        respawn_time: "60",
+      },
+      {
+        gametype: "king",
+        map_name: "final,dig,point",
+        score_to_win: "15",
+        static_hill: "1",
+        score_to_move: "7",
+        respawn_time: "60",
+      },
+      {
+        gametype: "rabbit",
+        map_name: "attack,final,combat,dig,point",
+        score_to_win: "15",
+        respawn_time: "60",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "attack,final,combat,dig,point",
+        score_to_win: "15",
+        respawn_time: "30",
+      }
+    ]
+  },
+  {
+    game_name: "Free For All #2",
+    max_players: "7",
+    randomize: "1",
+    rotation: [
+      {
+        gametype: "deathmatch",
+        map_name: "combat,area,final,point,vector,dig,position",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "king",
+        map_name: "combat,area,final,point,vector,dig,position",
+        score_to_win: "15",
+        static_hill: "1",
+        score_to_move: "10",
         respawn_time: "90",
       },
       {
         gametype: "rabbit",
-        map_name: "point",
+        map_name: "combat,area,final,point,vector,dig,position",
         score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "ultimate",
-        map_name: "area",
+        map_name: "combat,area,final,point,vector,dig,position",
         score_to_win: "15",
         respawn_time: "90",
       },
       {
         gametype: "tag",
-        map_name: "dig",
+        map_name: "combat,area,final,point,vector,dig,position",
         score_to_win: "15",
-        respawn_time: "90",
+        respawn_time: "120",
       },
       {
         gametype: "elimination",
-        map_name: "vector",
-        score_to_win: "15",
+        map_name: "combat,area,final,point,vector,dig,position",
+        min_players: "2",
         respawn_time: "90",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "combat,area,final,point,vector,dig,position",
+        score_to_win: "15",
+        respawn_time: "30",
+      }
+    ]
+  },
+  {
+    game_name: "Free For All #3",
+    max_players: "12",
+    randomize: "1",
+    rotation: [
+      {
+        gametype: "deathmatch",
+        map_name: "point,vector,position,war,unearth",
+        score_to_win: "15",
+        respawn_time: "30",
       },
       {
         gametype: "king",
-        map_name: "unearth",
+        map_name: "point,vector,position,war,unearth",
         score_to_win: "15",
         respawn_time: "90",
       },
       {
-        gametype: "deathmatch",
-        map_name: "area",
+        gametype: "rabbit",
+        map_name: "point,vector,position,war,unearth",
         score_to_win: "15",
         respawn_time: "90",
       },
       {
-        gametype: "deathmatch",
-        map_name: "position",
+        gametype: "ultimate",
+        map_name: "point,vector,position,war,unearth",
         score_to_win: "15",
+        respawn_time: "90",
+      },
+      {
+        gametype: "tag",
+        map_name: "point,vector,position,war,unearth",
+        score_to_win: "15",
+        respawn_time: "120",
+      },
+      {
+        gametype: "elimination",
+        map_name: "point,vector,position,war,unearth",
+        min_players: "4",
+        respawn_time: "90",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "point,vector,position,war,unearth",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "elimination",
+        map_name: "point,vector,position,war,unearth",
         respawn_time: "90",
       }
     ]
   },
   {
-    game_name: "Team Rotation #1",
-    max_players: "12",
+    game_name: "Team #1",
+    max_players: "6",
+    randomize: "1",
     rotation: [
       {
+        gametype: "teamdeathmatch",
+        map_name: "final,combat,dig,point,vector,area,position",
+        score_to_win: "25",
+        respawn_time: "30",
+      },
+      {
         gametype: "capturetheflag",
-        map_name: "position",
+        map_name: "final,combat,dig,point,vector,area,position",
         score_to_win: "3",
         respawn_time: "90",
       },
       {
         gametype: "teamking",
-        map_name: "location",
+        map_name: "final,combat,dig,point,vector,area,position",
         score_to_win: "25",
         respawn_time: "90",
       },
       {
         gametype: "teamelimination",
-        map_name: "vector",
-        score_to_win: "15",
+        map_name: "final,combat,dig,point,vector,area,position",
+        min_players: "2",
         respawn_time: "90",
       },
       {
         gametype: "assault",
-        map_name: "platform",
+        map_name: "final,combat,dig,point,vector,area,position",
         score_to_win: "3",
         respawn_time: "90",
       },
       {
         gametype: "freestyleflag",
-        map_name: "battle",
+        map_name: "final,combat,dig,point,vector,area,position",
         score_to_win: "3",
         respawn_time: "90",
       }
     ]
   },
   {
-    game_name: "Big Team Rotation #1",
-    max_players: "24",
+    game_name: "Team #2",
+    max_players: "12",
+    randomize: "1",
     rotation: [
       {
-        gametype: "teamelimination",
-        map_name: "big",
-        score_to_win: "24",
+        gametype: "teamdeathmatch",
+        map_name: "battle,big,location,platform,excavate,unearth,war",
+        score_to_win: "25",
         respawn_time: "30",
       },
       {
         gametype: "capturetheflag",
-        map_name: "platform",
+        map_name: "battle,big,location,platform,excavate,unearth,war",
         score_to_win: "3",
+        respawn_time: "90",
+      },
+      {
+        gametype: "teamking",
+        map_name: "battle,big,location,platform,excavate,unearth,war",
+        score_to_win: "25",
+        static_hill: "1",
+        score_to_move: "10",
+        respawn_time: "90",
+      },
+      {
+        gametype: "teamelimination",
+        map_name: "battle,big,location,platform,excavate,unearth,war",
+        min_players: "4",
         respawn_time: "90",
       },
       {
         gametype: "assault",
-        map_name: "battle",
-        score_to_win: "3",
-        respawn_time: "90",
-      },
-      {
-        gametype: "teamdeathmatch",
-        map_name: "big",
+        map_name: "battle,big,location,platform,excavate,unearth,war",
         score_to_win: "3",
         respawn_time: "90",
       },
       {
         gametype: "freestyleflag",
-        map_name: "location",
+        map_name: "battle,big,location,platform,excavate,unearth,war",
         score_to_win: "3",
         respawn_time: "90",
+      }
+    ]
+  },
+  {
+    game_name: "Big Team #1",
+    max_players: "32",
+    randomize: "1",
+    rotation: [
+      {
+        gametype: "teamelimination",
+        map_name: "big,battle,excavate",
+        score_to_win: "24",
+        min_players: "6",
+        respawn_time: "30",
+      },
+      {
+        gametype: "capturetheflag",
+        map_name: "big,battle,excavate",
+        score_to_win: "3",
+        respawn_time: "120",
+      },
+      {
+        gametype: "assault",
+        map_name: "big,battle,excavate",
+        score_to_win: "3",
+        respawn_time: "120",
+      },
+      {
+        gametype: "teamking",
+        map_name: "big,battle,excavate",
+        score_to_win: "3",
+        respawn_time: "120",
+      },
+      {
+        gametype: "teamdeathmatch",
+        map_name: "big,battle,excavate",
+        score_to_win: "3",
+        respawn_time: "60",
+      },
+      {
+        gametype: "freestyleflag",
+        map_name: "big,battle,excavate",
+        score_to_win: "3",
+        respawn_time: "120",
+      }
+    ]
+  },
+  {
+    game_name: "Battle Royale #1",
+    max_players: "64",
+    randomize: "0",
+    rotation: [
+      {
+        gametype: "elimination",
+        map_name: "big,excavate",
+        min_players: "6",
+        respawn_time: "30",
       }
     ]
   }

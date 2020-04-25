@@ -1,6 +1,5 @@
 package org.infpls.noxio.game.module.game.game.object;
 
-import java.util.*;
 import org.infpls.noxio.game.module.game.game.NoxioGame;
 
 public abstract class Pickup extends Mobile {

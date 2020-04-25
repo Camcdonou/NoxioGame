@@ -19,6 +19,8 @@ public class Tag extends SoloGame {
     
     scoreTimeAdjust = settings.get("score_time_adjust", 120, 30, 300);
     
+    disableCustomColor = true;
+    
     scoreTimers = new HashMap();
     tagCooldown = 0;
     it = null;

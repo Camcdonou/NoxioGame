@@ -145,7 +145,7 @@ public abstract class Player extends Mobile {
    
   @Override
   /* Player GameObject parameters:
-     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<string[] effects>
+     obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<vec2 look>;<float speed>;<string name>;<int objFlag>;<string[] effects>
   */
   public void generateUpdateData(final StringBuilder sb) {
     final Controller c = game.getControllerByObject(this);
@@ -160,6 +160,7 @@ public abstract class Player extends Mobile {
     look.toString(sb); sb.append(";");
     sb.append(speed); sb.append(";");
     sb.append(name.replaceAll("(\\;|\\,)", "")); sb.append(";"); /* @TODO: send this a single time instead all the time */
+    sb.append(objective?1:0); sb.append(";");
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }
@@ -184,13 +185,11 @@ public abstract class Player extends Mobile {
   
   /* Flags this player as an objective */
   public final void objective() {
-    effects.add("obj");
     objective = true;
   }
   
   /* Removes objective status from this player */
   public final void dejective() {
-    effects.add("jbo");
     objective = false;
   }
   
@@ -199,7 +198,7 @@ public abstract class Player extends Mobile {
     final List<Mobile> hits = new ArrayList();
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
-      if(obj != this && obj.is(Types.MOBILE) && !(obj.is(Types.FLAG) && obj.team != -1 && obj.team == team)) {
+      if(obj != this && obj.is(Types.MOBILE) && !(obj.is(Types.FLAG) && !((Flag)obj).canAttack(team))) {
         final Mobile mob = (Mobile)obj;
         final float cr = mob.getRadius() + r;
         if(!mob.immune && p.distance(mob.getPosition()) <= cr && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
@@ -252,6 +251,7 @@ public abstract class Player extends Mobile {
   @Override
   public void kill() {
     if(!alive()) { return; }
+    if(objective) { dejective(); }
     dead = true;
     drop();
     game.reportKill(tagTime-game.getFrame()<=TAG_CREDIT_GRACE_PERIOD?tagged:null, this);

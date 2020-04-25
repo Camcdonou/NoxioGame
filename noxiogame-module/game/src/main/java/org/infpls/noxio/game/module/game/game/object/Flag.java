@@ -2,8 +2,9 @@ package org.infpls.noxio.game.module.game.game.object;
 
 import org.infpls.noxio.game.module.game.game.*;
 
-public class Flag extends Pickup {
+public abstract class Flag extends Pickup {
   protected final Vec2 base;
+  protected boolean teamAttack, enemyAttack;  // Determines whether the flag can be hit by owning team or enemy team
     
   public Flag(final NoxioGame game, final int oid, final Vec2 position, final int team) {
     super(game, oid, position, 0, team);
@@ -15,6 +16,7 @@ public class Flag extends Pickup {
     
     /* Settings */
     radius = 0.1f; weight = 0.5f; friction = 0.725f; invulnerable = true;
+    teamAttack = false; enemyAttack = true;
 
     /* Timers */
   }
@@ -22,20 +24,10 @@ public class Flag extends Pickup {
   @Override
   public void step() {
     super.step();
-    
-    if(isHeld()) {
-      for(int i=0;i<game.objects.size();i++) {
-        final GameObject obj = game.objects.get(i);
-        if(obj.is(Types.FLAG)) {
-          final Flag f = (Flag)(obj);
-          if(f.team != team && f.onBase() && f.getPosition().distance(position) < f.getRadius()+held.getRadius()) { f.score(held); reset(); }
-        }
-      }
-    }
-    
+        
     if(!isHeld() && !onBase()) { resetCooldown++; }
     else { resetCooldown = 0; }
-    if(resetCooldown >= RESET_COOLDOWN_TIME) { kill(); }
+    if(resetCooldown >= RESET_COOLDOWN_TIME) { reset(); announceReset(); }
   }
 
   @Override
@@ -55,6 +47,10 @@ public class Flag extends Pickup {
     sb.append(";");
   }
   
+  public boolean canAttack(int atkrTeam) {
+    return (atkrTeam == team && teamAttack) || (atkrTeam != team && enemyAttack);
+  }
+  
   @Override
   public boolean touch(Player p) {
     if(isHeld()) { return false; }
@@ -65,10 +61,6 @@ public class Flag extends Pickup {
   @Override
   protected boolean pickup(Player p) {
     if(super.pickup(p)) {
-      if(onBase()) {
-        ((TeamGame)game).announceTeam(team, "fs");
-        ((TeamGame)game).announceTeam(team==0?1:0, "ft");
-      }
       setVelocity(new Vec2());
       setHeight(0f);
       setVSpeed(0f);
@@ -90,7 +82,7 @@ public class Flag extends Pickup {
   @Override
   public void kill() {
     reset();
-    ((TeamGame)game).announceTeam(team, "fr");
+    announceReturn();
   }
   
   @Override
@@ -110,6 +102,10 @@ public class Flag extends Pickup {
   
   @Override
   public boolean isGlobal() { return true; }
+  
+  public abstract void announceTaken(int team);
+  public abstract void announceReset();
+  public abstract void announceReturn();
   
   @Override
   public String type() { return "flg"; }

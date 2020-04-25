@@ -69,11 +69,7 @@ public class FreestyleFlag extends TeamGame {
       winr = 1;
     }
     else { return; }
-    if(scores[winr==0?1:0] == 0) {
-      for(int i=0;i<controllers.size();i++) {
-        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); controllers.get(i).score.perfect(); }
-      }
-    }
+    /* @TODO: Implement perfections for CTF */
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getTeam() == winr) { controllers.get(i).score.win(); }
       else { controllers.get(i).score.lose(); }

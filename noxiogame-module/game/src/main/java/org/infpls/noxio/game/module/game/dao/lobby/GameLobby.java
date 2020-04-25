@@ -154,6 +154,8 @@ public abstract class GameLobby {
   
   protected final String name;
   
+  private final boolean randomize;
+  
   public final int maxPlayers;
   protected final List<NoxioSession> players, loading;
   
@@ -174,6 +176,7 @@ public abstract class GameLobby {
     
     name = settings.get("game_name", "Default Name");
     maxPlayers = settings.get("max_players", 6, 2, 64);
+    randomize = settings.get("randomize", 0, 0, 1)==1;
     
     players = new ArrayList();
     loading = new ArrayList();
@@ -195,9 +198,14 @@ public abstract class GameLobby {
   
   private void newGame() throws IOException {
     if(game != null) { game.destroy(); }
-    final GameSettings gs = settings.getRotation(gameCount);
+    final GameSettings gs = settings.getRotation(randomize?(int)(Math.random()*1024):gameCount);
     final String gametype = gs.get("gametype", "deathmatch");
-    final NoxioMap map = new NoxioMap(gs.get("map_name", "final"));
+    String mapName = gs.get("map_name", "final");
+    if(mapName.contains(",")) {
+      final String[] spl = mapName.split(",");
+      mapName = spl[(int)(Math.random()*spl.length)];
+    }
+    final NoxioMap map = new NoxioMap(mapName);
     switch(gametype.toLowerCase()) {
       case "deathmatch" : { game = new Deathmatch(this, map, gs); break; }
       case "elimination" : { game = new Elimination(this, map, gs); break; }

@@ -16,12 +16,13 @@ public class FlagRabbit extends Flag {
     
     /* Timers */
     scoreTimer = 0;
+    
+    /* Settings */
+    teamAttack = true; enemyAttack = true;
   }
   
   @Override
-  public void step() {
-    super.step();
-    
+  public void step() {    
     if(isHeld()) {
       if(scoreTimer++ > SCORE_TIME_ADJUST) {
         scoreTimer = 0;
@@ -29,9 +30,7 @@ public class FlagRabbit extends Flag {
       }
     }
     
-    if(!isHeld() && !onBase()) { resetCooldown++; }
-    else { resetCooldown = 0; }
-    if(resetCooldown >= RESET_COOLDOWN_TIME) { kill(); }
+    super.step();
   }
   
   @Override
@@ -42,17 +41,11 @@ public class FlagRabbit extends Flag {
   
   @Override
   protected boolean pickup(Player p) {
-    if(p.getHolding() != null) { return false; }
-    if(dropCooldown > 0 && lastHeld == p.getOid()) { return false; }
-    held = p;
-    lastHeld = held.getOid();
-    if(onBase()) {
-      game.announce("ft");
+    if(super.pickup(p)) {
+      if(onBase()) { announceTaken(0); }
+      return true;
     }
-    setVelocity(new Vec2());
-    setHeight(0f);
-    setVSpeed(0f);
-    return true;
+    return false;
   }
   
   @Override
@@ -62,9 +55,27 @@ public class FlagRabbit extends Flag {
   }
   
   @Override
+  protected void reset() { kill(); }
+  
+  @Override
   public void kill() {
     dead = true;
     destroyed = true;
-    if(!onBase()) { game.announce("ff"); }
+    if(!onBase()) { announceReset(); }
+  }
+  
+  @Override
+  public void announceTaken(int team) {
+    game.announce("ft");
+  }
+  
+  @Override
+  public void announceReset() {
+    game.announce("ff");
+  }
+  
+  @Override
+  public void announceReturn() {
+    game.announce("ff");
   }
 }

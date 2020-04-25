@@ -21,8 +21,8 @@ public class CaptureTheFlag extends TeamGame {
     rsl = rs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)+1f, map.getBounds()[1]*0.5f):rs.get(0).getPos();
     bsl = bs.isEmpty()?new Vec2((map.getBounds()[0]*0.5f)-1f, map.getBounds()[1]*0.5f):bs.get(0).getPos();
     final Flag rf, bf;
-    rf = new Flag(this, createOid(), rsl, 0);
-    bf = new Flag(this, createOid(), bsl, 1);
+    rf = new FlagNormal(this, createOid(), rsl, 0);
+    bf = new FlagNormal(this, createOid(), bsl, 1);
     addObject(rf);
     addObject(bf);
   }
@@ -69,11 +69,7 @@ public class CaptureTheFlag extends TeamGame {
       winr = 1;
     }
     else { return; }
-    if(scores[winr==0?1:0] == 0) {
-      for(int i=0;i<controllers.size();i++) {
-        if(controllers.get(i).getTeam() == winr) { controllers.get(i).announce("pf"); controllers.get(i).score.perfect(); }
-      }
-    }
+    /* @TODO: Implement perfections and humiliations for CTF */
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getTeam() == winr) { controllers.get(i).score.win(); }
       else { controllers.get(i).score.lose(); }
