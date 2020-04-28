@@ -3,6 +3,19 @@
 
 lobbies: [
   {
+    game_name: "Test #1",
+    max_players: "4",
+    randomize: "1",
+    rotation: [
+      {
+        gametype: "deathmatch",
+        map_name: "test",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+    ]
+  },
+  {
     game_name: "Free For All #1",
     max_players: "4",
     randomize: "1",

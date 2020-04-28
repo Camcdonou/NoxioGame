@@ -39,7 +39,7 @@ public class UserSettings {
       upGame = Math.min(8f, Math.max(.25f, ug));
       upUi = Math.min(8f, Math.max(.25f, uu));
       upSky = Math.min(8f, Math.max(.25f, us));
-      shadowSize = Math.min(4096, Math.max(128, ss));
+      shadowSize = Math.min(4096, Math.max(16, ss));
       safeMode = sm;
       bloom = bl;
     }
