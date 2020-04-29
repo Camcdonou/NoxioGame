@@ -11,7 +11,7 @@ public class SessionThread extends Thread {
   private final NoxioSession session;
   private List<Packet> out;              // Outgoing packet queue
   
-  private static final int SEND_TIMEOUT = 450, CLOSE_WAIT_TIMEOUT = 150;
+  private static final int SEND_TIMEOUT = 1000, CLOSE_WAIT_TIMEOUT = 500;
   
   private long sendTime;                 // Time of last send start
   private boolean sending;               // Currently in the process of sending data to a client
@@ -41,12 +41,11 @@ public class SessionThread extends Thread {
         else { doWait(); }
       }
       catch(IOException | IllegalStateException ex) {
-        Oak.log(Oak.Type.NETWORK, Oak.Level.ERR, "Exception during SessionThread send for user: '" + session.getUser() + "'. Closing connection.", ex);
+        Oak.log(Oak.Type.NETWORK, Oak.Level.ERR, "Exception during SessionThread send for user: '" + session.getUser() + "'. :: " + ex.getMessage());
         forceClose();
       }
     }
     if(forceClose) {
-      Oak.log(Oak.Type.NETWORK, Oak.Level.WARN, "Unsafe SessionThread close for user: '" + session.getUser() + "'");
       try { if(session.isOpen()) { session.close(); } }
       catch(IOException ex) { Oak.log(Oak.Type.NETWORK, Oak.Level.ERR, "Failed to force close SessionThread for user: '" + session.getUser() + "'", ex); }
       Oak.log(Oak.Type.NETWORK, Oak.Level.INFO, "SessionThread resolved for user: '" + session.getUser() + "'");
@@ -96,8 +95,7 @@ public class SessionThread extends Thread {
   private void forceClose() {
     if(forceClose) { return; }
     forceClose = true;
-    Oak.log(Oak.Type.NETWORK, Oak.Level.WARN, "ForceClose call for user: '" + session.getUser() + "'");
-    try { Oak.log(Oak.Type.NETWORK, Oak.Level.INFO, "Kicking user from game: '" + session.getUser() + "'"); session.leaveGame(); } catch(IOException ex) { Oak.log(Oak.Type.NETWORK, Oak.Level.ERR, "Failed to kick user from game.", ex); }
+    try { session.leaveGame(); } catch(IOException ex) { Oak.log(Oak.Type.NETWORK, Oak.Level.ERR, "Failed to kick user from game during foreclose() :: '" + session.getUser() + "'", ex); }
     doNotify();
   }
 }

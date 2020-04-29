@@ -70,9 +70,6 @@ public abstract class NoxioGame {
           }
         }
       }
-      else {
-        Oak.log(Oak.Type.GAME, Oak.Level.WARN, "Invalid User Input: '" + (c!=null?c.getUser():"[NULL_CONTROLLER]") + "'");
-      }
     }
   }
   
