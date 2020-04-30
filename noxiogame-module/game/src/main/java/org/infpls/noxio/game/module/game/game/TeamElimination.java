@@ -45,8 +45,8 @@ public class TeamElimination extends TeamRoundGame {
         int blu = 0, red = 0;
         for(int i=0;i<controllers.size();i++) {
           final Controller c = controllers.get(i);
-          if(c.getTeam() == 0) { red++; lred = c; }
-          else { blu++; lblu = c; }
+          if(c.getTeam() == 0 && c.getControlled() != null) { red++; lred = c; }
+          else if(c.getTeam() == 1 && c.getControlled() != null) { blu++; lblu = c; }
         }
         if(!lmsBlu && blu == 1 && lblu != null) { lblu.announce("lms"); lmsBlu = true; }
         if(!lmsRed && red == 1 && lred != null) { lred.announce("lms"); lmsRed = true; }
