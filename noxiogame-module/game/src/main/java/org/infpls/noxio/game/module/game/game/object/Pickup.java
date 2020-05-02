@@ -98,6 +98,7 @@ public abstract class Pickup extends Mobile {
   }
   
   public boolean isHeld() { return held!=null; }
+  public Player getHeld() { return held; }
   
   @Override
   public void knockback(final Vec2 impulse, final Player p) { super.knockback(impulse.scale(KNOCKBACK_REDUCTION_MULT), p); }

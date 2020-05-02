@@ -1,9 +1,7 @@
-package org.infpls.noxio.game.module.game.game;
+package org.infpls.noxio.game.module.game.game.object;
 
-import org.infpls.noxio.game.module.game.game.object.Flag;
-import org.infpls.noxio.game.module.game.game.object.GameObject;
-import org.infpls.noxio.game.module.game.game.object.Player;
-import org.infpls.noxio.game.module.game.game.object.Vec2;
+import org.infpls.noxio.game.module.game.game.NoxioGame;
+import org.infpls.noxio.game.module.game.game.TeamGame;
 
 public class FlagNormal extends Flag {
 

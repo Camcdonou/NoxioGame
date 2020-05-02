@@ -74,7 +74,7 @@ public class Assault extends TeamGame {
       winr = 1;
     }
     else { return; }
-    /* @TODO: Implement perfections for CTF */
+    /* @TODO: Implement perfections for Assault */
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getTeam() == winr) { controllers.get(i).score.win(); }
       else { controllers.get(i).score.lose(); }
