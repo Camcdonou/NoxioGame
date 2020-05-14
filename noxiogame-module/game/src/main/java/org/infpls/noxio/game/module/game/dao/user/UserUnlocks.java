@@ -43,7 +43,7 @@ public class UserUnlocks {
     
     new Unlock(Key.ALT_CRATEVO, "Talking Crate", "Now it can talk.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CRATEORANGE, "Orange Crate", "Crate with orange effects.", Type.ALTERNATE, 5000, UserData.Type.FULL, false),
-    new Unlock(Key.ALT_CRATERAINBOW, "Rainbow Crate", "Crate with rainbow effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
+    new Unlock(Key.ALT_CRATERAINBOW, "Rainbow Crate", "Crate with rainbow effects.", Type.ALTERNATE, 12500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CRATEGOLD, "Solid Gold Crate", "Crate with a shiny gold finish and purple effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CRATEDELTA, "Delta Crate", "Crate with a shiny finish and blue effects.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CRATEFIRE, "Spicy Crate", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
@@ -52,14 +52,14 @@ public class UserUnlocks {
     
     new Unlock(Key.ALT_VOXVO, "Talking Voxel", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
     new Unlock(Key.ALT_VOXGREEN, "Green Voxel", "Voxel with green effects.", Type.ALTERNATE, 5000, UserData.Type.FULL, false),
-    new Unlock(Key.ALT_VOXRAINBOW, "Rainbow Voxel", "Voxel with rainbow effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
+    new Unlock(Key.ALT_VOXRAINBOW, "Rainbow Voxel", "Voxel with rainbow effects.", Type.ALTERNATE, 12500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_VOXGOLD, "Solid Gold Voxel", "Voxel with a shiny gold finish and purple effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
     new Unlock(Key.ALT_VOXDELTA, "Delta Voxel", "Voxel with a shiny finish and blue effects.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_VOXBLACK, "Dark Voxel", "Voxel with edgy effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
     new Unlock(Key.ALT_VOXLOOT, "Loot Voxel", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
     
     new Unlock(Key.ALT_QUADVO, "Talking Quad", "Now it can talk.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
-    new Unlock(Key.ALT_QUADRAINBOW, "Rainbow Quad", "Quad with rainbow effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
+    new Unlock(Key.ALT_QUADRAINBOW, "Rainbow Quad", "Quad with rainbow effects.", Type.ALTERNATE, 12500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_QUADGOLD, "Solid Gold Quad", "Quad with a shiny gold finish and purple effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
     new Unlock(Key.ALT_QUADDELTA, "Delta Quad", "Delta with a shiny finish and blue effects.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_QUADFIRE, "Spicy Quad", "Quad with fire effects.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
@@ -67,7 +67,7 @@ public class UserUnlocks {
     new Unlock(Key.ALT_QUADRUNE, "Rune Quad", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
     
     new Unlock(Key.ALT_BLOCKVO, "Talking Block", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
-    new Unlock(Key.ALT_BLOCKRAINBOW, "Rainbow Block", "Block with rainbow effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
+    new Unlock(Key.ALT_BLOCKRAINBOW, "Rainbow Block", "Block with rainbow effects.", Type.ALTERNATE, 12500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_BLOCKGOLD, "Solid Gold Block", "Block with a shiny gold finish.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
     new Unlock(Key.ALT_BLOCKDELTA, "Delta Block", "Delta with a shiny finish.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_BLOCKROUND, "Round Block", "An abomination.", Type.ALTERNATE, 5000, UserData.Type.FULL, false),
@@ -78,15 +78,15 @@ public class UserUnlocks {
     
     new Unlock(Key.ALT_CARGOVO, "Talking Cargo", "Now it can talk.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CARGOPLUS, "Bad Cargo", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
-    new Unlock(Key.ALT_CARGORAINBOW, "Rainbow Cargo", "Cargo with rainbow effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
+    new Unlock(Key.ALT_CARGORAINBOW, "Rainbow Cargo", "Cargo with rainbow effects.", Type.ALTERNATE, 12500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CARGOGOLD, "Solid Gold Cargo", "Cargo with a shiny gold finish and purple effects.", Type.ALTERNATE, 10000, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CARGODELTA, "Delta Cargo", "Delta with a shiny finish and blue effects.", Type.ALTERNATE, 7500, UserData.Type.FULL, false),
     new Unlock(Key.ALT_CARGOBLACK, "Blackflame Cargo", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
     new Unlock(Key.ALT_CARGOMINE, "Minecargo", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
     new Unlock(Key.ALT_CARGORETRO, "Retro Cargo", "Descriptions describe things.", Type.ALTERNATE, 999999, UserData.Type.FULL, true),
         
-    new Unlock(Key.FT_LOBBY, "Custom Lobbies", "Allows you to host custom games with your own rule sets.", Type.FEATURE, 25000, UserData.Type.SPEC, false),
-    new Unlock(Key.FT_COLOR, "Custom Colors", "Allows you to change the color of your character and create phasing colors.", Type.FEATURE, 25000, UserData.Type.SPEC, false),
+    new Unlock(Key.FT_LOBBY, "Custom Lobbies", "Allows you to host custom games with your own rule sets.", Type.FEATURE, 27500, UserData.Type.SPEC, false),
+    new Unlock(Key.FT_COLOR, "Custom Colors", "Allows you to change the color of your character and create phasing colors.", Type.FEATURE, 35000, UserData.Type.SPEC, false),
     new Unlock(Key.FT_MESSAGE, "Custom Message", "Allows you to set a win message that is displayed if you come in 1st place.", Type.FEATURE, 25000, UserData.Type.SPEC, false),
     new Unlock(Key.FT_SOUND, "Custom Sounds", "Allows you to upload and and use a custom sound effect. Plays when you come in 1st place.", Type.FEATURE, 123456789, UserData.Type.SPEC, false)
   );

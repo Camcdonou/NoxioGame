@@ -16,7 +16,7 @@ public class MapController {
     final Gson gson = new GsonBuilder().create();
     
     @RequestMapping(value = "/map/{map}", method = RequestMethod.GET, produces = "application/json")
-    public @ResponseBody ResponseEntity getStatus(@PathVariable String map) {
+    public @ResponseBody ResponseEntity getStatus(@PathVariable String map) {      
       NoxioMap m = null;
       for(int i=0;i<cache.size();i++) {
         final NoxioMap c = cache.get(i);
