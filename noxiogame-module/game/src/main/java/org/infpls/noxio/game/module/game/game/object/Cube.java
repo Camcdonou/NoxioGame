@@ -23,7 +23,7 @@ public class Cube extends Player {
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float BLIP_IMPULSE = 0.875f, BLIP_RADIUS = 0.6f;
   private static final int BOMB_COOLDOWN_LENGTH = 10, BOMB_POWER_MAX =  120, BOMB_POWER_COST = 60, BOMB_STUN_TIME = 30, BOMB_FUSE_LENGTH = 50;
-  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .3f;
+  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .415f;
   
   private int blipCooldown, blipPower, bombCooldown, bombPower;
   private final List<Bomblet> bombs;
