@@ -71,8 +71,6 @@ public class Voxel extends Player {
   public void actionA() {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
-      blipPower = 0;
-      effects.add("atk");
       
       final List<Mobile> hits = hitTest(position, BLIP_RADIUS);
       for(int i=0;i<hits.size();i++) {
@@ -80,6 +78,11 @@ public class Voxel extends Player {
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
         mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), voxelPermutation.hits[0], this, Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
+      }
+      
+      blipPower = 0;
+      effects.add("atk");
+      for(int i=0;i<hits.size();i++) {
         blipPower += BLIP_REFUND_POWER;
         effects.add("rfd");
       }

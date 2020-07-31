@@ -73,8 +73,6 @@ public class Crate extends Player {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
       final boolean isCrit = criticalTimer > 0;
-      blipPower = 0;
-      effects.add("atk");
       
       final List<Mobile> hits = hitTest(position, BLIP_RADIUS);
       for(int i=0;i<hits.size();i++) {
@@ -83,11 +81,14 @@ public class Crate extends Player {
         mob.stun((int)(BLIP_STUN_TIME*(blipPower/BLIP_POWER_MAX)*(isCrit?CRITICAL_MULT:1.0f)), cratePermutation.hits[0], this, isCrit?Mobile.CameraShake.HEAVY:Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)*(isCrit?CRITICAL_MULT:1.0f)), this);
         mob.popup(BLIP_POPUP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f), this);
-        // if(isCrit) { effects.add("crt"); } @TODO: Make a unique crit effect for crate
+      }
+      
+      blipPower = 0;
+      effects.add("atk");
+      for(int i=0;i<hits.size();i++) {
         blipPower += BLIP_REFUND_POWER;
         effects.add("rfd");
       }
-      
     }
   }
   
