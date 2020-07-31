@@ -27,8 +27,8 @@ public class Box extends Player {
     }
   }
   
-  private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30;
-  private static final int DASH_COOLDOWN_LENGTH = 15, DASH_POWER_MAX = 60, DASH_POWER_ADD = 30, DASH_STUN_TIME = 30;
+  private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 35, BLIP_STUN_TIME = 30, BLIP_REFUND_POWER = 5;
+  private static final int DASH_COOLDOWN_LENGTH = 18, DASH_POWER_MAX = 60, DASH_POWER_ADD = 35, DASH_STUN_TIME = 35;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float BLIP_IMPULSE = 0.875f, DASH_IMPULSE = 0.25f, BLIP_RADIUS = 0.6f;
   
@@ -67,6 +67,8 @@ public class Box extends Player {
   public void actionA() {
     if(blipCooldown <= 0) {
       blipCooldown = BLIP_COOLDOWN_LENGTH;
+      blipPower = 0;
+      effects.add("atk");
       
       final List<Mobile> hits = hitTest(position, BLIP_RADIUS);
       for(int i=0;i<hits.size();i++) {
@@ -74,10 +76,9 @@ public class Box extends Player {
         final Vec2 normal = mob.getPosition().subtract(position).normalize();
         mob.stun((int)(BLIP_STUN_TIME*(((blipPower/BLIP_POWER_MAX)*0.75f)+0.25f)), boxPermutation.hits[0], this, Mobile.CameraShake.LIGHT);
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
+        blipPower += BLIP_REFUND_POWER;
+        effects.add("rfd");
       }
-      
-      blipPower = 0;
-      effects.add("atk");
     }
   }
   

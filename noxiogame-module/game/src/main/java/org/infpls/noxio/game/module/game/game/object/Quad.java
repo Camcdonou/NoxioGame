@@ -25,9 +25,9 @@ public class Quad extends Player {
     }
   }
   
-  private static final int SLASH_COOLDOWN_LENGTH = 20, SLASH_COMBO_LENGTH = 3, SLASH_COMBO_DEGEN = 90, SLASH_STUN_LENGTH = 15, SLASH_COMBO_STUN_LENGTH = 25;
+  private static final int SLASH_COOLDOWN_LENGTH = 25, SLASH_COMBO_LENGTH = 3, SLASH_COMBO_DEGEN = 90, SLASH_STUN_LENGTH = 14, SLASH_COMBO_STUN_LENGTH = 25, SLASH_REFUND_TIME = 5;
   private static final float SLASH_RANGE = 1.0f, SLASH_ANGLE = 120f, SLASH_SEGMENT_DISTANCE=5f, SLASH_IMPULSE = 0.525f, SLASH_COMBO_IMPULSE = 1.05f;
-  private static final int COUNTER_COOLDOWN_LENGTH = 50, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 35, COUNTER_IMPACT = 2, COUNTER_MIN_STUN = 5;
+  private static final int COUNTER_COOLDOWN_LENGTH = 50, COUNTER_ACTIVE_LENGTH = 7, COUNTER_LAG_LENGTH = 38, COUNTER_IMPACT = 2, COUNTER_MIN_STUN = 5;
   private static final float COUNTER_MULTIPLIER = 1.5f, COUNTER_ANGLE = 45f, COUNTER_SEGMENT_DISTANCE=5f, COUNTER_RANGE = 1.25f, COUNTER_MIN_KNOCK = 0.55f;
   private static final int TAUNT_COOLDOWN_LENGTH = 60;
   
@@ -126,6 +126,8 @@ public class Quad extends Player {
         mob.knockback(normal.scale(isCombo?SLASH_COMBO_IMPULSE:SLASH_IMPULSE), this);
         combo++; comboTimer = SLASH_COMBO_DEGEN;
         effects.add(isCombo?"cht":"sht");
+        effects.add("rfd");
+        slashCooldown -= SLASH_REFUND_TIME;
       }
       
       if(combo > SLASH_COMBO_LENGTH) { combo = SLASH_COMBO_LENGTH; }

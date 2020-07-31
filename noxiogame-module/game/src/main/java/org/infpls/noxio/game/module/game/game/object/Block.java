@@ -28,8 +28,8 @@ public class Block extends Player {
     }
   }
   
-  private static final int REST_COOLDOWN_LENGTH = 15, REST_STUN_LENGTH = 45, REST_SLEEP_LENGTH = 99, REST_IMPACT = 3;
-  private static final int POUND_COOLDOWN_LENGTH = 38, POUND_STUN_LENGTH = 25, POUND_CHANNEL_TIME = 11, POUND_HIT_DELAY = 4, POUND_HITBOX_TIME = 2;
+  private static final int REST_COOLDOWN_LENGTH = 15, REST_STUN_LENGTH = 45, REST_SLEEP_LENGTH = 75, REST_IMPACT = 3, REST_REFUND_TIME = 30;
+  private static final int POUND_COOLDOWN_LENGTH = 38, POUND_STUN_LENGTH = 28, POUND_CHANNEL_TIME = 11, POUND_HIT_DELAY = 4, POUND_HITBOX_TIME = 2;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float REST_IMPULSE = 2.55f, POUND_DASH_IMPULSE = 0.5f, POUND_IMPULSE = 0.225f, POUND_POPUP = 0.175f, POUND_RADIUS = 0.425f, POUND_OFFSET = 0.33f;
   
@@ -82,6 +82,7 @@ public class Block extends Player {
     if(restCooldown <= 0) {
       restCooldown = REST_COOLDOWN_LENGTH;
       effects.add("atk");
+      sleep();
       
       final List<Mobile> hits = hitTest(position, getRadius());
       for(int i=0;i<hits.size();i++) {
@@ -92,10 +93,10 @@ public class Block extends Player {
         mob.knockback(normal.scale(REST_IMPULSE), this);
         effects.add("crt");
         effects.add("rht");
+        effects.add("rfd");
+        channelTimer -= REST_REFUND_TIME;
         cameraShake(Mobile.CameraShake.HEAVY);
       }
-      
-      sleep();
     }
   }
   

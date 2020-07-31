@@ -265,6 +265,15 @@ public abstract class NoxioGame {
       }
     }
     
+    /* CUB_x :: Cube.java */
+    for(Cube.Permutation perm : Cube.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Cube po = new Cube(this, createOid(), pos, perm, team);
+        po.setColor(color);
+        return po;
+      }
+    }
+    
     /* INF_x :: Inferno.java */
     for(Inferno.Permutation perm : Inferno.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
