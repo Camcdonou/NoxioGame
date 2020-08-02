@@ -22,8 +22,8 @@ public class Cube extends Player {
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30, BLIP_REFUND_POWER = 5;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float BLIP_IMPULSE = 0.875f, BLIP_RADIUS = 0.6f;
-  private static final int BOMB_COOLDOWN_LENGTH = 10, BOMB_POWER_MAX =  120, BOMB_POWER_COST = 60, BOMB_STUN_TIME = 30, BOMB_FUSE_LENGTH = 50;
-  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .415f;
+  private static final int BOMB_COOLDOWN_LENGTH = 15, BOMB_POWER_MAX =  100, BOMB_POWER_COST = 50, BOMB_STUN_TIME = 65, BOMB_FUSE_LENGTH = 40, BOMB_HITBOX_DURATION = 5;
+  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .455f;
   
   private int blipCooldown, blipPower, bombCooldown, bombPower;
   private final List<Bomblet> bombs;
@@ -59,10 +59,9 @@ public class Cube extends Player {
     
     for(int i=0;i<bombs.size();i++) {
       final Bomblet b = bombs.get(i);
-      if(--b.time <= 0) {
-        bombs.remove(b);
+      if(--b.fuse <= 0) {
+        if(--b.active <= 0) { bombs.remove(b); i--; }
         detonate(b);
-        i--;
       }
     }
   }
@@ -96,7 +95,7 @@ public class Cube extends Player {
       bombPower -= BOMB_POWER_COST;
       
       effects.add("bmb");
-      bombs.add(new Bomblet(position.copy(), BOMB_FUSE_LENGTH));
+      bombs.add(new Bomblet(position.copy(), BOMB_FUSE_LENGTH, BOMB_HITBOX_DURATION));
     }
   }
   
@@ -106,6 +105,8 @@ public class Cube extends Player {
     for(int i=0;i<hits.size();i++) {
       final Mobile mob = hits.get(i);
       final Vec2 normal = mob.getPosition().subtract(bomb.position).normalize();
+      if(bomb.hits.contains(mob)) { continue; }
+      bomb.hits.add(mob);
       if(mob != this) {
         mob.stun(BOMB_STUN_TIME, cubePermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
         mob.knockback(normal.scale(BOMB_IMPULSE), this);
@@ -134,10 +135,13 @@ public class Cube extends Player {
   
   private class Bomblet {
     public final Vec2 position;
-    public int time;
-    public Bomblet(Vec2 position, int time) {
+    public int fuse, active;
+    public List<Mobile> hits;
+    public Bomblet(Vec2 position, int fuse, int active) {
       this.position = position;
-      this.time = time;
+      this.fuse = fuse;
+      this.active = active;
+      this.hits = new ArrayList();
     }
   }
 }
