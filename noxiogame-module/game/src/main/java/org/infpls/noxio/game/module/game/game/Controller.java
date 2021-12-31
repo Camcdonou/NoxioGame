@@ -15,8 +15,8 @@ final public class Controller {
   private int team;                 // Team this player is on, -1 if no teams.
   private GameObject object;        // Object this controller is controlling
   
-  private Vec2 direction;           // Player movement direction
-  private float speed;              // Player movement speed
+  private Vec2 to;                  // Player mouse position in world coordinates
+  private boolean move;           // True if player is holding down move button
   private final List<String> action;
   
   private int respawnTimer;
@@ -38,7 +38,7 @@ final public class Controller {
     sid = player.getSessionId();
     user = player.getUserData();
     
-    direction = new Vec2(0.0f, 1.0f); speed = 0.0f;
+    to = new Vec2(0.0f, 0.0f); move = false;
     action = new ArrayList();
 
     respawnTimer = 0;
@@ -109,14 +109,13 @@ final public class Controller {
   /* Handles i00->01 */
   private void inputMouseNeutral(final Queue<String> q) {
     final Vec2 pos = Parse.vec2(q.remove());
-    direction = pos.normalize(); speed = 0.0f;
+    to = pos; move = false;
   }
   
   /* Handles i00->04 */
   private void inputMouse(final Queue<String> q) {
     final Vec2 pos = Parse.vec2(q.remove());
-    final float spd = Parse.f(q.remove());
-    direction = pos.normalize(); speed = Math.min(Math.max(spd, 0.33f), 1.0f);
+    to = pos; move = true;
   }
   
   /* Handles i00->05 */
@@ -153,7 +152,7 @@ final public class Controller {
       if(!object.alive()) { objectDead(); return; }
       if(object.is(GameObject.Types.PLAYER)) {
         Player p = (Player)object;
-        p.setInput(direction, speed);
+        p.setInput(to, move);
         for(int i=0;i<action.size();i++) { p.queueAction(action.get(i)); }
         action.clear();
       }

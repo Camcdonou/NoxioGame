@@ -49,6 +49,7 @@ public class Quad extends Player {
     /* Settings */
     radius = 0.5f; weight = 0.9f; friction = 0.705f;
     moveSpeed = 0.0355f; jumpHeight = 0.175f;
+    recoveryJumpHeight = RECOVERY_JUMP_HEIGHT + 0.075f;
     
     /* Timers */
     combo = 0;

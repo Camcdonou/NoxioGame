@@ -27,6 +27,7 @@ public final class Vec2 {
   public Vec2 rotate(final float angle) { float cos = (float)Math.cos(angle); float sin = (float)Math.sin(angle); return new Vec2((x*cos)+(y*sin), (x*-sin)+(y*cos)); }
   public boolean equals(final Vec2 b) { return x == b.x && y == b.y; }
   public Vec2 copy() { return new Vec2(x, y); } /* @TODO: Does not need to exist since Vec2 is final */
+  public Vec3 concat(final float z) { return new Vec3(x, y, z); }
   
   @Override
   public String toString() { return x + "," + y; }

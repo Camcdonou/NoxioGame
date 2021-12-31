@@ -23,9 +23,11 @@ public class Cube extends Player {
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float BLIP_IMPULSE = 0.875f, BLIP_RADIUS = 0.6f;
   private static final int BOMB_COOLDOWN_LENGTH = 15, BOMB_POWER_MAX =  100, BOMB_POWER_COST = 50, BOMB_STUN_TIME = 65, BOMB_FUSE_LENGTH = 40, BOMB_HITBOX_DURATION = 5;
-  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .455f;
+  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .55f;
+  private static final float BOMB_VECTOR_RATE = 0.03f;
+  private static final int BOMB_VECTOR_LENGTH = 25;
   
-  private int blipCooldown, blipPower, bombCooldown, bombPower;
+  private int blipCooldown, blipPower, bombCooldown, bombPower, bombVectorTimer;
   private final List<Bomblet> bombs;
   private final Permutation cubePermutation;
   public Cube(final NoxioGame game, final int oid, final Vec2 position, final Permutation perm) {
@@ -45,7 +47,20 @@ public class Cube extends Player {
     
     /* Timers */
     blipCooldown = 0; bombCooldown = 0;
+    bombVectorTimer = 0;
     blipPower = BLIP_POWER_MAX; bombPower = BOMB_POWER_MAX;
+  }
+  
+  @Override
+  public void movement() {
+    super.movement();
+    
+    if(speed > 0.05) {
+      float r = BOMB_VECTOR_RATE*(bombVectorTimer/BOMB_VECTOR_LENGTH);
+      Vec2 mix = look.normalize().lerp(velocity.normalize(), r);
+
+      setVelocity(mix.scale(velocity.magnitude())); // Greater control for a moment after recovery jump
+    }
   }
   
   /* Updates various timers */
@@ -79,6 +94,13 @@ public class Cube extends Player {
         mob.knockback(normal.scale(BLIP_IMPULSE*(((blipPower/BLIP_POWER_MAX)*0.5f)+0.5f)), this);
       }
       
+//      for(int i=0;i<bombs.size();i++) {
+//        final Bomblet bmb = bombs.get(i);
+//        if(position.distance(bmb.position) <= BLIP_RADIUS + BOMB_RADIUS) {
+//          bmb.fuse = 0;
+//        }
+//      }
+      
       blipPower = 0;
       effects.add("atk");
       for(int i=0;i<hits.size();i++) {
@@ -111,12 +133,17 @@ public class Cube extends Player {
         mob.stun(BOMB_STUN_TIME, cubePermutation.hits[0], this, Mobile.CameraShake.MEDIUM);
         mob.knockback(normal.scale(BOMB_IMPULSE), this);
         mob.popup(BOMB_POPUP, this);
+        impact(1);
       }
-      else { // No self stun or kill credit on bomb jump
+      else { // No self stun or kill credit on bomb jump, also launches you in the direction you are already going
         effects.add(cubePermutation.hits[0].id);
-        cameraShake(CameraShake.MEDIUM);
-        mob.knockback(normal.scale(BOMB_IMPULSE));
-        mob.popup(BOMB_POPUP);
+        cameraShake(CameraShake.LIGHT);
+        if(velocity.magnitude() > 0.05) {
+          mob.knockback(velocity.normalize().scale(BOMB_IMPULSE*0.5f));
+        }
+        mob.popup(BOMB_POPUP*2.0f);
+        bombVectorTimer = BOMB_VECTOR_LENGTH;
+        impact(1);
         drop();
       }
     }

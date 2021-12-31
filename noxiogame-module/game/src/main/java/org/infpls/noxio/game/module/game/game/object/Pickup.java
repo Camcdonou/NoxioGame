@@ -46,11 +46,6 @@ public abstract class Pickup extends Mobile {
   }
   
   @Override
-  public void post() {
-    effects.clear();
-  }
-  
-  @Override
   /* Player GameObject parameters:
      obj;<int oid>;<vec2 pos>;<vec2 vel>;<float height>;<float vspeed>;<string[] effects>
   */

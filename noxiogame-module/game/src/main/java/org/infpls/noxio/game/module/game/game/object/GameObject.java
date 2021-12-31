@@ -53,7 +53,7 @@ public abstract class GameObject {
   public final boolean is(final int flag) { return (bitIs & flag) == flag; }
   public abstract String type();
   public final int color() { return color; }
-  public final void setColor(int c) { color = c; }
+  public void setColor(int c) { color = c; }
   
   public final Vec2 getPosition() { return position; }
   public final Vec2 getVelocity() { return velocity; }

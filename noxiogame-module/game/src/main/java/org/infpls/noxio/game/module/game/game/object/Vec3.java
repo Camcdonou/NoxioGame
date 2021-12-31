@@ -17,6 +17,7 @@ public final class Vec3 {
   public float magnitude() { return (float)(Math.sqrt((x*x)+(y*y)+(z*z))); }
   public boolean equals(final Vec3 b) { return x == b.x && y == b.y && z == b.z; }
   public Vec3 copy() { return new Vec3(x, y, z); } /* @TODO: Does not need to exist since Vec3 is final */
+  public Vec2 trunc() { return new Vec2(x, y); }
   
   @Override
   public String toString() { return x + "," + y + "," + z; }

@@ -38,6 +38,7 @@ public class LobbyDao {
     cleanUp();
     List<GameLobbyInfo> info = new ArrayList();
     for(int i=0;i<lobbies.size();i++) {
+      if(lobbies.get(i).isPrivate) { continue; }
       info.add(lobbies.get(i).getInfo());
     }
     return info;
@@ -47,6 +48,16 @@ public class LobbyDao {
     cleanUp();
     for(int i=0;i<lobbies.size();i++) {
       if(lobbies.get(i).getLid().equals(lid)) {
+        return lobbies.get(i);
+      }
+    }
+    return null;
+  }
+  
+  public GameLobby getLobbyByName(final String lobbyName) {
+    cleanUp();
+    for(int i=0;i<lobbies.size();i++) {
+      if(lobbies.get(i).getInfo().getName().trim().equals(lobbyName.trim())) {
         return lobbies.get(i);
       }
     }

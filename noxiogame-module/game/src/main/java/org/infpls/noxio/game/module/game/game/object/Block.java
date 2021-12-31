@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.game.*;
+import org.infpls.noxio.game.module.game.util.Intersection;
 
 public class Block extends Player {
   public static enum Permutation {
@@ -32,6 +33,7 @@ public class Block extends Player {
   private static final int POUND_COOLDOWN_LENGTH = 38, POUND_STUN_LENGTH = 28, POUND_CHANNEL_TIME = 11, POUND_HIT_DELAY = 4, POUND_HITBOX_TIME = 2;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
   private static final float REST_IMPULSE = 2.55f, POUND_DASH_IMPULSE = 0.5f, POUND_IMPULSE = 0.225f, POUND_POPUP = 0.175f, POUND_RADIUS = 0.425f, POUND_OFFSET = 0.33f;
+  private static final float POUND_RECOVERY_DAMPEN = 0.35f, POUND_RECOVERY_UP = 0.315f;
   
   private List<Mobile> activeHit; // Objects hit by active pound hitbox
   private Vec2 poundDirection;
@@ -70,6 +72,7 @@ public class Block extends Player {
     if(hitboxTimer > 0) { hitboxTimer--; pounding(); }
     if(channelSleep && channelTimer <= 0) { wake(); }
     if(channelPound && channelTimer <= 0) { poundDash(); }
+    if(channelPound) { poundChannel(); }
     if(delayTimer > 0) { delayTimer--; }
     if(delayPound && delayTimer <= 0) { pound(); }
     if(restCooldown > 0) { restCooldown--; }
@@ -79,7 +82,7 @@ public class Block extends Player {
 
   @Override   /* Rest */
   public void actionA() {
-    if(restCooldown <= 0) {
+    if(restCooldown <= 0 && !isRecovery) {
       restCooldown = REST_COOLDOWN_LENGTH;
       effects.add("atk");
       sleep();
@@ -102,12 +105,17 @@ public class Block extends Player {
   
   @Override   /* Pound */
   public void actionB() {
-    if(poundCooldown <= 0) {
+    if(poundCooldown <= 0 && !isRecovery) {
       poundCooldown = POUND_COOLDOWN_LENGTH;
       effects.add("mov");
       channelPound = true;
       channelTimer = POUND_CHANNEL_TIME;
     }
+  }
+  
+  /* Channeling before dash */
+  public void poundChannel() {
+    setVSpeed(getVSpeed() * POUND_RECOVERY_DAMPEN);
   }
   
   /* The dash of pound */
@@ -116,6 +124,11 @@ public class Block extends Player {
     channelPound = false;
     drop();
     setVelocity(velocity.add(look.scale(POUND_DASH_IMPULSE)));
+    
+    final List<Polygon> floors = game.map.getNearFloors(position, radius);
+    boolean overFloor = collideFloors(position, floors);
+    if(height < 0 || !collideFloors(position, floors)) { popup(POUND_RECOVERY_UP); }
+    
     delayPound = true;
     delayTimer = POUND_HIT_DELAY;
     poundDirection = look;
@@ -180,6 +193,20 @@ public class Block extends Player {
     delayPound = false;
     delayTimer = 0;
     poundCooldown = 0;
+  }
+  
+  /* This fuction is simple and just returns a boolean true/false if the object is over solid ground */
+  private boolean collideFloors(final Vec2 pos, final List<Polygon> floors) {
+    for(int i=0;i<floors.size();i++) {
+      if(Intersection.pointInPolygon(position, floors.get(i))) {
+        return true;
+      }
+      else {
+        final Intersection.Instance inst = Intersection.polygonCircle(pos, floors.get(i), radius);
+        if(inst != null && inst.distance < (radius*0.5)) { return true; }
+      }
+    }
+    return false;
   }
   
   @Override

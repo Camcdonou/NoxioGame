@@ -9,6 +9,7 @@ echo [-- Copy Assets --]
 rm -r /home/inferno/dev/NoxioGame/noxiogame-core/src/main/resources/map
 cp -r /home/inferno/dev/NoxioAsset/asset/map/min /home/inferno/dev/NoxioGame/noxiogame-core/src/main/resources
 mv /home/inferno/dev/NoxioGame/noxiogame-core/src/main/resources/min /home/inferno/dev/NoxioGame/noxiogame-core/src/main/resources/map
+cp /home/inferno/dev/NoxioAsset/asset/map/cache.dat /home/inferno/dev/NoxioGame/noxiogame-core/src/main/resources/cache.dat
 
 echo [-- Build WAR --]
 mvn clean install

@@ -43,6 +43,7 @@ public class Lobby extends SessionState {
         case "b02" : { close(); break; }
         case "b03" : { createLobby(gson.fromJson(data, PacketB03.class)); break; }
         case "b04" : { joinLobby(gson.fromJson(data, PacketB04.class)); break; }
+        case "b06" : { joinLobbyByName(gson.fromJson(data, PacketB06.class)); break; }
         case "b11" : { joinLobbyAuto(gson.fromJson(data, PacketB11.class)); break; }
         default : { /*close("Invalid data: " + p.getType()); */ break; }   /* @TODO: commented out to prevent game kick -> i00 packet error */
       }
@@ -91,6 +92,18 @@ public class Lobby extends SessionState {
   
   private void joinLobby(PacketB04 p) throws IOException {
     GameLobby gl = lobbyDao.getLobby(p.getLid());
+    if(gl != null) {
+      session.joinGame(gl);
+    }
+    else {
+      sendPacket(new PacketB05("Failed to join lobby."));
+    }
+  }
+  
+    private void joinLobbyByName(PacketB06 p) throws IOException {
+    if(p.getLobbyName() == null) { sendPacket(new PacketB05("Failed to join lobby.")); }
+    
+    GameLobby gl = lobbyDao.getLobbyByName(p.getLobbyName());
     if(gl != null) {
       session.joinGame(gl);
     }

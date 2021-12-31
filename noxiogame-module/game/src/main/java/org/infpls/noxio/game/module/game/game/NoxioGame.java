@@ -197,8 +197,9 @@ public abstract class NoxioGame {
   
   /* Returns controller for given Object */
   public Controller getControllerByObject(final GameObject obj) {
+    final GameObject o = obj instanceof PolyBit ? ((PolyBit)obj).owner : obj;
     for(int i=0;i<controllers.size();i++) {
-      if(controllers.get(i).getControlled() == obj) {
+      if(controllers.get(i).getControlled() == o) {
         return controllers.get(i);
       }
     }
@@ -269,6 +270,24 @@ public abstract class NoxioGame {
     for(Cube.Permutation perm : Cube.Permutation.values()) {
       if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
         final Cube po = new Cube(this, createOid(), pos, perm, team);
+        po.setColor(color);
+        return po;
+      }
+    }
+    
+    /* PLY_x :: Poly.java */
+    for(Poly.Permutation perm : Poly.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Poly po = new Poly(this, createOid(), pos, perm, team);
+        po.setColor(color);
+        return po;
+      }
+    }
+    
+    /* XOB_x :: Xob.java */
+    for(Xob.Permutation perm : Xob.Permutation.values()) {
+      if(perm.name().equalsIgnoreCase(id) && c.user.unlocks.has(perm.unlock)) {
+        final Xob po = new Xob(this, createOid(), pos, perm, team);
         po.setColor(color);
         return po;
       }

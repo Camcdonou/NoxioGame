@@ -1,8 +1,13 @@
 package org.infpls.noxio.game.module.game.game;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
+import org.infpls.noxio.game.module.game.session.Packet;
 import org.infpls.noxio.game.module.game.util.*;
 
 public class NoxioMap {
@@ -22,10 +27,14 @@ public class NoxioMap {
   private final List<Polygon> floor;  // Floor collision data
   private final List<Polygon> wall;   // Wall collision data
   
-  private final String cache;         // Asset cache for client
+  private String cache;         // Asset cache for client
   
   public NoxioMap(final String mapName) throws IOException {
-    final String data = Scung.readFile("map/" + mapName + ".map").replaceAll("\\n", "");
+    this(mapName, Scung.readFile("map/" + mapName + ".map").replaceAll("\\n", ""));
+  }
+  
+  public NoxioMap(final String mapName, final String data) throws IOException {
+
     final String[] fields = data.split("\\|");
     
     /* Field#0 - Info */
@@ -244,5 +253,64 @@ public class NoxioMap {
     public int getTeam() { return team; }
     public Vec2 getPos() { return pos; }
     public String[] getGametype() { return gametype; }
+  }
+  
+  /* Loads map and caches it. Will check the mapstore on nxc and load from there as well. */
+  public static final List<NoxioMap> CACHE = new ArrayList();
+  public static List<NoxioMap> GET() {
+    return CACHE;
+  }
+  public static synchronized NoxioMap GET(String map) {
+      for(int i=0;i<CACHE.size();i++) {
+        final NoxioMap c = CACHE.get(i);
+        if(c.getFile().equals(map)) {
+          return c;
+        }
+      }
+      
+      if(Scung.exists("map/" + map + ".map")) {
+        try {
+          final NoxioMap m = new NoxioMap(map);
+          CACHE.add(m);
+          return m;
+        }
+        catch(IOException ex) {
+          Oak.log(Oak.Type.GAME, Oak.Level.ERR, "Error parsing map file: " + map, ex);
+        }
+      }
+      
+      /* @TODO: this is blocking but it's probably okay. research and decide. */
+      /* @TODO: move this type of get to a static class? */
+      /* @FIXME also the app name is hardcoded here, make that a prop later. */
+      try {
+        final String address = "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/file/map/" + map;
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(address);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        while ((line = rd.readLine()) != null) {
+           result.append(line);
+        }
+        rd.close();
+        conn.disconnect();
+        
+        final NoxioMap n = new NoxioMap(map, result.toString());
+        
+        // Since this is a custom map it's not compiled fully so we add cache.dat on the fly.
+        final String[] datc = Scung.readFile("cache.dat").split(";");
+        final String[] mapc = n.cache.split(";");
+        n.cache = mapc[0] + "," + datc[0] + ";" + mapc[1] + "," + datc[1] + ";" + mapc[2] + "," + datc[2] + ";";
+        
+        //CACHE.add(n); /* Don't cache custom maps. Users need to be able to overwrite them in prod and update them on the fly. */
+        /* @TODO: really should improve this though to make it less aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa, maybe have nxc send a 'invalidate cache' packet to nxg */
+        return n;
+      }
+      catch(IOException ex) {
+        Oak.log(Oak.Type.GAME, Oak.Level.ERR, "Error parsing/downloading map file: " + map, ex);
+      }
+      
+      return null;
   }
 }

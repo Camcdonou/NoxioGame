@@ -3,6 +3,7 @@ package org.infpls.noxio.game.module.game.game.object;
 import java.util.*;
 import org.infpls.noxio.game.module.game.game.Controller;
 import org.infpls.noxio.game.module.game.game.NoxioGame;
+import static org.infpls.noxio.game.module.game.game.object.Pickup.RESET_COOLDOWN_TIME;
 import org.infpls.noxio.game.module.game.util.Intersection;
 import org.infpls.noxio.game.module.game.util.Intersection.Instance;
 
@@ -34,7 +35,7 @@ public abstract class Mobile extends GameObject {
   protected Controller tagged;
   protected int tagTime;
   
-  protected float radius, weight, friction;
+  protected float radius, weight, friction, springyness;
   
   public float height;
   private float vspeed;
@@ -53,31 +54,19 @@ public abstract class Mobile extends GameObject {
     effects = new ArrayList();
     
     /* Settings */
-    radius = 0.5f; weight = 1.0f; friction = 0.725f;
+    radius = 0.5f; weight = 1.0f; friction = 0.725f; springyness = 1.0f;
     
     /* States */
     height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false; immune = false; invulnerable = false;
   }
+    
+  @Override
+  public void post() {
+    postPhysics();
+    effects.clear();
+  }
   
   protected void physics() {
-    /* -- Objects -- */
-    if(!intangible) {                                                            // Ignore if intangible
-      for(int i=0;i<game.objects.size();i++) {
-        final GameObject obj = game.objects.get(i);
-        if(obj != this && obj.is(Types.MOBILE)) {                                // Object must be something physical (IE a barrel or a pillar or a player)
-          final Mobile mob = (Mobile)obj;
-          final float combinedRadius = radius+mob.getRadius();
-          if(!mob.intangible && position.distance(mob.getPosition()) < combinedRadius && Math.abs(getHeight()-mob.getHeight()) < combinedRadius) {
-            final float dist = position.distance(obj.getPosition());
-            final Vec2 norm = position.subtract(obj.getPosition()).normalize();
-            final float weightOffset = weight/(mob.getWeight()+weight);
-            final Vec2 push = norm.scale((0.5f*weightOffset)*((combinedRadius-dist)/combinedRadius));
-            setVelocity(velocity.add(push));
-            game.reportTouch(this, mob);
-          }
-        }
-      }
-    }
     /* -- Movement  -- */
     final Vec2 to = position.add(velocity);
     final List<Polygon> walls = game.map.getNearWalls(position, radius + velocity.magnitude());
@@ -153,6 +142,30 @@ public abstract class Mobile extends GameObject {
     else {                                                  // No friction while moving airborne, but air drag is accounted.
       float ratio = Math.max(Math.min(velocity.magnitude()/VELOCITY_SOFTCAP, 1.f), 0.f);
       setVelocity(velocity.scale((friction*ratio)+(AIR_DRAG*(1.f-ratio))));
+    }
+  }
+  
+  /* Noteworthy change, this was originally processed at the same time as physics() but that causes step ordering issues (push varied by object order in array) */
+  /* This is now calculated at the end of a frame instead to prevent array order physics step issues */
+  public void postPhysics() {
+    /* -- Objects -- */
+    if(!intangible) {                                                            // Ignore if intangible
+      for(int i=0;i<game.objects.size();i++) {
+        final GameObject obj = game.objects.get(i);
+        if(obj != this && obj.is(Types.MOBILE)) {                                // Object must be something physical (IE a barrel or a pillar or a player)
+          final Mobile mob = (Mobile)obj;
+          final float combinedRadius = radius+mob.getRadius();
+          if(!mob.intangible && position.distance(mob.getPosition()) < combinedRadius && Math.abs(getHeight()-mob.getHeight()) < combinedRadius) {
+            final float dist = position.distance(obj.getPosition());
+            final Vec2 norm = position.subtract(obj.getPosition()).normalize();
+            final float weightOffset = mob.getWeight()/weight;
+            final float pushForce = 0.5f * mob.springyness;
+            final Vec2 push = norm.scale((pushForce*weightOffset)*((combinedRadius-dist)/combinedRadius));
+            setVelocity(velocity.add(push));
+            game.reportTouch(this, mob);
+          }
+        }
+      }
     }
   }
   

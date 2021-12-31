@@ -8,11 +8,15 @@ import org.infpls.noxio.game.module.game.util.Oak;
 public abstract class Player extends Mobile {
   private static final int TAG_CREDIT_GRACE_PERIOD = 300;
   protected static final float VERTICAL_HIT_TEST_LENIENCY = 1.25f;
-  protected static final float AIR_CONTROL = 0.2f, MULTI_JUMP_DAMPEN = 0.2f;
+  protected static final float AIR_CONTROL = 0.2f, MULTI_JUMP_DAMPEN = 0.125f;
   protected static final float TOSS_IMPULSE = 0.3f, TOSS_POPUP = 0.15f;
+  protected static final float JUMP_HEIGHT = 0.175f, RECOVERY_JUMP_HEIGHT = 0.5f, RECOVERY_START_HEIGHT = -0.125f, RECOVERY_END_HEIGHT = -2.75f, RECOVERY_DAMPEN = 0.4f, RECOVERY_DI = 0.075f;
+  protected static final int RECOVERY_CHANNEL_LENGTH = 4;
   
   protected boolean jumped;                  // Flags a jump so players can only jump once, either off the ground or mid air
-  protected float moveSpeed, jumpHeight;
+  protected boolean isRecovery;              // Waits for impact to end then sends a recover jump start effect
+  protected float moveSpeed, jumpHeight, recoveryJumpHeight;
+  protected boolean doomed;                      // Dies on next step that isn't impacted
   
   protected Vec2 look;                       // Normalized direction player is facing
   protected float speed;                     // Current scalar of max movement speed <0.0 to 1.0>
@@ -38,10 +42,14 @@ public abstract class Player extends Mobile {
     
     /* Settings */
     radius = 0.5f; weight = 1.0f; friction = 0.725f;
-    moveSpeed = 0.0375f; jumpHeight = 0.175f;
+    moveSpeed = 0.0375f; jumpHeight = JUMP_HEIGHT;
+    recoveryJumpHeight = RECOVERY_JUMP_HEIGHT;
     
     /* State */
     objective = false;
+    jumped = false;
+    isRecovery = false;
+    doomed = false;
     
     /* Timers */
     stunTimer = 0;
@@ -51,9 +59,14 @@ public abstract class Player extends Mobile {
   }
   
   /* Sets player inputs. These will be processed on the next step() */
-  public void setInput(final Vec2 dir, final float s) {
+  public void setInput(final Vec2 to, final boolean move) {
     if(stunTimer > 0) { speed = 0; return; }
-    speed = s;
+    final Vec2 dir = to.subtract(position).normalize();
+    final float dist = position.distance(to);
+    
+    if(!move || dist < 0.1f || Float.isNaN(dist)) { speed = 0f; }
+    else { speed = Math.min(Math.max(dist, 0.33f), 1.0f); }
+    
     if(!dir.isNaN()) { look = dir; }
   }
   
@@ -86,11 +99,12 @@ public abstract class Player extends Mobile {
     action.clear();
   }
   
-  
-  
   /* Updates various timers */
   public void timers() {
-    if(stunTimer > 0) { stunTimer--; }
+    if(stunTimer > 0 && height < 0 && this.game.getFrame() % 2 == 0) { stunTimer -= 2; }
+    else if(stunTimer > 0) { stunTimer--; }
+    if(channelTimer <= 0 && isRecovery) { recoveryJump(); }
+    if(channelTimer > 0 && isRecovery) { recovery(); }
     if(channelTimer > 0) { channelTimer--; }
     if(tauntCooldown > 0) { tauntCooldown--; }
   }
@@ -98,6 +112,7 @@ public abstract class Player extends Mobile {
   @Override
   public void step() {
     if(impactTimer > 0) { impactTimer--; return; }
+    if(doomed) { destroyx(); return; }
     if(alive()){ movement(); }   // Apply player movement input
     physics();                   // Object physics and collision
     if(alive()){ actions(); }    // Perform action
@@ -137,11 +152,6 @@ public abstract class Player extends Mobile {
     p.dropped();
     p.setVelocity(velocity.scale(0.5f));
   }
-
-  @Override
-  public void post() {
-    effects.clear();
-  }
    
   @Override
   /* Player GameObject parameters:
@@ -171,25 +181,44 @@ public abstract class Player extends Mobile {
   
   public void jump() {
     if(jumped) { return; }
-    if(grounded) {
+    if(grounded) {                               // Normal grounded jump
       popup(jumpHeight);
+      effects.add("jmp");
     }
-    else {
+    else if(height > RECOVERY_START_HEIGHT) {    // Normal air jump 
       setVSpeed(getVSpeed()*MULTI_JUMP_DAMPEN);
       popup(jumpHeight);
       effects.add("air");
+      effects.add("jmp");
+    }
+    else {                                       // Recovery jump from below stage
+      isRecovery = true;
+      channelTimer = RECOVERY_CHANNEL_LENGTH;
+      effects.add("rcv");
     }
     jumped = true;
-    effects.add("jmp");
+  }
+  
+  public void recovery() {
+    setVSpeed(getVSpeed()*RECOVERY_DAMPEN);
+    setVelocity(velocity.scale(RECOVERY_DAMPEN));
+  }
+  
+  public void recoveryJump() {
+    isRecovery = false;
+    float r = (float)Math.pow(Math.min(RECOVERY_START_HEIGHT, Math.max(RECOVERY_END_HEIGHT, height)) / RECOVERY_END_HEIGHT, 0.8f); // This calculation is flawed but ' close enough '
+    popup((jumpHeight*(1f-r)) + (recoveryJumpHeight*r));
+    setVelocity(look.scale(RECOVERY_DI));
+    effects.add("rcvj");
   }
   
   /* Flags this player as an objective */
-  public final void objective() {
+  public void objective() {
     objective = true;
   }
   
   /* Removes objective status from this player */
-  public final void dejective() {
+  public void dejective() {
     objective = false;
   }
   
@@ -238,6 +267,8 @@ public abstract class Player extends Mobile {
     impact(impact);
     cameraShake(shake);
     stunTimer = time;
+    channelTimer = 0;
+    isRecovery = false;
   }
   
   public void impact(int time) {
@@ -255,6 +286,8 @@ public abstract class Player extends Mobile {
     dead = true;
     drop();
     game.reportKill(tagTime-game.getFrame()<=TAG_CREDIT_GRACE_PERIOD?tagged:null, this);
+    // Hacky shit. really should not be doing it this way
+    if(tagged != null && tagTime-game.getFrame()<=TAG_CREDIT_GRACE_PERIOD && tagged.getControlled() != null && tagged.getControlled().is(GameObject.Types.PLAYER)) { ((Player)(tagged.getControlled())).killCredit(this); }
     tagged = null;
   }
   
@@ -264,6 +297,14 @@ public abstract class Player extends Mobile {
     if(alive()) { effects.add("xpl"); }
     kill();
     destroyed = true;
+  }
+  
+  public void doom() {
+    doomed = true;
+  }
+  
+  public void killCredit(Player player) {
+    
   }
   
   public Pickup getHolding() { return holding; }

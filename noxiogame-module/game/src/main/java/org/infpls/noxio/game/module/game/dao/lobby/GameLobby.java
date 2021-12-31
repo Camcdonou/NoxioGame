@@ -153,6 +153,7 @@ public abstract class GameLobby {
   protected final String lid; //Lobby ID
   
   protected final String name;
+  public final boolean isPrivate;
   
   private final boolean randomize;
   
@@ -176,6 +177,7 @@ public abstract class GameLobby {
     
     name = settings.get("game_name", "Default Name");
     maxPlayers = settings.get("max_players", 6, 2, 64);
+    isPrivate  = settings.get("private", 0, 0, 1)==1;
     randomize = settings.get("randomize", 0, 0, 1)==1;
     
     players = new ArrayList();
@@ -205,7 +207,7 @@ public abstract class GameLobby {
       final String[] spl = mapName.split(",");
       mapName = spl[(int)(Math.random()*spl.length)];
     }
-    final NoxioMap map = new NoxioMap(mapName);
+    final NoxioMap map = NoxioMap.GET(mapName);
     switch(gametype.toLowerCase()) {
       case "deathmatch" : { game = new Deathmatch(this, map, gs); break; }
       case "elimination" : { game = new Elimination(this, map, gs); break; }

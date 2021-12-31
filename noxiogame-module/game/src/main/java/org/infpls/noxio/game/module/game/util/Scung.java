@@ -9,10 +9,18 @@ import org.springframework.core.io.Resource;
 
 public class Scung {
   
+  public static boolean exists(final String path) {
+    return new ClassPathResource(path).exists();
+  }
+  
   /* Reads a file from the classpath and return as a string. Murders new lines */
   public static String readFile(final String path) throws IOException {
     final Resource resource = new ClassPathResource(path);
-    final InputStream in = resource.getInputStream();
+    return readFile(resource);
+  }
+  
+  public static String readFile(final Resource res) throws IOException {
+    final InputStream in = res.getInputStream();
     final BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
     final StringBuilder sb = new StringBuilder();
     String line;
