@@ -9,7 +9,7 @@ public class Score {
       this.id = id;
     }
   }
-  private static final int MULTI_TIMER_LENGTH = 150; // Timer for multikills
+  private static final int MULTI_TIMER_LENGTH = 175; // Timer for multikills
   
   /* Number of credits awareded for various actions */
   private static final int 

@@ -52,6 +52,8 @@ public abstract class NoxioGame {
     
     frame = 0;
     gameOver = false;
+    
+    createMapObjects();
   }
     
   public void handlePackets(final List<GameLobby.InputData> inputs) {
@@ -204,6 +206,52 @@ public abstract class NoxioGame {
       }
     }
     return null;
+  }
+  
+    
+  /* Spawns special objects placed in the map like teleporters or bumpers */
+  public final void createMapObjects() {
+    /* Teleporters */
+    final List<NoxioMap.Spawn> entrances = map.getSpawns("telenter", gametypeId());
+    for(int i=0;i<entrances.size();i++) {
+      final NoxioMap.Spawn ent = entrances.get(i);
+      final List<NoxioMap.Spawn> exits = map.getSpawns("telexit", gametypeId(), ent.getTeam());
+      
+      if(exits.size() > 0) {
+        final Telexit exit = new Telexit(this, createOid(), exits.get(0).getPos());
+        final Telenter entrance = new Telenter(this, createOid(), ent.getPos(), exit);
+        addObject(exit);
+        addObject(entrance);
+      }
+    }
+    
+    /* Voids */
+    final List<NoxioMap.Spawn> voids = map.getSpawns("void", gametypeId());
+    for(int i=0;i<voids.size();i++) {
+      final NoxioMap.Spawn v = voids.get(i);
+      
+      final VoidZone vz = new VoidZone(this, createOid(), v.getPos(), v.getTeam());
+      addObject(vz);
+    }
+    
+    /* Bumper */
+    final List<NoxioMap.Spawn> bumpers = map.getSpawns("bumper", gametypeId());
+    for(int i=0;i<bumpers.size();i++) {
+      final NoxioMap.Spawn bump = bumpers.get(i);
+      
+      final Bumper bumper = new Bumper(this, createOid(), bump.getPos());
+      addObject(bumper);
+    }
+    
+    /* Jumper */
+    final List<NoxioMap.Spawn> jumpers = map.getSpawns("jumper", gametypeId());
+    for(int i=0;i<jumpers.size();i++) {
+      final NoxioMap.Spawn jump = jumpers.get(i);
+      
+      final Jumper jumper = new Jumper(this, createOid(), jump.getPos());
+      addObject(jumper);
+    }
+    
   }
   
   protected abstract boolean spawnPlayer(final Controller c, final Queue<String> q); // Returns true is player is spawned

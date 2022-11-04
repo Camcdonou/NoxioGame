@@ -12,6 +12,7 @@ public abstract class GameObject {
     public static final int HILL =   0b00010000;
     public static final int BOMB =   0b00100000;
     public static final int ZONE =   0b01000000;
+    public static final int MAPOBJ = 0b10000000;
   }
   
   protected final NoxioGame game; /* Parent Game */

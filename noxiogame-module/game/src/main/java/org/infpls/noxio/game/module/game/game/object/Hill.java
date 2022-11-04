@@ -29,10 +29,8 @@ public class Hill extends GameObject {
       final Controller con = game.getControllerByObject(obj);
       if(con != null && obj.is(Types.MOBILE)) {
         final Mobile mob = (Mobile)obj;
-        final boolean inside = Intersection.pointInPolygon(mob.getPosition(), hitbox);
-        final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());
         final int timer = scoreTimers.containsKey(obj.getOid())?scoreTimers.get(obj.getOid()):0;
-        if(inside || inst != null) {
+        if(isInside(mob)) {
           if(timer > TIMER_SCORE_ADJUST) { game.reportObjective(con, obj); scoreTimers.put(obj.getOid(), 1); }
           else { scoreTimers.put(obj.getOid(), timer+1); }
         }
@@ -70,7 +68,7 @@ public class Hill extends GameObject {
   }
   
   public boolean isInside(GameObject obj) {
-    if(!obj.is(Types.MOBILE)) { return false; }
+    if(!obj.is(Types.MOBILE) || obj instanceof PolyBit) { return false; }
     final Mobile mob = (Mobile)obj;
     final boolean inside = Intersection.pointInPolygon(mob.getPosition(), hitbox);
     final Intersection.Instance inst = Intersection.polygonCircle(mob.getPosition(), hitbox, mob.getRadius());

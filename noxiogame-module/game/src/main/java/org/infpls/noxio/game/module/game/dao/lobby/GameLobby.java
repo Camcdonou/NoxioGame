@@ -170,6 +170,7 @@ public abstract class GameLobby {
   private final LobbySettings settings;
   
   private int gameCount;    // Number of times the game has ended and restarted
+  private int overload;     // Counting number of ticks that took a long time (3ms), if this value exceeds 100 we close the lobby by force. Value degrades when running normally
   protected boolean closed; // Clean this shit up!
   public GameLobby(final HttpThread http, final LobbySettings settings) throws IOException {
     lid = Salt.generate();
@@ -187,6 +188,7 @@ public abstract class GameLobby {
     events = new EventSync();
     
     gameCount = 0;
+    overload = 0;
     closed = false;
     
     newGame();
@@ -229,6 +231,8 @@ public abstract class GameLobby {
 
   public void step(final long tick) {
     try {
+      long s = System.currentTimeMillis(); // Start of step
+      
       handleEvents();
       if(game.isResetReady()) {
         newGame();
@@ -247,6 +251,9 @@ public abstract class GameLobby {
       game.generateUpdatePackets(tick);  // Send updates to players
       game.post();                       // Clean up
       
+      long t = s - System.currentTimeMillis(); // How long the step took to process in millis
+      overload = Math.max(0, overload + (t>3?1:-1)); // If step took longer than 3ms to process we start counting up overload
+      if(overload > 150) { close("This lobby was causing stress on the server and was closed for safety. Sorry about that!"); } // If lobby is taking a stupid amount of processor time to run we murder it
     }
     catch(Exception ex) {
       Oak.log(Oak.Type.GAME, Oak.Level.CRIT, "Game step exception ??? lobbyName=" + name + " ... gameOver=" + game.isGameOver(), ex);

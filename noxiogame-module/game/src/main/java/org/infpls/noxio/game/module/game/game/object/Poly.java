@@ -18,7 +18,7 @@ public class Poly extends Player {
     }
   }
   
-  private static final int POLY_INIT_COUNT = 3;
+  private static final int POLY_INIT_COUNT = 3, POLY_MAX_COUNT = 12;
   
   public Vec2 lastTo;
   private final List<PolyBit> bits;
@@ -51,10 +51,12 @@ public class Poly extends Player {
   }
   
   private void createBit() {
+    if(bits.size() < POLY_MAX_COUNT) {
       final PolyBit pb = new PolyBit(game, game.createOid(), position, polyPermutation, team, this);
       pb.setColor(color);
       game.addObject(pb);
       bits.add(pb);
+    }
   }
   
   @Override
@@ -174,6 +176,9 @@ public class Poly extends Player {
   
   @Override
   public void destroyx() {
+    for(int i=0;i<bits.size();i++) {
+      bits.get(i).destroyx();
+    }
     if(destroyed()) { return; }
     kill();
     destroyed = true;
