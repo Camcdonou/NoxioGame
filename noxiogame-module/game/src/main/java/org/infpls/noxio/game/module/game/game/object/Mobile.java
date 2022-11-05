@@ -250,13 +250,16 @@ public abstract class Mobile extends GameObject {
   public void knockback(final Vec2 impulse, final Player p) { knockback(impulse); tag(p); }
   public void knockback(final Vec2 impulse) { setVelocity(velocity.add(impulse)); }
   public void popup(float power, final Player p) { popup(power); tag(p); }
-  public void popup(float power) { vspeed += (power > 0.0f ? power : 0.0f); }
+  public void popup(float power) { vspeed += Math.max(0f, power); }
   
   @Override
   public void tag(final Player player) {
     final Controller c = game.getControllerByObject(player);
     if(c != null) { tagged = c; tagTime = game.getFrame(); }
   }
+  
+  @Override
+  public Vec3 getThree() { return new Vec3(position.x, position.y, height); };
   
   public float getRadius() { return radius; }
   public float getWeight() { return weight; }

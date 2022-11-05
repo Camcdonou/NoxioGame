@@ -59,6 +59,10 @@ public abstract class GameObject {
   public final Vec2 getPosition() { return position; }
   public final Vec2 getVelocity() { return velocity; }
   
+  /* Returns a vec3 of the 3d position. We only use this for a few specific calculations. Like the VoidZone Succccc */
+  /* z defaults 0, only mobiles actually have a real height */
+  public Vec3 getThree() { return new Vec3(position.x, position.y, 0f); };
+  
   public boolean isGlobal() { return false; }    /* If this returns true this object ignores fog of war and is globally visible. */
     
   public boolean alive() { return !dead; }         /* Object is dead but not ready to be deleted. */

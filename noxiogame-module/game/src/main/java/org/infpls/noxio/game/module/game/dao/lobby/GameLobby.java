@@ -224,6 +224,7 @@ public abstract class GameLobby {
       case "assault" : { game = new Assault(this, map, gs); break; }
       case "bomb" : { game = new BombingRun(this, map, gs); break; }
       case "teamking" : { game = new TeamKing(this, map, gs); break; }
+      case "sportsball" : { game = new SportsBall(this, map, gs); break; }
       default : { game = new Deathmatch(this, map, gs); break; }
     }
     gameCount++;

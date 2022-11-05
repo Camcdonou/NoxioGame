@@ -5,19 +5,21 @@ import org.infpls.noxio.game.module.game.game.*;
 
 public class Bumper extends GameObject {
   private static final int COOLDOWN = 15, STUN = 27;
-  private static final float RADIUS = .45f, POWER = 0.975f, INIT_VELOCITY_SCALE = 0.35f;
+  private static final float BASE_RADIUS = .1f, POWER = 0.975f, INIT_VELOCITY_SCALE = 0.35f;
   
+  private final float radiusActual;
   private boolean fxUpd; // When true we send a trigger for an effect to play on this object next frame
   
   private final Map<Player, Integer> bumping;
   
-  public Bumper(final NoxioGame game, final int oid, final Vec2 position) {
-    super(game, oid, position, 0);
+  public Bumper(final NoxioGame game, final int oid, final Vec2 position, final int team) {
+    super(game, oid, position, 0, team);
     /* Bitmask Type */
     bitIs = bitIs | GameObject.Types.MAPOBJ;
     
     bumping = new HashMap();
     fxUpd = false;
+    radiusActual = BASE_RADIUS + (team * 0.365f);
   }
     
   @Override
@@ -40,7 +42,7 @@ public class Bumper extends GameObject {
       final Controller con = game.getControllerByObject(obj);
       if(con != null && obj.is(GameObject.Types.PLAYER) && !(obj instanceof Poly)) {
         final Player ply = (Player)obj;
-        if(ply.position.distance(position) < ply.radius + RADIUS && ply.height < 1.15f && ply.height > -0.5f) {
+        if(ply.position.distance(position) < ply.radius + radiusActual && ply.height < 1.15f && ply.height > -0.5f) {
           if(!bumping.containsKey(ply)) {
             Vec2 init = ply.velocity.scale(INIT_VELOCITY_SCALE);
             Vec2 dir = ply.position.subtract(position).normalize();

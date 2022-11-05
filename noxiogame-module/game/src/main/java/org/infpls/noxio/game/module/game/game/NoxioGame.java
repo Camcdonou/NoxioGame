@@ -239,7 +239,7 @@ public abstract class NoxioGame {
     for(int i=0;i<bumpers.size();i++) {
       final NoxioMap.Spawn bump = bumpers.get(i);
       
-      final Bumper bumper = new Bumper(this, createOid(), bump.getPos());
+      final Bumper bumper = new Bumper(this, createOid(), bump.getPos(), bump.getTeam());
       addObject(bumper);
     }
     

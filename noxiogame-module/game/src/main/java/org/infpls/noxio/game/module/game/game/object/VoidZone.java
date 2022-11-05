@@ -8,15 +8,15 @@ public class VoidZone extends GameObject {
   
   private boolean fxUpd; // When true we send a trigger for an effect to play on this object next frame
   
-  private final float size;   // Size of black hole
+  private final float area;   // Size of black hole
   
-  public VoidZone(final NoxioGame game, final int oid, final Vec2 position, final int s) {
-    super(game, oid, position, 0);
+  public VoidZone(final NoxioGame game, final int oid, final Vec2 position, final int team) {
+    super(game, oid, position, 0, team);
     /* Bitmask Type */
     bitIs = bitIs | GameObject.Types.MAPOBJ;
     
     fxUpd = false;
-    size = Math.max(2.5f, (float)s);
+    area = Math.max(2.5f, (float)team);
   }
     
   @Override
@@ -27,18 +27,19 @@ public class VoidZone extends GameObject {
       if(con != null && obj.is(GameObject.Types.MOBILE) && !(obj instanceof Poly)) {
         final Mobile mob = (Mobile)obj;
         
-        float dist = mob.position.distance(position);
-        if(dist < size) {
-          float str = (float)Math.pow(1f - Math.max(0f, Math.min(1f, dist/size)), 1.95f);
-          Vec2 dir = position.subtract(mob.position).normalize();
-          Vec2 force = dir.scale(SUCC_STRENGTH*str);
+        float dist = mob.getThree().distance(getThree()); // Oh fuck we are going dimensional
+        if(dist < area) {
+          float str = (float)Math.pow(1f - Math.max(0f, Math.min(1f, dist/area)), 2.125f);
+          Vec3 dir = getThree().subtract(mob.getThree()).normalize();
+          Vec3 force = dir.scale(SUCC_STRENGTH*str);
           
           if(dist < UNSAFE_RANGE + mob.radius) {
             mob.destroyx();
             fx();
           }
 
-          mob.knockback(force);
+          mob.knockback(force.trunc());
+          mob.setVSpeed(mob.getVSpeed()+force.z);
         }
       }
     }

@@ -3,25 +3,25 @@
 
 lobbies: [
   {
-    game_name: "Small FFA Mix #1",
+    game_name: "New Map #1",
     max_players: "4",
     randomize: "1",
     rotation: [
       {
         gametype: "deathmatch",
-        map_name: "attack,final,combat,point",
+        map_name: "castle",
+        score_to_win: "15",
+        respawn_time: "30",
+      },
+      {
+        gametype: "deathmatch",
+        map_name: "castle",
         score_to_win: "15",
         respawn_time: "30",
       },
       {
         gametype: "king",
-        map_name: "attack,combat",
-        score_to_win: "15",
-        respawn_time: "60",
-      },
-      {
-        gametype: "king",
-        map_name: "final,combat,point",
+        map_name: "castle",
         score_to_win: "15",
         static_hill: "1",
         score_to_move: "7",
@@ -29,19 +29,20 @@ lobbies: [
       },
       {
         gametype: "rabbit",
-        map_name: "attack,final,combat,point",
+        map_name: "castle",
         score_to_win: "15",
         respawn_time: "60",
-      },
+      }
+    ]
+  },
+  {
+    game_name: "Sports Ball Test #1",
+    max_players: "8",
+    randomize: "1",
+    rotation: [
       {
-        gametype: "rabbit",
-        map_name: "attack,final,combat,point",
-        score_to_win: "15",
-        respawn_time: "60",
-      },
-      {
-        gametype: "deathmatch",
-        map_name: "attack,final,combat,point",
+        gametype: "sportsball",
+        map_name: "stadium",
         score_to_win: "15",
         respawn_time: "30",
       }
