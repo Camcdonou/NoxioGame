@@ -15,7 +15,7 @@ public abstract class Flag extends Pickup {
     base = position;
     
     /* Settings */
-    radius = 0.1f; weight = 0.5f; friction = 0.725f; invulnerable = true;
+    radius = 0.1f; weight = 0.5f; friction = 0.725f; invulnerable = true; bounciness = 0.5f;
     teamAttack = false; enemyAttack = true;
 
     /* Timers */

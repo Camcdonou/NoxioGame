@@ -96,6 +96,9 @@ public class Box extends Player {
       if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME, boxPermutation.hits[1], 0, Mobile.CameraShake.LIGHT); }
     }
   }
+  
+  @Override
+  public void forceMovementCooldown() { dashPower = DASH_POWER_MAX; }
 
   @Override
   public void taunt() {

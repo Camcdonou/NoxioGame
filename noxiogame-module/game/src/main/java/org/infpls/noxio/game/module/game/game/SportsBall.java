@@ -9,7 +9,7 @@ import org.infpls.noxio.game.module.game.session.NoxioSession;
 public class SportsBall extends TeamGame {
 
   public SportsBall(final GameLobby lobby, final NoxioMap map, final GameSettings settings) throws IOException {
-    super(lobby, map, settings, settings.get("score_to_win", 3, 1, 25));
+    super(lobby, map, settings, settings.get("score_to_win", 5, 1, 25));
     
     createObjectives();
   }
@@ -23,9 +23,22 @@ public class SportsBall extends TeamGame {
     final Vec2 redP = redSp.isEmpty()?center.add(new Vec2(5,0)):redSp.get(0).getPos();
     final Vec2 blueP = blueSp.isEmpty()?center.add(new Vec2(-5,0)):blueSp.get(0).getPos();
     
-    final Ball ball = new Ball(this, createOid(), ballP, 0);
-    final GoalZone red = new GoalZone(this, createOid(), redP, 0, new Vec2(3,3));
-    final GoalZone blue = new GoalZone(this, createOid(), blueP, 1, new Vec2(3,3));
+    List<NoxioMap.Spawn> fieldSpA = map.getSpawns("field", gametypeId(), 0);
+    List<NoxioMap.Spawn> fieldSpB = map.getSpawns("field", gametypeId(), 1);
+    final Vec2 fieldPA = fieldSpA.isEmpty()?new Vec2(0,0):fieldSpA.get(0).getPos();
+    final Vec2 fieldPB = fieldSpB.isEmpty()?new Vec2(256,256):fieldSpB.get(0).getPos();
+    
+    final Vec2[] v = new Vec2[] {
+      fieldPA,
+      new Vec2(fieldPA.x, fieldPB.y),
+      fieldPB,
+      new Vec2(fieldPB.x, fieldPA.y)
+    };
+    final Polygon field = new Polygon(v);
+    
+    final Ball ball = new Ball(this, createOid(), ballP, -1, field);
+    final GoalZone red = new GoalZone(this, createOid(), redP, 0, new Vec2(1.5f,2f));
+    final GoalZone blue = new GoalZone(this, createOid(), blueP, 1, new Vec2(1.5f,2f));
     
     addObject(ball);
     addObject(red);
@@ -59,11 +72,15 @@ public class SportsBall extends TeamGame {
   public void reportObjective(final Controller player, final GameObject objective) {
     if(isGameOver()) { return; }
     
-    scores[player.getTeam()]++;
-    announceTeam(player.getTeam(), "fc");
-    announceTeam(player.getTeam()==0?1:0, "fl");
+    int team = objective.team==1?0:1;
+    scores[team]++;
+    announce(team==1?"bts":"rts");
 
-    player.score.flagCapture();
+    if(player != null) {
+      player.score.ballScore();
+      if(player.getTeam() == team) { sendMessage(player.getDisplay() + " scored a goal!"); }
+      else { sendMessage(player.getDisplay() + " is very bad at sports!"); }
+    }
     updateScore();
     announceObjective();
     
@@ -85,7 +102,7 @@ public class SportsBall extends TeamGame {
   public void join(final NoxioSession player) throws IOException {
     super.join(player);
     final Controller con = getController(player.getSessionId());
-    if(con != null) { con.announce("ctf"); }
+    if(con != null) { con.announce("spb"); }
   }
   
   @Override

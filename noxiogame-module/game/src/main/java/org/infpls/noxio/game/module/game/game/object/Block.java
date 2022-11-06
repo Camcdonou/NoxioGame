@@ -113,6 +113,9 @@ public class Block extends Player {
     }
   }
   
+  @Override
+  public void forceMovementCooldown() { poundCooldown = POUND_COOLDOWN_LENGTH;} 
+  
   /* Channeling before dash */
   public void poundChannel() {
     setVSpeed(getVSpeed() * POUND_RECOVERY_DAMPEN);

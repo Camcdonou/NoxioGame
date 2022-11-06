@@ -32,7 +32,7 @@ public abstract class Pickup extends Mobile {
   @Override
   public void step() {
     if(dropCooldown > 0) { dropCooldown--; }
-    if(held != null) { stepHeld(); return; }
+    if(held != null) { return; } // holder calls stepheld now, prevents tick delayed physics)
     
     immune = false; physics();
   }

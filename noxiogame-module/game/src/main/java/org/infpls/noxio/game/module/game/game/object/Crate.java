@@ -102,6 +102,9 @@ public class Crate extends Player {
     }
   }
   
+  @Override
+  public void forceMovementCooldown() { dashCooldown = DASH_COOLDOWN_LENGTH; }
+  
   public void dash() {
     channelDash = false;
     criticalTimer = CRITICAL_WINDOW_LENGTH;

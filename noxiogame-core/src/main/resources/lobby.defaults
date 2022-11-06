@@ -3,7 +3,7 @@
 
 lobbies: [
   {
-    game_name: "New Map #1",
+    game_name: "New Map Test #1",
     max_players: "4",
     randomize: "1",
     rotation: [
@@ -43,8 +43,8 @@ lobbies: [
       {
         gametype: "sportsball",
         map_name: "stadium",
-        score_to_win: "15",
-        respawn_time: "30",
+        score_to_win: "5",
+        respawn_time: "60",
       }
     ]
   },

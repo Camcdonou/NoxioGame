@@ -127,12 +127,12 @@ public abstract class Player extends Mobile {
       if(obj.is(Types.PICKUP)) {
         final Pickup pickup = (Pickup)(obj);
         if(pickup.getPosition().distance(position) > pickup.getRadius()+getRadius()) { continue; }
+        if(Math.abs(height - pickup.height) > .75f) { continue; }
         if(pickup.touch(this)) { holding = pickup; effects.add("pik"); }
       }
     }
     if(holding != null) {
-      holding.position = position;
-      holding.height = height;
+      holding.stepHeld();
     }
   }
   
@@ -150,7 +150,6 @@ public abstract class Player extends Mobile {
     if(holding == null) { return; }
     final Pickup p = holding;
     p.dropped();
-    p.setVelocity(velocity.scale(0.5f));
   }
    
   @Override
@@ -221,6 +220,9 @@ public abstract class Player extends Mobile {
   public void dejective() {
     objective = false;
   }
+  
+  /* Force all dash abilities onto cooldown. Used by sportsball to prevent self passing by tossing ball then dashing to catch up */
+  public void forceMovementCooldown() { }
   
   /* Test given circle at <vec2 p> w/ radius <float r> against other players and return hits */ 
   public List<Mobile> hitTest(final Vec2 p, final float r) {

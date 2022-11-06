@@ -107,6 +107,9 @@ public class PolyBit extends Player {
       if(dashPower >= DASH_POWER_MAX) { stun(DASH_STUN_TIME, polyBitPermutation.hits[1], 0, Mobile.CameraShake.LIGHT); }
     }
   }
+  
+  @Override
+  public void forceMovementCooldown() { dashCooldown = DASH_COOLDOWN_LENGTH; }
 
   @Override
   public void taunt() {

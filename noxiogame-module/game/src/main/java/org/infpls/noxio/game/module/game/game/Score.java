@@ -24,6 +24,7 @@ public class Score {
     ENDREIGN_C = 25,
     FLAGCAP_C = 50,
     FLAGDEF_C = 10,
+    BALLSCORE_C = 40,
     BOMB_C = 50,
     BOMBDEF_C = 25,
     HILL_C = 5,
@@ -79,6 +80,7 @@ public class Score {
   
   public void flagCapture() { objectives++; stats.flagCapture++; addCredits(FLAGCAP_C, SSFX.global); }
   public void flagDefense() { stats.flagDefense++; addCredits(FLAGDEF_C, SSFX.major); }
+  public void ballScore() { objectives++; addCredits(BALLSCORE_C, SSFX.global); }
   public void bomb() { objectives++; addCredits(BOMB_C, SSFX.global); }
   public void bombDefense() { addCredits(BOMBDEF_C, SSFX.major); }
   public void hillControl() { objectives++; stats.hillControl++; addCredits(HILL_C, SSFX.minor); }

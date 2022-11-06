@@ -148,6 +148,9 @@ public class Cargo extends Player {
     }
   }
   
+  @Override
+  public void forceMovementCooldown() { kickCooldown = KICK_COOLDOWN_LENGTH; }
+  
   private float baseImp;
   public void kicking() { /* @TODO: POW USAGE HERE IS FUBAR */
     kickTimer--;

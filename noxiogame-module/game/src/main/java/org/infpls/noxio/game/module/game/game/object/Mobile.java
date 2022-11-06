@@ -35,7 +35,7 @@ public abstract class Mobile extends GameObject {
   protected Controller tagged;
   protected int tagTime;
   
-  protected float radius, weight, friction, springyness;
+  protected float radius, weight, friction, springyness, bounciness;
   
   public float height;
   private float vspeed;
@@ -54,7 +54,7 @@ public abstract class Mobile extends GameObject {
     effects = new ArrayList();
     
     /* Settings */
-    radius = 0.5f; weight = 1.0f; friction = 0.725f; springyness = 1.0f;
+    radius = 0.5f; weight = 1.0f; friction = 0.725f; springyness = 1.0f; bounciness = 0.0f;
     
     /* States */
     height = 0.0f; vspeed = 0.0f; grounded = false; intangible = false; immune = false; invulnerable = false;
@@ -169,9 +169,10 @@ public abstract class Mobile extends GameObject {
     }
   }
   
-  private float rayWalls(final Vec2[] mov, final List<Polygon> walls) {
+  private float rayWalls(final Vec2[] mov, final List<Polygon> walls) { return rayWalls(mov, walls, 1f); }
+  private float rayWalls(final Vec2[] mov, final List<Polygon> walls, float overcast) {
     final List<Instance> hits = new ArrayList();
-    final Vec2 to = mov[0].add(mov[1]);
+    final Vec2 to = mov[0].add(mov[1].scale(overcast));
     for(int i=0;i<walls.size();i++) {
       final Polygon w = walls.get(i);
       Instance inst = Intersection.polygonLine(new Line2(mov[0], to), w);
@@ -194,6 +195,7 @@ public abstract class Mobile extends GameObject {
       float aoi = (float)Math.pow(1f-Math.max(0f, mov[1].normalize().inverse().dot(nearest.normal)), 0.5f); // 0.0 is straight into the wall 1.0 is parallel to it
       mov[1]=ref.scale(mov[1].magnitude()*((aoi*0.5f)+0.5f));
       mov[0]=corrected;
+      if(aoi < 0.675) { bounced(); }
       return 1f-aoi;
     }
     
@@ -201,12 +203,19 @@ public abstract class Mobile extends GameObject {
     return Float.NaN;
   }
   
+  /* !!!!!!!! 
+  So about this calculation. I think the polygonCircle intersection returns a bad normal sometimes because the reflection results are weird. 
+  It seems to be caused by certain larger wall shapes, like long thin walls? Also appears to only affect a single direction for some reason.
+  Ray walls works fine so its something specific to circle polygon tests
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+  
   /* Takes current position & velociyt as well as a list of wall polygons and returns the result of movement. */
   /* 0.0   - no hits, mov unchanged
      !0.0  - hit,     updated mov, returned value is impact angle
   */
   private float collideWalls(final Vec2[] mov, final List<Polygon> walls) {
     final List<Instance> hits = new ArrayList();
+    final Vec2 to = mov[0].add(mov[1]);
     for(int i=0;i<walls.size();i++) {
       final Polygon w = walls.get(i);
       Instance inst = Intersection.polygonCircle(mov[0], w, radius);
@@ -223,8 +232,19 @@ public abstract class Mobile extends GameObject {
       final Vec2 corrected = nearest.intersection.add(nearest.normal.scale(radius));
       /* Slide off nearest collision */
       float aoi = (float)Math.pow(1f-Math.max(0f, mov[1].normalize().inverse().dot(nearest.normal)), 0.5f); // 0.0 is straight into the wall 1.0 is parallel to it
-      mov[1]=mov[1].scale((aoi*0.5f)+0.5f);
+      final Vec2 oldCalc = mov[1].scale((aoi*0.5f)+0.5f);
+      if(bounciness > 0.0f) {  // Hack level 100. God help anyone who ever has to maintain this
+        Vec2[] temp = new Vec2[]{mov[0], mov[1]};
+        rayWalls(temp, walls, 5f);
+        final Vec2 newCalc = temp[1];
+        final Vec2 bounceMix = oldCalc.scale(1f - bounciness).add(newCalc.scale(bounciness));
+        mov[1]=bounceMix;
+      }
+      else {
+        mov[1]=oldCalc; 
+      }
       mov[0]=corrected;
+      if(bounciness > 0.1f && aoi < 0.675) { bounced(); }
       return 1f-aoi;
     }
     return 0f;
@@ -243,6 +263,10 @@ public abstract class Mobile extends GameObject {
     }
     return false;
   }
+  
+  /* Called when when an object bounces off a wall */
+  /* literally only used by sportball ball right now */
+  public void bounced() { }
   
   public void stun(final int time, final Mobile.HitStun type, final Player p, int impact, Mobile.CameraShake shake) { stun(time, type, impact, shake); tag(p); }
   public void stun(int time, final Mobile.HitStun type, int impact, Mobile.CameraShake shake) { effects.add(type.id); }
