@@ -139,10 +139,7 @@ public abstract class Player extends Mobile {
   public void toss() {
     if(holding == null) { return; }
     final Pickup p = holding;
-    p.dropped();
-    p.setVelocity(velocity.scale(0.5f));
-    p.setVelocity(velocity.scale(0.5f).add(look.scale(TOSS_IMPULSE)));
-    p.popup(TOSS_POPUP);
+    p.tossed();
     effects.add("tos");
   }
   

@@ -6,13 +6,15 @@ import org.infpls.noxio.game.module.game.util.Intersection;
 public class Ball extends Pickup {
   private static final float HOLD_OFFSET = 0.475f, HOLD_STRENGTH = 0.0825f, HOLD_DAMPEN = 0.65f, HOLD_DIST_MIN = 0.05f, HOLD_DIST_MAX = 0.25f, FUMBLE_DISTANCE = 0.875f, PICKUP_RADIUS_OVERRIDE = 0.1f;
   private static final float HOVER_HEIGHT = 0.25f, VELOCITY_CAP = 0.55f;
-  private static final int OOB_TIMER_MAX = 60;
+  private static final int OOB_TIMER_MAX = 75, SCORE_TIMER_MAX = 55, PASS_TIMER_MAX = 45, BOOST_TIMER_MAX = 90;
+  private static final float MIN_PASS_DISTANCE = 2f, TOSS_FORCE_BASE_MULT = 1.05f, PASS_BOOST = 1.6f;
   
-  private int oobTimer;
+  private int oobTimer, scoreTimer, passTimer, boostTimer;
+  private float passDistance;
   
   protected final Vec2 base;
   protected final Polygon field;
-  protected boolean teamAttack, enemyAttack;  // Determines whether the flag can be hit by owning team or enemy team
+  protected boolean teamAttack, enemyAttack;  // Determines whether the ball can be hit by owning team or enemy team
   
   private Controller responsible; // Last player to touch the ball. Gets credit for scoring
     
@@ -25,20 +27,24 @@ public class Ball extends Pickup {
     base = position;
     responsible = null;
     this.field = field;
+    passDistance = 0f;
     
     /* Settings */
-    radius = 0.35f; weight = 0.5f; friction = 0.95f; invulnerable = true; bounciness = 1.0f;
+    radius = 0.325f; weight = 0.5f; friction = 0.95f; invulnerable = true; bounciness = 1.0f;
     teamAttack = true; enemyAttack = true;
 
     /* Timers */
     oobTimer = 0;
+    scoreTimer = 0;
+    boostTimer = 0;
+    passTimer = 0;
   }
   
   @Override
   public void step() {
-    super.step();
+    final Vec2 lastPos = position;
     
-    /* Drop cooldown override */
+    super.step();
     
     /* Fake gravity */
     if(held == null) {
@@ -59,6 +65,16 @@ public class Ball extends Pickup {
       kill();
       oobTimer = 0;
     }
+    
+    /* Score timer -- When the ball enters a goal there is a short period before it resets. During this period is is disabled and force dropped */
+    if(scoreTimer > 0) {
+      if(--scoreTimer == 0) { reset(); }
+      if(held != null) { held.drop(); }
+    }
+    
+    if(passTimer > 0) { passTimer--; }
+    if(boostTimer > 0) { boostTimer--; }
+    passDistance += lastPos.distance(position);
   }
   
   @Override
@@ -109,6 +125,7 @@ public class Ball extends Pickup {
   @Override
   public boolean touch(Player p) {
     if(isHeld()) { return false; }
+    if(!inPlay()) { return false; }
     if(p.position.distance(position) > p.getRadius() + PICKUP_RADIUS_OVERRIDE) { return false; }
     return pickup(p);
   }
@@ -116,20 +133,19 @@ public class Ball extends Pickup {
   @Override
   protected boolean pickup(Player p) {
     if(super.pickup(p)) {
+      if(responsible != null && responsible.getTeam() == p.team && responsible.getControlled() != p && passTimer > 0 && passDistance > MIN_PASS_DISTANCE) {
+        boostTimer = BOOST_TIMER_MAX;
+        held.effects.add("pbst");
+      }
       responsible = game.getControllerByObject(p);
       return true;
     }
     return false;
   }
-  
-  public boolean flagReturn(Player p) {
-    if(onBase()) { return false; }
-    kill();
-    return false;
-  }
-  
-  public void score(final Player p) {
-    game.reportObjective(game.getControllerByObject(p), this);
+
+  public void scored() {
+    scoreTimer = SCORE_TIMER_MAX;
+    effects.add("bals");
   }
   
   @Override
@@ -139,9 +155,26 @@ public class Ball extends Pickup {
   
   @Override
   public void dropped() {
+    boostTimer = 0;
     responsible = game.getControllerByObject(held);
     held.forceMovementCooldown();
     super.dropped();
+  }
+  
+  @Override
+  public void tossed() {
+    passTimer = PASS_TIMER_MAX;
+    passDistance = 0f;
+    
+    setVelocity(held.velocity.scale(0.5f));
+    
+    float force = Player.TOSS_IMPULSE * TOSS_FORCE_BASE_MULT;
+    if(isBoosted()) { held.effects.add("tbst"); force *= PASS_BOOST; }
+    
+    setVelocity(held.velocity.scale(0.5f).add(held.look.scale(force)));
+    popup(Player.TOSS_POPUP);
+    
+    dropped();
   }
   
   @Override
@@ -162,9 +195,15 @@ public class Ball extends Pickup {
     dropCooldown = 0;
     resetCooldown = 0;
     responsible = null;
+    scoreTimer = 0;
+    oobTimer = 0;
+    effects.add("balr");
   }
   
   public boolean onBase() { return position.equals(base); }
+  
+  public boolean inPlay() { return scoreTimer == 0; }
+  public boolean isBoosted() { return boostTimer > 0; }
   
   public Controller getResponsible() {
     return responsible;

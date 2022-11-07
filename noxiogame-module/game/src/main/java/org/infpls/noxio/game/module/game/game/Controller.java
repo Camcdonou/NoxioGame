@@ -213,7 +213,7 @@ final public class Controller {
   public void extendRespawn(int time) { if(!respawnReady()) { respawnTimer+=time; update.add("rst;"+respawnTimer+";"); } }
   public void setRound(final String info) { update.add("rnd;"+info+";"); roundLock = true; }
   public void clearRound() { update.add("rnd;;"); roundLock = false; }
-  public void whisper(final String msg) { update.add("wsp;"+msg+";"); }
+  public void whisper(final String msg) { update.add("msg;"+msg+";"); }
   public void announce(final String code) { update.add("anc;"+code+";"); }
   public void setClientTimer(String title, int time) { update.add("tim;" + title + ";" + time + ";"); }
   public String getUser() { return user.name; }

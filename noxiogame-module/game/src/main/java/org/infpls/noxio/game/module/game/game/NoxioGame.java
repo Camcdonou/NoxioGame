@@ -413,6 +413,7 @@ public abstract class NoxioGame {
     updateScore();
     final String csm = c.getCustomSound();
     if(!csm.equals("")) { update.add("snd;" + csm + ";"); }
+    c.whisper("Map: " + map.getName());
   }
   
   public void leave(final NoxioSession player) {

@@ -154,6 +154,7 @@ public abstract class TeamGame extends NoxioGame {
     controllers.add(controller);
     generateJoinPacket(player);
     updateScore();
+    controller.whisper("Map: " + map.getName());
     final String csm = controller.getCustomSound();
     if(csm != null) { update.add("snd;" + csm + ";"); }
   }

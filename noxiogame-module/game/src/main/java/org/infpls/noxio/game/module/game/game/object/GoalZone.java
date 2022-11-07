@@ -31,9 +31,9 @@ public class GoalZone extends GameObject {
       final GameObject obj = game.objects.get(i);
       if(obj instanceof Ball) {
         Ball ball = (Ball)obj;
-        if(isInside(ball)) {
+        if(isInside(ball) && ball.inPlay()) {
           game.reportObjective(ball.getResponsible(), this); // Responsible can be null under weird circumstances
-          ball.reset();
+          ball.scored();
         }
       }
     }

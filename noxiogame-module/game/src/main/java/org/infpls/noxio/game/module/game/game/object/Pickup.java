@@ -80,6 +80,13 @@ public abstract class Pickup extends Mobile {
     held = null;
   }
   
+  public void tossed() {
+    setVelocity(held.velocity.scale(0.5f));
+    setVelocity(held.velocity.scale(0.5f).add(held.look.scale(Player.TOSS_IMPULSE)));
+    popup(Player.TOSS_POPUP);
+    dropped();
+  }
+  
   @Override
   public void kill() {
     if(held != null) { held.drop(); }
