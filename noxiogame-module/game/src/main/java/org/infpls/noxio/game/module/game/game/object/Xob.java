@@ -18,10 +18,10 @@ public class Xob extends Player {
     }
   }
   
-  private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 35, BLIP_STUN_TIME = 30, BLIP_REFUND_POWER = 5;
-  private static final int REWIND_COOLDOWN_LENGTH = 11, REWIND_POWER_MAX = 60, REWIND_POWER_ADD = 40, REWIND_LENGTH = 40, REWIND_DELAY = 4;
+  private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 27, BLIP_STUN_TIME = 30, BLIP_REFUND_POWER = 5;
+  private static final int REWIND_COOLDOWN_LENGTH = 11, REWIND_POWER_MAX = 60, REWIND_POWER_ADD = 40, REWIND_LENGTH = 40, REWIND_DELAY = 4, REWIND_STUN = 45;
   private static final int TAUNT_COOLDOWN_LENGTH = 30;
-  private static final float BLIP_IMPULSE = 0.875f, REWIND_IMPULSE = 0.25f, BLIP_RADIUS = 0.6f;
+  private static final float BLIP_IMPULSE = 0.9f, REWIND_HIT_DAMPEN = 0.1f, REWIND_POPUP = 0.35f, BLIP_RADIUS = 0.6f, REWIND_RADIUS = 0.25f;
     
   private int blipCooldown, rewindCooldown, blipPower, rewindPower, rewindDelay;
   private boolean doRewind;
@@ -118,6 +118,17 @@ public class Xob extends Player {
       rewindPower += REWIND_POWER_ADD;
       setPosition(prevPos[REWIND_LENGTH-1].trunc());
       setHeight(prevPos[REWIND_LENGTH-1].z);
+      
+      final List<Mobile> hits = hitTest(position, REWIND_RADIUS);
+      for(int i=0;i<hits.size();i++) {
+        final Mobile mob = hits.get(i);
+        final Vec2 normal = mob.getPosition().subtract(position).normalize();
+        mob.stun(REWIND_STUN, xobPermutation.hits[1], this, Mobile.CameraShake.MEDIUM);
+        mob.setVelocity(mob.velocity.scale(REWIND_HIT_DAMPEN));
+        mob.popup(REWIND_POPUP, this);
+        effects.add("crt");
+      }
+      
       effects.add("mov");
       rewindDelay = 0;
       doRewind = false;

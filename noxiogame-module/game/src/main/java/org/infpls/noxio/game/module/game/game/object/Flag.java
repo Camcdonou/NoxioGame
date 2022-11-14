@@ -47,6 +47,7 @@ public abstract class Flag extends Pickup {
     sb.append(";");
   }
   
+  @Override
   public boolean canAttack(int atkrTeam) {
     return (atkrTeam == team && teamAttack) || (atkrTeam != team && enemyAttack);
   }

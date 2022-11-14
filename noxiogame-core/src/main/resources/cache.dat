@@ -378,5 +378,6 @@ character/generic/recover0.wav,
 character/poly/blip0.wav,
 character/poly/dash0.wav,
 character/xob/rewind0.wav,
+character/cube/shorten0.wav,
 object/void/succ.wav,
 object/jumper/boing.wav;

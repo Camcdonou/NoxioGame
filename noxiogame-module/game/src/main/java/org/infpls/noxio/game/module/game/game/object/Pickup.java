@@ -59,6 +59,8 @@ public abstract class Pickup extends Mobile {
     for(int i=0;i<effects.size();i++) { sb.append(effects.get(i)); sb.append(","); }
     sb.append(";");
   }
+    
+  public abstract boolean canAttack(int atkrTeam);
   
   /* Called when a player touches this pickup */
   public boolean touch(Player p) {

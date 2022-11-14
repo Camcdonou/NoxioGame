@@ -226,7 +226,7 @@ public abstract class Player extends Mobile {
     final List<Mobile> hits = new ArrayList();
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
-      if(obj != this && obj.is(Types.MOBILE) && !(obj.is(Types.FLAG) && !((Flag)obj).canAttack(team))) {
+      if(obj != this && obj.is(Types.MOBILE) && !(obj.is(Types.PICKUP) && !((Pickup)obj).canAttack(team))) {
         final Mobile mob = (Mobile)obj;
         final float cr = mob.getRadius() + r;
         if(!mob.immune && p.distance(mob.getPosition()) <= cr && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {
@@ -242,7 +242,7 @@ public abstract class Player extends Mobile {
     final List<Mobile> hits = new ArrayList();
     for(int i=0;i<game.objects.size();i++) {
       final GameObject obj = game.objects.get(i);
-      if(obj != this && obj.is(Types.MOBILE) && !(obj.is(Types.FLAG) && obj.team != -1 && obj.team == team)) {
+      if(obj != this && obj.is(Types.MOBILE) && !(obj.is(Types.PICKUP) && !((Pickup)obj).canAttack(team))) {
         final Mobile mob = (Mobile)obj;
         final float cr = mob.getRadius() + getRadius();
         if(!mob.immune && Math.abs(getHeight()-mob.getHeight()) <= cr*VERTICAL_HIT_TEST_LENIENCY) {

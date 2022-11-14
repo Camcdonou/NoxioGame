@@ -16,7 +16,7 @@ public class VoidZone extends GameObject {
     bitIs = bitIs | GameObject.Types.MAPOBJ;
     
     fxUpd = false;
-    area = Math.max(2.5f, (float)team);
+    area = Math.max(2.5f, ((float)team) * .9f);
   }
     
   @Override
@@ -29,7 +29,7 @@ public class VoidZone extends GameObject {
         
         float dist = mob.getThree().distance(getThree()); // Oh fuck we are going dimensional
         if(dist < area) {
-          float str = (float)Math.pow(1f - Math.max(0f, Math.min(1f, dist/area)), 2.125f);
+          float str = (float)Math.pow(1f - Math.max(0f, Math.min(1f, dist/area)), 2.425f);
           Vec3 dir = getThree().subtract(mob.getThree()).normalize();
           Vec3 force = dir.scale(SUCC_STRENGTH*str);
           

@@ -66,6 +66,11 @@ public class Bomb extends Pickup {
   }
   
   @Override
+  public boolean canAttack(int atkrTeam) {
+    return false;
+  }
+  
+  @Override
   public boolean touch(Player p) {
     if(isHeld()) { return false; }
     if(p.team == team) { return pickup(p); }

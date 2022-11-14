@@ -20,10 +20,10 @@ public class Cube extends Player {
   }
   
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 30, BLIP_REFUND_POWER = 5;
-  private static final int TAUNT_COOLDOWN_LENGTH = 30;
+  private static final int TAUNT_COOLDOWN_LENGTH = 45;
   private static final float BLIP_IMPULSE = 0.875f, BLIP_RADIUS = 0.6f;
-  private static final int BOMB_COOLDOWN_LENGTH = 15, BOMB_POWER_MAX =  100, BOMB_POWER_COST = 50, BOMB_STUN_TIME = 65, BOMB_FUSE_LENGTH = 40, BOMB_HITBOX_DURATION = 5;
-  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .55f;
+  private static final int BOMB_COOLDOWN_LENGTH = 15, BOMB_POWER_MAX =  100, BOMB_POWER_COST = 50, BOMB_STUN_TIME = 65, BOMB_FUSE_LENGTH = 65, BOMB_SHORTEN = 35, BOMB_HITBOX_DURATION = 5;
+  private static final float BOMB_IMPULSE = .575f, BOMB_POPUP = .145f, BOMB_RADIUS = .575f;
   private static final float BOMB_VECTOR_RATE = 0.03f;
   private static final int BOMB_VECTOR_LENGTH = 25;
   
@@ -154,6 +154,9 @@ public class Cube extends Player {
     if(tauntCooldown <= 0) {
       tauntCooldown = TAUNT_COOLDOWN_LENGTH;
       effects.add("tnt");
+      for(int i=0;i<bombs.size();i++) {
+        bombs.get(i).shorten();
+      }
     }
   }
   
@@ -169,6 +172,9 @@ public class Cube extends Player {
       this.fuse = fuse;
       this.active = active;
       this.hits = new ArrayList();
+    }
+    public void shorten() {
+      fuse = Math.max(0, fuse-BOMB_SHORTEN);
     }
   }
 }

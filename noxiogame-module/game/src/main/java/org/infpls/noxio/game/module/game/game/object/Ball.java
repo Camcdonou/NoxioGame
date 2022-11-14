@@ -7,14 +7,13 @@ public class Ball extends Pickup {
   private static final float HOLD_OFFSET = 0.475f, HOLD_STRENGTH = 0.0825f, HOLD_DAMPEN = 0.65f, HOLD_DIST_MIN = 0.05f, HOLD_DIST_MAX = 0.25f, FUMBLE_DISTANCE = 0.875f, PICKUP_RADIUS_OVERRIDE = 0.1f;
   private static final float HOVER_HEIGHT = 0.25f, VELOCITY_CAP = 0.55f;
   private static final int OOB_TIMER_MAX = 75, SCORE_TIMER_MAX = 55, PASS_TIMER_MAX = 45, BOOST_TIMER_MAX = 90;
-  private static final float MIN_PASS_DISTANCE = 2f, TOSS_FORCE_BASE_MULT = 1.05f, PASS_BOOST = 1.6f;
+  private static final float MIN_PASS_DISTANCE = 2f, TOSS_FORCE_BASE_MULT = 1.1f, PASS_BOOST = 1.6f;
   
   private int oobTimer, scoreTimer, passTimer, boostTimer;
   private float passDistance;
   
   protected final Vec2 base;
   protected final Polygon field;
-  protected boolean teamAttack, enemyAttack;  // Determines whether the ball can be hit by owning team or enemy team
   
   private Controller responsible; // Last player to touch the ball. Gets credit for scoring
     
@@ -31,7 +30,6 @@ public class Ball extends Pickup {
     
     /* Settings */
     radius = 0.325f; weight = 0.5f; friction = 0.95f; invulnerable = true; bounciness = 1.0f;
-    teamAttack = true; enemyAttack = true;
 
     /* Timers */
     oobTimer = 0;
@@ -118,8 +116,9 @@ public class Ball extends Pickup {
     sb.append(";");
   }
   
+  @Override
   public boolean canAttack(int atkrTeam) {
-    return (atkrTeam == team && teamAttack) || (atkrTeam != team && enemyAttack);
+    return false;
   }
   
   @Override

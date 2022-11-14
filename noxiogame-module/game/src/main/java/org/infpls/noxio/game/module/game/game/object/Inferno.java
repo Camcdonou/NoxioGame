@@ -16,7 +16,7 @@ public class Inferno extends Player {
     }
   }
   
-  private final static int GEN_COOLDOWN_LENGTH = 13, TAUNT_COOLDOWN_LENGTH = 30, DASH_LENGTH = 7;
+  private final static int GEN_COOLDOWN_LENGTH = 22, TAUNT_COOLDOWN_LENGTH = 30, DASH_LENGTH = 7;
   private final static float HURT_JUMP_BONUS = 0.0275f, HURT_SELF_MULT = 0.2f, OOF_RADIUS = 0.475f, DASH_IMPULSE = 0.325f, DASH_HIT_IMPULSE = 0.175f, GOOMBA_THRESHOLD = -0.245f, GOOMBA_DOOM_THRESHOLD = -0.5f;
   private final static int GOOMBA_STUN = 20;
   private final static float HURT_JUMP_FALLOFF_MAX = 0.435f, HURT_BONUS_MULT_MIN = 4.75f, HURT_BONUS_MULT_MAX = 0.25f, GOOMBA_IMPULSE = 0.4f, GROWTH_RATE = 1.05f;
@@ -75,7 +75,11 @@ public class Inferno extends Player {
     if(genCooldown <= 0) {
       genCooldown = GEN_COOLDOWN_LENGTH;
       effects.add("mov");
-      setVelocity(velocity.add(new Vec2((float)(Math.random()-0.5), (float)(Math.random()-0.5)).normalize().scale(DASH_IMPULSE)));
+      
+      final Vec2 rand = new Vec2((float)(Math.random()-.5), (float)(Math.random()-.5)).normalize();
+      final Vec2 dir = look.add(rand.scale(.8f)).normalize();
+      
+      setVelocity(velocity.add(dir.scale(DASH_IMPULSE)));
       popup(DASH_IMPULSE*0.5f);
       super.stun(5, Mobile.HitStun.Generic, 0, Mobile.CameraShake.LIGHT);
       hurted(0.2f);

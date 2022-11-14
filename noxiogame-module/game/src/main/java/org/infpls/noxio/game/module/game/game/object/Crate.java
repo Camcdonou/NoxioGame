@@ -29,7 +29,7 @@ public class Crate extends Player {
   private static final int BLIP_COOLDOWN_LENGTH = 10, BLIP_POWER_MAX = 30, BLIP_STUN_TIME = 35, BLAST_STUN_TIME = 25, BLIP_REFUND_POWER = 5;
   private static final int DASH_COOLDOWN_LENGTH = 45, CHARGE_TIME_LENGTH = 20;
   private static final int TAUNT_COOLDOWN_LENGTH = 60;
-  private static final float BLIP_IMPULSE = 0.475f, BLIP_POPUP_IMPULSE = 0.225f, DASH_IMPULSE = 0.425f, DASH_POPOUP_IMPULSE = 0.225f, BLIP_RADIUS = 0.6f, BLAST_RADIUS = 0.75f, BLAST_IMPULSE = 0.6f, DASH_FALL_DAMPEN_MULT = 0.15f;
+  private static final float BLIP_IMPULSE = 0.4875f, BLIP_POPUP_IMPULSE = 0.215f, DASH_IMPULSE = 0.425f, DASH_POPOUP_IMPULSE = 0.225f, BLIP_RADIUS = 0.6f, BLAST_RADIUS = 0.75f, BLAST_IMPULSE = 0.6f, DASH_FALL_DAMPEN_MULT = 0.15f;
   private static final float CRITICAL_MULT = 1.55f;
   private static final int CRITICAL_WINDOW_LENGTH = 20;
   
