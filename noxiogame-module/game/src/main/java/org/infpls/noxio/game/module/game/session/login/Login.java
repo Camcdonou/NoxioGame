@@ -45,11 +45,19 @@ public class Login extends SessionState {
     /* @TODO: this is blocking but it's probably okay. research and decide. */
     /* @TODO: move this type of get to a static class? */
     /* @FIXME also the app name is hardcoded here, make that a prop later. */
-    final String address = "http://" + Settable.getAuthDomain() + ":" + Settable.getAuthPort() + "/nxc/validate/" + p.getUser() + "/" + p.getSid();
+
+    // Use HTTPS for port 443, HTTP for other ports
+    final int portInt = Settable.getAuthPort();
+    final String port = String.valueOf(portInt);
+    final String protocol = "443".equals(port) ? "https://" : "http://";
+    final String portSuffix = ("443".equals(port) || "80".equals(port)) ? "" : ":" + port;
+    final String address = protocol + Settable.getAuthDomain() + portSuffix + "/nxc/validate/" + p.getUser() + "/" + p.getSid();
     StringBuilder result = new StringBuilder();
     URL url = new URL(address);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setRequestMethod("GET");
+    // Set Host header for internal Docker requests
+    conn.setRequestProperty("Host", Settable.getAuthDomain() + portSuffix);
     BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
     String line;
     while ((line = rd.readLine()) != null) {
