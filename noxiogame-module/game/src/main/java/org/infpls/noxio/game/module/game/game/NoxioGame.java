@@ -11,6 +11,7 @@ import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 import org.infpls.noxio.game.module.game.session.PacketH01;
 import org.infpls.noxio.game.module.game.util.Oak;
+import org.infpls.noxio.game.module.game.util.SpatialGrid;
 
 public abstract class NoxioGame {
   
@@ -30,6 +31,7 @@ public abstract class NoxioGame {
   
   protected final List<Controller> controllers; // Player controller objects 
   public final List<GameObject> objects;        // Objects populating the game world
+  public final SpatialGrid grid;                // Spatial partitioning for collision optimization
     
   private int idGen; /* Used to generate OIDs for objects. */
   public NoxioGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
@@ -39,6 +41,7 @@ public abstract class NoxioGame {
     
     controllers = new ArrayList();
     objects = new ArrayList();
+    grid = new SpatialGrid(2.0f); // 2.0f cell size is a good balance for typical object sizes
     
     created = new ArrayList();
     deleted = new ArrayList();
@@ -76,6 +79,15 @@ public abstract class NoxioGame {
   }
   
   public void step() {
+    /* Update Spatial Grid */
+    grid.clear();
+    for(int i=0;i<objects.size();i++) {
+      GameObject obj = objects.get(i);
+      if(obj.is(GameObject.Types.MOBILE)) {
+        grid.add(obj);
+      }
+    }
+
     if(!gameOver) {
       for(int i=0;i<controllers.size();i++) {
         final Controller cont = controllers.get(i);
