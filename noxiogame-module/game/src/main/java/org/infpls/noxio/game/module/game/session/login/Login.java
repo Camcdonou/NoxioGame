@@ -2,8 +2,11 @@ package org.infpls.noxio.game.module.game.session.login;
 
 import com.google.gson.*;
 import java.io.*;
-import java.io.IOException;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.util.Settable;
@@ -58,12 +61,34 @@ public class Login extends SessionState {
     conn.setRequestMethod("GET");
     // Set Host header for internal Docker requests
     conn.setRequestProperty("Host", Settable.getAuthDomain() + portSuffix);
-    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    
+    int responseCode = conn.getResponseCode();
+    InputStream stream = (responseCode >= 400) ? conn.getErrorStream() : conn.getInputStream();
+    
+    if (stream == null) {
+        throw new IOException("Server returned HTTP " + responseCode + " and no error stream for URL: " + address);
+    }
+
+    BufferedReader rd = new BufferedReader(new InputStreamReader(stream));
     String line;
     while ((line = rd.readLine()) != null) {
        result.append(line);
     }
     rd.close();
+    
+    if (responseCode == 403) {
+        // Handle unauthorized game server specifically
+        try {
+            Gson gson = new GsonBuilder().create();
+            // My custom 403 returns a JSON with "message"
+            Map<String, String> errorMap = gson.fromJson(result.toString(), Map.class);
+            session.close("Authentication Denied: " + errorMap.getOrDefault("message", "Forbidden"));
+            return;
+        } catch (Exception e) {
+            session.close("Authentication Denied (403): " + result.toString());
+            return;
+        }
+    }
     
     Gson gson = new GsonBuilder().create();
     Packet pkt = gson.fromJson(result.toString(), Packet.class);

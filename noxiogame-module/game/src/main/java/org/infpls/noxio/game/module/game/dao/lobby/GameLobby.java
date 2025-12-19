@@ -252,8 +252,8 @@ public abstract class GameLobby {
       game.generateUpdatePackets(tick);  // Send updates to players
       game.post();                       // Clean up
       
-      long t = s - System.currentTimeMillis(); // How long the step took to process in millis
-      overload = Math.max(0, overload + (t>3?1:-1)); // If step took longer than 3ms to process we start counting up overload
+      long t = System.currentTimeMillis() - s; // How long the step took to process in millis
+      overload = Math.max(0, overload + (t>15?1:-1)); // If step took longer than 15ms to process we start counting up overload
       if(overload > 150) { close("This lobby was causing stress on the server and was closed for safety. Sorry about that!"); } // If lobby is taking a stupid amount of processor time to run we murder it
     }
     catch(Exception ex) {

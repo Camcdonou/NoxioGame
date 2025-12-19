@@ -150,8 +150,9 @@ public abstract class Mobile extends GameObject {
   public void postPhysics() {
     /* -- Objects -- */
     if(!intangible) {                                                            // Ignore if intangible
-      for(int i=0;i<game.objects.size();i++) {
-        final GameObject obj = game.objects.get(i);
+      List<GameObject> nearby = game.grid.getNearby(position, radius + 1.0f); // Check slightly beyond radius
+      for(int i=0;i<nearby.size();i++) {
+        final GameObject obj = nearby.get(i);
         if(obj != this && obj.is(Types.MOBILE)) {                                // Object must be something physical (IE a barrel or a pillar or a player)
           final Mobile mob = (Mobile)obj;
           final float combinedRadius = radius+mob.getRadius();
