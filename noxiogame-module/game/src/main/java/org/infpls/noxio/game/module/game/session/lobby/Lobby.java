@@ -7,6 +7,7 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
+import org.infpls.noxio.game.module.game.game.NoxioMap;
 import org.infpls.noxio.game.module.game.util.*;
 
 
@@ -77,8 +78,17 @@ public class Lobby extends SessionState {
       sendPacket(new PacketB05("Lobby name must be between 3 and 24 characters.")); return;
     }
     
-    if(!Validation.isAlphaNumericWithSpaces(ls.getRotation(0).get("map_name", "final"))) {
-      sendPacket(new PacketB05("Stop trying to break things you jerk.")); return;
+    /* Validate map rotation */
+    for(int i=0; i<ls.getRotationCount(); i++) {
+      final String mapName = ls.getRotation(i).get("map_name", "final");
+      if(!Validation.isMapName(mapName)) {
+        sendPacket(new PacketB05("Invalid characters in map name: " + mapName)); return;
+      }
+      
+      // Attempt to load map to ensure it exists and is valid
+      if(NoxioMap.GET(mapName) == null) {
+        sendPacket(new PacketB05("Failed to load map '" + mapName + "'. It may be corrupted or missing.")); return;
+      }
     }
 
     GameLobby gl = lobbyDao.createLobby(ls);

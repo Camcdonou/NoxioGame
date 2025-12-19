@@ -12,6 +12,7 @@ public class LobbySettings extends GameSettings {
   
   public void addRotation(final GameSettings gs) { rotation.add(gs); }
   public GameSettings getRotation(int i) { return rotation.size()>0?rotation.get(i%rotation.size()):new GameSettings(); }
+  public int getRotationCount() { return rotation.size(); }
   
   /* ================== Static Methods ================== */
   
