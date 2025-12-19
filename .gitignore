@@ -1,15 +1,176 @@
-#Builds
-target/
+# ========================================
+# SECRETS AND SENSITIVE DATA - DO NOT COMMIT
+# ========================================
 
+# Configuration files with secrets
+**/noxio.properties
+**/application.properties
+*.env
+.env.*
+!.env.example
+
+# Credentials and keys
+credentials.json
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+# Build artifacts with embedded config
+*.war
+*.jar
+*.ear
+
+# ========================================
+# BUILD AND DEPENDENCIES
+# ========================================
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Compiled class files
 *.class
+
+# ========================================
+# IDE AND EDITOR FILES
+# ========================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.metadata/
+.settings/
+.classpath
+.project
+*.launch
+.recommenders/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+nbactions.xml
+nb-configuration.xml
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ========================================
+# OS FILES
+# ========================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Traches
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# ========================================
+# LOGS AND TEMPORARY FILES
+# ========================================
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Application logs
+*.log
+logs/
+*.log.*
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.cache
+
+# Java crash logs
 hs_err_pid*
+replay_pid*
+
+# ========================================
+# DATABASE AND DATA FILES
+# ========================================
+
+# SQL dumps with potential sensitive data
+# (Uncomment if you have production data dumps)
+# *-dump.sql
+# backup-*.sql
+
+# ========================================
+# DEPLOYMENT AND DOCKER
+# ========================================
+
+# Docker volumes and data
+docker-compose.override.yml
+.docker/
+
+# Deployment scripts with secrets
+# (if you have deployment scripts with hardcoded credentials)
+# deploy-prod.sh
+# deploy-*.sh
+
+# ========================================
+# NODE MODULES (if any frontend tools)
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================================
+# MISC
+# ========================================
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
