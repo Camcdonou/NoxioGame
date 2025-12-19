@@ -30,37 +30,26 @@ public class GameWebSocket extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocket) {
       try {
-        System.out.println("[WEBSOCKET-DEBUG] Connection established: " + webSocket.getId());
         NoxioSession session = dao.getUserDao().createSession(webSocket, dao);
         session.start();
         webSocket.getAttributes().put("session", session);
 
-        System.out.println("[WEBSOCKET-DEBUG] Scheduling PING task for: " + webSocket.getId());
         // Start sending WebSocket PING frames every 20 seconds to keep connection alive
         // This is critical for tunneling services (Cloudflare, playit.gg) that timeout idle connections
         ScheduledFuture<?> pingTask = scheduler.scheduleAtFixedRate(() -> {
           try {
-            System.out.println("[WEBSOCKET-PING] Executing PING task for: " + webSocket.getId());
             if (webSocket.isOpen()) {
               webSocket.sendMessage(new PingMessage());
-              System.out.println("[WEBSOCKET-PING] Sent PING to: " + webSocket.getId());
               Oak.log(Oak.Type.SESSION, Oak.Level.INFO, "Sent WebSocket PING to keep connection alive: " + webSocket.getId());
-            } else {
-              System.out.println("[WEBSOCKET-PING] WebSocket closed, skipping PING: " + webSocket.getId());
             }
           } catch (Exception e) {
-            System.out.println("[WEBSOCKET-PING] ERROR sending PING: " + e.getMessage());
-            e.printStackTrace();
             Oak.log(Oak.Type.SESSION, Oak.Level.WARN, "Failed to send WebSocket PING: " + e.getMessage());
           }
         }, 20, 20, TimeUnit.SECONDS);
 
         pingTasks.put(webSocket.getId(), pingTask);
-        System.out.println("[WEBSOCKET-DEBUG] PING task scheduled successfully for: " + webSocket.getId());
       }
       catch(Exception ex) {
-        System.out.println("[WEBSOCKET-DEBUG] ERROR in afterConnectionEstablished: " + ex.getMessage());
-        ex.printStackTrace();
         Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Exception thrown at Websocket top level.", ex);
       }
     }
