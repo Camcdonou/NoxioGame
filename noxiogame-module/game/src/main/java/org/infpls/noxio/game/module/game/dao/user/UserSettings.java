@@ -13,7 +13,7 @@ public class UserSettings {
   public UserSettings(final String uid) {
     this.uid = uid;
     volume = new Volume(.9f, .5f, .75f, .75f, .75f, .75f);
-    graphics = new Graphics(1f, 1f, 1f, 2048, false, true);
+    graphics = new Graphics(1f, 1f, 1f, 2048, false, true, 60, false);
     control = new Control(false, 70, 68, 32, 84, 83, 192);
     game = new Game(0, 0, 0, null, null, false, null, 1);
     toggle = new Toggle(false, false, false, false, false);
@@ -35,13 +35,17 @@ public class UserSettings {
     public final float upGame, upUi, upSky;
     public final int shadowSize;
     public final boolean safeMode, bloom;
-    public Graphics(float ug, float uu, float us, int ss, boolean sm, boolean bl) {
+    public final int frameLimit;
+    public final boolean showFPS;
+    public Graphics(float ug, float uu, float us, int ss, boolean sm, boolean bl, int fl, boolean sf) {
       upGame = Math.min(8f, Math.max(.25f, ug));
       upUi = Math.min(8f, Math.max(.25f, uu));
       upSky = Math.min(8f, Math.max(.25f, us));
       shadowSize = Math.min(4096, Math.max(16, ss));
       safeMode = sm;
       bloom = bl;
+      frameLimit = fl;
+      showFPS = sf;
     }
   }
   
