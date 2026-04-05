@@ -4,6 +4,7 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.*;
 import org.infpls.noxio.game.module.game.util.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 import org.infpls.noxio.game.module.game.dao.user.UserData;
 import org.infpls.noxio.game.module.game.dao.user.UserUnlocks;
 
@@ -165,6 +166,7 @@ final public class Controller {
   public void setControl(GameObject obj) {
     object = obj;
     update.add("ctl;"+obj.getOid()+";");
+    Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Controller.setControl: " + getUser() + " -> oid=" + obj.getOid() + " type=" + obj.type());
   }
   
   private void objectDead() {

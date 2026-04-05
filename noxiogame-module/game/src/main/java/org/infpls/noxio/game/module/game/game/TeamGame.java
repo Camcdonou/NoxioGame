@@ -5,6 +5,7 @@ import java.util.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.game.object.*;
 import org.infpls.noxio.game.module.game.session.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class TeamGame extends NoxioGame {
   
@@ -84,10 +85,11 @@ public abstract class TeamGame extends NoxioGame {
 
     final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeId(), c.getTeam());
     final Vec2 sp = findSafeTeamSpawn(c, spawns);
-    
+
     Player player = makePlayerObject(c, charSel, sp, c.getTeam());
     addObject(player);
     c.setControl(player);
+    Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Player spawned: " + c.getUser() + " (" + charSel + ") team=" + c.getTeam() + " at " + sp.toString() + " oid=" + player.getOid());
     return true;
   }
   

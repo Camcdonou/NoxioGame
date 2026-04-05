@@ -426,12 +426,14 @@ public abstract class NoxioGame {
     final String csm = c.getCustomSound();
     if(!csm.equals("")) { update.add("snd;" + csm + ";"); }
     c.whisper("Map: " + map.getName());
+    Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Player joined game: " + c.getUser() + " (gametype=" + gametypeId() + ", map=" + map.getName() + ")");
   }
   
   public void leave(final NoxioSession player) {
     for(int i=0;i<controllers.size();i++) {
       if(controllers.get(i).getSid().equals(player.getSessionId())) {
         final String usr = controllers.get(i).getUser();
+        Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Player left game: " + usr + " (gametype=" + gametypeId() + ")");
         sendStats(usr, controllers.get(i).destroy());
         controllers.remove(i);
         break;

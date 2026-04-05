@@ -4,29 +4,31 @@ import java.io.IOException;
 import java.util.*;
 import org.infpls.noxio.game.module.game.dao.lobby.*;
 import org.infpls.noxio.game.module.game.game.object.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 
 public abstract class SoloGame extends NoxioGame {
-    
+
   public SoloGame(final GameLobby lobby, final NoxioMap map, final GameSettings settings, int stw) throws IOException {
     super(lobby, map, settings, stw);
   }
-  
+
   @Override
   public void requestTeamChange(final Controller c, final Queue<String> q) {
     /* No teams, ignore */
   }
-  
+
   @Override
   protected boolean spawnPlayer(final Controller c, final Queue<String> q) {
     final String charSel = q.remove();
     if(c.getControlled() != null || !c.respawnReady()) { return false; } /* Already controlling an object */
-    
+
     final List<NoxioMap.Spawn> spawns = map.getSpawns("player", gametypeId());
     final Vec2 sp = findSafeSpawn(spawns);
-    
+
     Player player = makePlayerObject(c, charSel, sp);
     addObject(player);
     c.setControl(player);
+    Oak.log(Oak.Type.GAME, Oak.Level.INFO, "Player spawned: " + c.getUser() + " (" + charSel + ") at " + sp.toString() + " oid=" + player.getOid());
     return true;
   }
   
