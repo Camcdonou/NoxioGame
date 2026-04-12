@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.infpls.noxio.game.module.game.session.*;
+import org.infpls.noxio.game.module.game.util.Oak;
 import org.infpls.noxio.game.module.game.util.Settable;
 
 
@@ -49,12 +50,17 @@ public class Login extends SessionState {
     /* @TODO: move this type of get to a static class? */
     /* @FIXME also the app name is hardcoded here, make that a prop later. */
 
+    Oak.log(Oak.Type.SESSION, Oak.Level.INFO, "Login attempt for user: " + p.getUser() + " sid=" + p.getSid());
+
     // Use HTTPS for port 443, HTTP for other ports
     final int portInt = Settable.getAuthPort();
     final String port = String.valueOf(portInt);
     final String protocol = "443".equals(port) ? "https://" : "http://";
     final String portSuffix = ("443".equals(port) || "80".equals(port)) ? "" : ":" + port;
     final String address = protocol + Settable.getAuthDomain() + portSuffix + "/nxc/validate/" + p.getUser() + "/" + p.getSid();
+    
+    Oak.log(Oak.Type.SESSION, Oak.Level.INFO, "Validating session with auth server: " + address);
+    
     StringBuilder result = new StringBuilder();
     URL url = new URL(address);
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -63,9 +69,12 @@ public class Login extends SessionState {
     conn.setRequestProperty("Host", Settable.getAuthDomain() + portSuffix);
     
     int responseCode = conn.getResponseCode();
+    Oak.log(Oak.Type.SESSION, Oak.Level.INFO, "Auth server response code: " + responseCode + " for user: " + p.getUser());
+    
     InputStream stream = (responseCode >= 400) ? conn.getErrorStream() : conn.getInputStream();
     
     if (stream == null) {
+        Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Auth server returned HTTP " + responseCode + " with no response stream for user: " + p.getUser());
         throw new IOException("Server returned HTTP " + responseCode + " and no error stream for URL: " + address);
     }
 
@@ -78,6 +87,7 @@ public class Login extends SessionState {
     
     if (responseCode == 403) {
         // Handle unauthorized game server specifically
+        Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Auth validation DENIED (403) for user: " + p.getUser() + " response: " + result.toString());
         try {
             Gson gson = new GsonBuilder().create();
             // My custom 403 returns a JSON with "message"
@@ -90,17 +100,26 @@ public class Login extends SessionState {
         }
     }
     
+    if (responseCode != 200) {
+        Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Auth server returned unexpected HTTP " + responseCode + " for user: " + p.getUser() + " response: " + result.toString());
+    }
+    
     Gson gson = new GsonBuilder().create();
     Packet pkt = gson.fromJson(result.toString(), Packet.class);
     
     if(pkt.getType().equals("l04")) {
       final PacketL04 r = gson.fromJson(result.toString(), PacketL04.class);
+      Oak.log(Oak.Type.SESSION, Oak.Level.INFO, "Login SUCCESS for user: " + p.getUser() + " display: " + r.getData().display);
       sendPacket(new PacketL01(Settable.getServerInfo()));
       session.login(r.getData(), p.getSid());
     }
     else if(pkt.getType().equals("l03")) {
       final PacketL03 r = gson.fromJson(result.toString(), PacketL03.class);
+      Oak.log(Oak.Type.SESSION, Oak.Level.WARN, "Login FAILED for user: " + p.getUser() + " reason: " + r.getMessage());
       session.close("Failed to validate user: " + r.getMessage());
+    }
+    else {
+      Oak.log(Oak.Type.SESSION, Oak.Level.ERR, "Auth server returned unexpected packet type: " + pkt.getType() + " for user: " + p.getUser() + " response: " + result.toString());
     }
     
     conn.disconnect();
